@@ -93,6 +93,7 @@ export function formatCurrency(amount: number): string {
 ## 4. Capa de Aplicación (Application)
 
 ### 4.1 Casos de Uso
+
 - Representan acciones que el usuario o el sistema ejecutan (ej. `GetCatalogUseCase`, `ConfirmSaleUseCase`).
 - Son funciones o clases en TypeScript puro que reciben dependencias mediante inyección (inversión de dependencias).
 - Retornan datos de dominio o resultados tipados (`Result` / excepciones controladas).
@@ -112,6 +113,7 @@ export class GetProductsUseCase {
 ```
 
 ### 4.2 Puertos de Salida (Ports)
+
 - Interfaces que declaran qué operaciones necesita la aplicación sin atarse a cómo se implementan.
 
 ```typescript
@@ -153,6 +155,7 @@ export class HttpProductApi implements ProductApiPort {
 ## 6. Adaptadores de UI (Inbound Adapters & Presentation)
 
 ### 6.1 Custom Hooks como Puentes de Presentación
+
 - Los hooks gestionan el estado reactivo de React (`useState`, `useQuery`, estados de carga y error) e invocan a los casos de uso.
 - Aislan los componentes de la lógica de orquestación.
 
@@ -168,9 +171,10 @@ export function useProducts(getProductsUseCase: GetProductsUseCase) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getProductsUseCase.execute()
+    getProductsUseCase
+      .execute()
       .then(setProducts)
-      .catch((err) => setError(err.message))
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [getProductsUseCase]);
 
@@ -179,6 +183,7 @@ export function useProducts(getProductsUseCase: GetProductsUseCase) {
 ```
 
 ### 6.2 Componentes de Presentación
+
 - Solo se encargan de cómo se ven los datos y de emitir eventos hacia los hooks o props.
 - No deben contener `fetch`, cálculos complejos de negocio ni llamadas directas a APIs.
 

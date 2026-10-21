@@ -71,6 +71,7 @@ src/contexts/<contexto>/
 ## 3. Capa de Dominio (Domain)
 
 ### 3.1 Entidades
+
 - Deben ser ricas en comportamiento (prohibido modelos puramente anémicos cuando existan reglas).
 - Proteger las invariantes del negocio en su creación y mutación.
 - Utilizar constructor privado/protegido o métodos estáticos `create(...)` para garantizar consistencia.
@@ -110,13 +111,14 @@ export class Product {
     return {
       id: this.id,
       name: this._name,
-      wholesalePrice: this._wholesalePrice,
+      wholesalePrice: this._wholesalePrice
     };
   }
 }
 ```
 
 ### 3.2 Errores de Dominio
+
 - Cada regla rota debe lanzar o retornar un error de dominio específico que extienda de `Error` o una clase base `DomainError`.
 - Evitar errores genéricos como `throw new Error('Algo falló')`.
 
@@ -125,6 +127,7 @@ export class Product {
 ## 4. Capa de Aplicación (Application)
 
 ### 4.1 Casos de Uso
+
 - Un caso de uso representa una única acción de negocio / caso de uso del sistema.
 - Método de entrada estándar: `run(dto: DTO): Promise<Result<T>>`.
 - Orquesta las entidades y los puertos de salida. **No debe incluir lógica de base de datos ni detalles de protocolo HTTP**.
@@ -145,7 +148,7 @@ export class UpdateProductUseCase {
 
     const updated = product.update({
       name: dto.name,
-      wholesalePrice: dto.wholesalePrice,
+      wholesalePrice: dto.wholesalePrice
     });
 
     await this.productRepository.save(updated);
@@ -157,6 +160,7 @@ export class UpdateProductUseCase {
 ```
 
 ### 4.2 Puertos de Salida (Outbound Ports)
+
 - Se definen en `application/ports/outbound/`.
 - Son interfaces abstractas en TypeScript.
 - Operan únicamente con entidades de dominio o primitivos, jamás con entidades de TypeORM o DTOs de infraestructura.
@@ -174,12 +178,14 @@ export interface ProductRepository {
 ## 5. Capa de Adaptadores (Adapters)
 
 ### 5.1 Adaptadores de Entrada (Inbound / HTTP)
+
 - Son responsables de traducir el protocolo de transporte (Express `Request`, `Response`, query params, headers, body) al DTO del caso de uso.
 - Invocan al caso de uso mediante `useCase.run(dto)`.
 - Convierten el `Result<T>` retornado en el código de estado HTTP adecuado mediante un helper (ej. `httpResponse(res, result, 201)`).
 - **Prohibido colocar lógica de negocio o validaciones de dominio en los controladores**.
 
 ### 5.2 Adaptadores de Salida (Outbound / Persistence)
+
 - Implementan los puertos definidos en `application/ports/outbound/`.
 - Trabajan con entidades ORM (`ProductEntity`), queries SQL o clientes externos.
 - Deben implementar un Mapper bidireccional entre la entidad de dominio pura (`Product`) y la entidad de persistencia (`ProductEntity`).

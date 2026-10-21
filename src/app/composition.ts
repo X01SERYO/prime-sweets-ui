@@ -9,6 +9,6 @@ export interface AppContainer {
 export function createAppContainer(): AppContainer {
   return {
     apiBaseUrl: env.apiBaseUrl,
-    http: createHttpClient(env.apiBaseUrl),
+    http: createHttpClient(env.apiBaseUrl)
   };
 }

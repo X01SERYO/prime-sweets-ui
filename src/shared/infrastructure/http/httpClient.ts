@@ -20,9 +20,9 @@ export function createHttpClient(baseUrl: string): HttpClient {
       const response = await fetch(`${baseUrl}${path}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       });
       return readJson<T>(response);
-    },
+    }
   };
 }
