@@ -13,7 +13,7 @@ title Prime Sweets UI — Components (current)
 Container_Boundary(spa, "Prime Sweets UI") {
   Component(boot, "Browser entry", "main.tsx", "Finds #root and renders App inside StrictMode")
   Component(composition, "Composition root", "createAppContainer", "Reads env and builds the HTTP client")
-  Component(shell, "Startup view", "App.tsx", "Shows the title and the configured API base URL")
+  Component(shell, "App shell", "App.tsx, routes.ts, styles.css", "BrowserRouter routes and narrow/wide navigation. Placeholders do not call use cases")
   Component(env, "Environment", "shared/config/env.ts", "VITE_API_BASE_URL")
   Component(http, "HTTP client", "createHttpClient", "get and post JSON. No caller yet")
 }
@@ -43,4 +43,4 @@ src/
   modules/                    empty
 ```
 
-There is no router and no module for catalog, customers, sales day, sales, or fulfillment output.
+Routes: `/sales-day`, `/customers`, `/sales`, `/load-sheets`, `/invoices`. `/` redirects to `/sales-day`. There is still no module for catalog, customers, sales day, sales, or fulfillment output.

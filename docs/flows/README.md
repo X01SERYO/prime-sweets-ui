@@ -9,8 +9,9 @@ Only the flow that exists in code is described as current. Version 1 seller flow
 1. The browser loads `index.html` and `src/main.tsx`.
 2. If `#root` is missing, startup throws `No se encontró el elemento #root`.
 3. `createAppContainer()` reads `VITE_API_BASE_URL`.
-4. `App` renders the title `Prime Sweets`, a short status line, and the base URL.
-5. No API request, navigation, or print dialog runs.
+4. `App` renders the shell. `/` redirects to `/sales-day`. The other routes are placeholders.
+5. Below `64rem` the navigation stacks. At `64rem` and wider it sits beside the page. The switch is a CSS media query.
+6. No API request or print dialog runs.
 
 ## Pending definition / not implemented
 

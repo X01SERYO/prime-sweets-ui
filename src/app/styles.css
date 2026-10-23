@@ -9,12 +9,70 @@ body {
   margin: 0;
 }
 
-main {
-  max-width: 40rem;
-  margin: 4rem auto;
-  padding: 0 1.5rem;
-}
-
 code {
   font-family: ui-monospace, monospace;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.shell-bar,
+.shell main {
+  padding: 1rem 1.25rem;
+}
+
+.shell-title {
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+}
+
+.shell-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shell-nav a {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.shell-nav a[aria-current='page'] {
+  background: #fde68a;
+}
+
+.shell-api {
+  color: #57534e;
+  font-size: 0.875rem;
+}
+
+/*
+ * Wide class starts at 64rem.
+ * A typical phone stays in the narrow column. A typical PC window gets the side navigation.
+ * There is no user-agent check.
+ */
+@media (min-width: 64rem) {
+  .shell {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .shell-bar {
+    flex: 0 0 16rem;
+  }
+
+  .shell main {
+    flex: 1;
+    max-width: 60rem;
+  }
 }

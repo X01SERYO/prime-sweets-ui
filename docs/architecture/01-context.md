@@ -2,7 +2,7 @@
 
 **Sources:** `src/`, `package.json`, `.env.example`.
 
-The UI is a browser shell. It shows the configured API base URL. It does not load brands, customers, sales days, sales, a Load Sheet, or an invoice. It does not open a print dialog.
+The UI is a browser shell with five placeholder routes: Sales Day, customers, sale, Load Sheet, and invoices. It shows the configured API base URL. It does not call the API, load those resources, or open a print dialog. Sign-in is not a route.
 
 ## Diagram
 

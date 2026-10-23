@@ -13,7 +13,7 @@ title Prime Sweets UI — Containers (current)
 Person(seller, "Seller", "Browser user")
 
 Container_Boundary(client, "Prime Sweets UI") {
-  Container(spa, "Web application", "Vite 7, React 19, TypeScript", "Renders the startup page. Holds the API base URL and an unused HTTP client")
+  Container(spa, "Web application", "Vite 7, React 19, TypeScript, React Router", "Renders placeholder routes and a narrow/wide shell. Holds the API base URL and an unused HTTP client")
 }
 
 System_Ext(api, "Prime Sweets Core API", "Express process. Default base URL http://localhost:3000")
@@ -41,4 +41,4 @@ Configured only. Feature calls are not wired. Authentication headers are not sen
 | Deployable | Static files from `dist/` after `npm run build`. |
 | Runtime data | None stored in the browser. |
 | Print | None. |
-| Layout | `src/app/styles.css` centers one column (`max-width: 40rem`). There are no media queries. The Version 1 narrow/wide rules are in the SPEC and are not implemented. |
+| Layout | Narrow by default. At `min-width: 64rem` the shell places navigation beside the page. No user-agent check. Feature screens do not yet reflow their own tables. |

@@ -9,7 +9,7 @@ Business gaps (authentication, capture, print) are specified in the [PDR](./pdrs
 
 | ID | Item | Where | Notes |
 |---|---|---|---|
-| TD-01 | No feature modules | `src/modules/` | ADR-001 and the SPEC name the modules. The folder is empty. |
+| TD-01 | No feature modules | `src/modules/` | The shell routes to placeholders. ADR-001 modules are still empty. |
 | TD-02 | HTTP client drops the API error body | `src/shared/infrastructure/http/httpClient.ts` | A non-2xx response becomes `Error('HTTP {status}')`. The SPEC needs `code` and `message` before seller screens can distinguish a business rejection from a failure. |
 | TD-03 | No automated tests | repository root | No test script and no test files. |
 | TD-04 | ESLint 9 is outside the current support window | `package.json` | `npm install` warns that ESLint 9 is deprecated. Lint still passes. Moving to ESLint 10 is a tooling change, not a feature. |

@@ -90,7 +90,7 @@ Where the code lives:
 - Domain models, use cases, and HTTP adapters do not read the viewport and do not branch on it.
 - A hook may track a media query when CSS cannot express a presentation swap. That flag stays in the hook and is not an argument of a use case.
 
-The startup page in `src/app/styles.css` is a single centered column. It is not this breakpoint system. Version 1 views replace that limitation per screen; the shell does not grow a device-specific router.
+The shell records its wide class at `min-width: 64rem` in `src/app/styles.css`. Placeholder routes share that shell. A feature view adds its own media query only when its content needs a different reflow. The shell does not grow a device-specific router.
 
 ## 5. Use cases
 

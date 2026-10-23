@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 import { App } from '@/app/App';
 import { createAppContainer } from '@/app/composition';
 import '@/app/styles.css';
@@ -12,6 +13,8 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <App container={createAppContainer()} />
+    <BrowserRouter>
+      <App container={createAppContainer()} />
+    </BrowserRouter>
   </StrictMode>
 );

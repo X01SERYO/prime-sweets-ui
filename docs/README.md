@@ -38,6 +38,6 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | Seller session | No — the API has no authentication yet |
 | Sales Day, customer, sale, Load Sheet, and invoice screens | No |
 | Invoice printing through the browser print dialog | No |
-| Narrow and wide layouts (SPEC § 4.1) | No — the shell is one fixed column |
+| Narrow and wide shell (SPEC § 4.1) | Partial — navigation reflows at `64rem`. Feature screens are placeholders. |
 
 When a SPEC step is implemented, update `architecture/`, `model/`, and `flows/` to match the code. Do not mark SPEC sections as done only in the SPEC.
