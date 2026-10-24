@@ -2,7 +2,20 @@
 
 **Sources:** `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`, `src/app/composition.ts`.
 
-The running UI has no sale, customer, product, Sales Day, Load Sheet, or invoice model. Those view models are specified in [SPEC § 6](../specs/SPEC.md) and must be added here only after the matching module exists in `src/modules/`.
+Sale, customer, Sales Day, Load Sheet, and invoice models are not in code. They stay in [SPEC § 6](../specs/SPEC.md) until those modules exist.
+
+## Product hit
+
+`src/modules/catalog/domain/models/productHit.ts`, mapped from `GET /products/search`.
+
+| Field | API source |
+|---|---|
+| `id` | `id` |
+| `name` | `name`, or null |
+| `code` | `alegraId` |
+| `wholesalePrice` | `wholesalePrice`, number or numeric string, otherwise null |
+
+The search response does not include the brand name. `brandName` from the SPEC is not stored on this hit.
 
 ## Environment
 

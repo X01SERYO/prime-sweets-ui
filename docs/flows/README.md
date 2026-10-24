@@ -11,7 +11,17 @@ Only the flow that exists in code is described as current. Version 1 seller flow
 3. `createAppContainer()` reads `VITE_API_BASE_URL`.
 4. `App` renders the shell. `/` redirects to `/sales-day`. The other routes are placeholders.
 5. Below `64rem` the navigation stacks. At `64rem` and wider it sits beside the page. The switch is a CSS media query.
-6. No API request or print dialog runs.
+6. No print dialog runs. The sale route is the only screen that calls the API, and only after the seller submits a search.
+
+## 2. Search products
+
+Screen: `/sales`.
+
+1. An empty query does not call the API. The screen asks for a name, brand, or code.
+2. Submit calls `SearchProductsUseCase`, which trims the query and calls `GET /products/search?q=`.
+3. The mapper keeps `id`, `name`, `alegraId` as `code`, and `wholesalePrice`. The API payload has no brand name, so the hit does not invent one.
+4. Wholesale price is display-only. There is no price input and no add-to-sale action.
+5. A non-2xx response shows `error` from the body, or `HTTP {status}`. Network failure shows the client message. The list is cleared.
 
 ## Pending definition / not implemented
 

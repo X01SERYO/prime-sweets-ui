@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes } from 'react-router';
 import type { AppContainer } from '@/app/composition';
 import { routes } from '@/app/routes';
+import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 
 interface AppProps {
   container: AppContainer;
@@ -10,7 +11,7 @@ export function App({ container }: AppProps) {
   return (
     <div className="shell">
       <header className="shell-bar">
-        <p className="shell-title">Prime Sweets</p>
+        <img className="shell-logo" src="/logo.webp" alt="Dulcería La Principal" />
         <nav aria-label="Secciones">
           <ul className="shell-nav">
             {routes.map(route => (
@@ -25,7 +26,17 @@ export function App({ container }: AppProps) {
         <Routes>
           <Route path="/" element={<Navigate to="/sales-day" replace />} />
           {routes.map(route => (
-            <Route key={route.path} path={route.path} element={<Placeholder title={route.label} note={route.note} />} />
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                route.path === '/sales' ? (
+                  <ProductSearchView searchProducts={container.searchProducts} />
+                ) : (
+                  <Placeholder title={route.label} note={route.note} />
+                )
+              }
+            />
           ))}
           <Route path="*" element={<Navigate to="/sales-day" replace />} />
         </Routes>

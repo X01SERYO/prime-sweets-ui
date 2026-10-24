@@ -13,13 +13,13 @@ title Prime Sweets UI — Containers (current)
 Person(seller, "Seller", "Browser user")
 
 Container_Boundary(client, "Prime Sweets UI") {
-  Container(spa, "Web application", "Vite 7, React 19, TypeScript, React Router", "Renders placeholder routes and a narrow/wide shell. Holds the API base URL and an unused HTTP client")
+  Container(spa, "Web application", "Vite 7, React 19, TypeScript, React Router", "Renders the shell. The sale route searches products. Other routes are placeholders")
 }
 
 System_Ext(api, "Prime Sweets Core API", "Express process. Default base URL http://localhost:3000")
 
 Rel(seller, spa, "Loads index.html", "HTTPS or HTTP")
-Rel(spa, api, "Client created, no startup request", "fetch")
+Rel(spa, api, "GET /products/search when the seller submits a query", "fetch")
 ```
 
 ## Web application

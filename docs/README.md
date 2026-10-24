@@ -34,7 +34,7 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 |---|---|
 | Vite + React + TypeScript shell | Yes |
 | Composition root and shared HTTP client | Yes |
-| Feature modules (`catalog`, `customers`, `sales-day`, `sales`, `fulfillment-output`) | No — `src/modules/` is empty |
+| Feature modules (`catalog`, `customers`, `sales-day`, `sales`, `fulfillment-output`) | Catalog search only. The other modules are not created. |
 | Seller session | No — the API has no authentication yet |
 | Sales Day, customer, sale, Load Sheet, and invoice screens | No |
 | Invoice printing through the browser print dialog | No |

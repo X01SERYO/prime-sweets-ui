@@ -1,0 +1,18 @@
+import type { ProductSearchPort } from '@/modules/catalog/application/ports/productSearch.port';
+import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
+
+export class SearchProductsUseCase {
+  private readonly searchPort: ProductSearchPort;
+
+  constructor(searchPort: ProductSearchPort) {
+    this.searchPort = searchPort;
+  }
+
+  async execute(query: string): Promise<ProductHit[]> {
+    const term = query.trim();
+    if (!term) {
+      return [];
+    }
+    return this.searchPort.search(term);
+  }
+}

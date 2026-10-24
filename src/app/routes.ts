@@ -1,7 +1,7 @@
 export const routes = [
   { path: '/sales-day', label: 'Jornada', note: 'Abrir, ver, cerrar y reabrir la jornada queda para el módulo sales-day.' },
   { path: '/customers', label: 'Clientes', note: 'Buscar y crear clientes queda para el módulo customers.' },
-  { path: '/sales', label: 'Venta', note: 'Capturar y confirmar la venta queda para el módulo sales.' },
+  { path: '/sales', label: 'Venta', note: 'La búsqueda de catálogo ya está en esta pantalla. Confirmar la venta queda pendiente.' },
   {
     path: '/load-sheets',
     label: 'Hoja de cargue',
