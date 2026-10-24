@@ -24,6 +24,14 @@ The phone does not talk to the printer. No Bluetooth, USB, or Wi-Fi printer inte
 
 The layout is responsive: the same screens reflow between a phone-width viewport and a PC viewport. Width does not add or remove a business action, and it does not create a second application or a device role. Capture stays available on the PC. Printing stays the browser print dialog already defined for the PC that has the thermal printer; a narrower viewport does not become a different product. Technical layout rules are in the UI SPEC. They do not change this section.
 
+## 2.1 Language
+
+The seller-facing chrome is Spanish by default, with an English option in the same application. The choice does not change the seller, the route, or a business rule.
+
+Spanish and English cover labels, buttons, empty states, validation hints, and messages mapped from API error codes. They do not cover data the business stored: product names, customer names, sale-item names, company legal text, or invoice numbers. The printed invoice keeps the company profile text supplied by the API. Currency display stays Colombian pesos.
+
+This language step is next, before the remaining SPEC screens.
+
 ## 3. What the seller can do
 
 1. Sign in once and keep a session. The same account may stay signed in on phone and PC at the same time, up to 3 sessions (API PDR OQ-05).
@@ -78,6 +86,7 @@ The seller chooses the printer in that dialog, as in the current Excel flow.
 ## 7. Acceptance criteria
 
 - The same screens are usable on a phone-width viewport and on a PC, with the same actions. Layout reflow is specified in the UI SPEC.
+- The seller can switch the chrome between Spanish and English. Spanish is the default. Stored business text is not translated.
 - Capture does not require the seller to wait until the day is closed.
 - The sale form has no price input.
 - Item name can be edited only while the sale is a draft and the Sales Day is open.

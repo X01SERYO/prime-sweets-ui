@@ -13,7 +13,7 @@ title Prime Sweets UI — Components (current)
 Container_Boundary(spa, "Prime Sweets UI") {
   Component(boot, "Browser entry", "main.tsx", "Finds #root and renders App inside StrictMode")
   Component(composition, "Composition root", "createAppContainer", "Reads env and builds the HTTP client")
-  Component(shell, "App shell", "App.tsx, routes.ts, styles.css", "BrowserRouter routes and narrow/wide navigation. Placeholders do not call use cases")
+  Component(shell, "App shell", "App.tsx, styles.css, shared/i18n", "Top bar, ES/EN, Sales Day hub. Placeholders do not call use cases")
   Component(env, "Environment", "shared/config/env.ts", "VITE_API_BASE_URL")
   Component(http, "HTTP client", "createHttpClient", "get and post JSON. No caller yet")
 }

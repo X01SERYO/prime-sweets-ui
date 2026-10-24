@@ -15,7 +15,8 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | [adrs/ADR-001.md](./adrs/ADR-001.md) | Architecture decision: one SPA, feature modules, hexagon per module | Proposed. Binding for Version 1. Current runtime shape is in `architecture/`. |
 | [architecture/](./architecture/README.md) | C4 model of **the current UI** | Implemented. One C4 set only. |
 | [model/](./model/README.md) | Client structures verified in code | Shell configuration and HTTP client only. Version 1 view models are named in the SPEC. |
-| [flows/](./flows/README.md) | User and application flows verified in code | Application boot. Pending Version 1 flows are listed, not invented. |
+| [flows/](./flows/README.md) | User and application flows verified in code | Application boot and catalog search. Pending Version 1 flows are listed, not invented. |
+| [mocks/](./mocks/README.md) | Visual guide for seller screens | Reference. Not a second SPEC. |
 | [technical-debt.md](./technical-debt.md) | Register of UI technical debt | Active. |
 
 ## Authority
@@ -39,5 +40,6 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | Sales Day, customer, sale, Load Sheet, and invoice screens | No |
 | Invoice printing through the browser print dialog | No |
 | Narrow and wide shell (SPEC § 4.1) | Partial — navigation reflows at `64rem`. Feature screens are placeholders. |
+| Spanish default and English option (SPEC § 2.1) | Partial — the shell and the sale search use the dictionaries. New screens must use them too. |
 
 When a SPEC step is implemented, update `architecture/`, `model/`, and `flows/` to match the code. Do not mark SPEC sections as done only in the SPEC.

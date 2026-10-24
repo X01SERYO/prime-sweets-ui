@@ -25,6 +25,22 @@ authenticate, operate today's Sales Day, select or create a customer, capture an
 
 The client copies `totalAmount`, `totalProfit`, `invoiceNumber`, Load Sheet lines, and invoice lines from the API. It does not derive them.
 
+## 2.1 Language
+
+Implement this before the next business screen. The running shell and catalog search are still Spanish literals; this section is the target.
+
+| Rule | Detail |
+|---|---|
+| Locales | `es` (default) and `en` only. |
+| What is translated | Navigation, titles, buttons, empty and loading states, client input checks, and messages keyed by API `code`. |
+| What is not translated | Product name, customer name, `itemName`, company legal text, invoice number, and money. `formatCurrency` stays `es-CO` / `COP`. |
+| Where it lives | Dictionaries and the locale preference sit in `src/shared`, consumed by UI adapters. Domain models and use cases do not receive a locale and do not format sentences. |
+| Preference | The shell reads and writes the seller's choice in `localStorage`. Missing or unknown value means `es`. `document.documentElement.lang` matches the active locale. |
+| Switch | A control in the shell, visible in the narrow and wide layouts. Changing it does not navigate and does not call the API. |
+| Unknown code | Show a generic failure string in the active locale. Do not show the raw API message as a second language. |
+
+New screens and the existing catalog search read strings from the dictionaries. Do not add another hardcoded Spanish sentence in a view.
+
 ## 3. Module map
 
 ```text
@@ -61,6 +77,8 @@ Sales Day
 ```
 
 Screen-size behavior is specified in section 4.1. Viewport width does not change this route map.
+
+The mock guide is [docs/mocks/README.md](../mocks/README.md). The shell is a top bar, and Sales Day is the hub. Do not add a persistent menu of every section. Desktop sale search and lines sit side by side only when the sale lines exist.
 
 Until the API exposes authentication, sign-in stays unimplemented. Do not hardcode a `sellerId`. Sales Day open requires that id from the session.
 

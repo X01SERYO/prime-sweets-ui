@@ -9,7 +9,8 @@ Business gaps (authentication, capture, print) are specified in the [PDR](./pdrs
 
 | ID | Item | Where | Notes |
 |---|---|---|---|
-| TD-01 | Remaining feature modules | `src/modules/` | Catalog search exists. Customers, sales day, sales, and fulfillment output are not modules yet. |
+| TD-01 | Remaining feature modules | `src/modules/` | Catalog search calls the API. Customers, day sales, the load sheet, and invoices render `src/shared/dev/dummyLists.ts`. Delete that file when those screens use their API ports. |
+| TD-13 | Dummy lists | `src/shared/dev/dummyLists.ts`, `src/app/lists/DummyLists.tsx` | Sample rows stand in for four lists. They are not a fallback. Remove the file and the views when each list is wired. |
 | TD-02 | ~~HTTP client drops the API error body~~ | `src/shared/infrastructure/http/httpClient.ts` | **[RESOLVED]** `HttpRequestError` keeps `status`, `message`, and `code` when the body sends them. |
 | TD-03 | No automated tests | repository root | No test script and no test files. |
 | TD-04 | ESLint 9 is outside the current support window | `package.json` | `npm install` warns that ESLint 9 is deprecated. Lint still passes. Moving to ESLint 10 is a tooling change, not a feature. |

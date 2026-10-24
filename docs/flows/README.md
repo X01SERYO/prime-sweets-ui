@@ -9,8 +9,8 @@ Only the flow that exists in code is described as current. Version 1 seller flow
 1. The browser loads `index.html` and `src/main.tsx`.
 2. If `#root` is missing, startup throws `No se encontró el elemento #root`.
 3. `createAppContainer()` reads `VITE_API_BASE_URL`.
-4. `App` renders the shell. `/` redirects to `/sales-day`. The other routes are placeholders.
-5. Below `64rem` the navigation stacks. At `64rem` and wider it sits beside the page. The switch is a CSS media query.
+4. `App` renders a top bar and opens `/sales-day`. That screen links to customers, the sale search, the load sheet, and invoices. There is no side menu.
+5. `ES | EN` switches the chrome between Spanish and English and stores the choice in `localStorage`. The default is Spanish.
 6. No print dialog runs. The sale route is the only screen that calls the API, and only after the seller submits a search.
 
 ## 2. Search products
@@ -29,6 +29,7 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 
 | Flow | UI responsibility once built |
 |---|---|
+| Language | Shell control for Spanish (default) and English. Dictionaries for chrome and API error codes. No API call. Specified in SPEC § 2.1. Not built. |
 | Sign in / sign out | Session of a seller, up to the API session limit. Blocked while the API has no authentication. |
 | Open, read, close, reopen Sales Day | Commands and confirmation. The API decides the transition. |
 | Search or create customer | From the open Sales Day, including create during the visit. |
