@@ -13,7 +13,7 @@ export function useProductSearch(searchProducts: SearchProductsUseCase) {
     if (!query.trim()) {
       setProducts([]);
       setSearched(false);
-      setError('Escribe nombre, marca o código');
+      setError('searchRequired');
       return;
     }
     setLoading(true);

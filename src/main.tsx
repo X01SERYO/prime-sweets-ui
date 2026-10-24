@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { App } from '@/app/App';
 import { createAppContainer } from '@/app/composition';
+import { LocaleProvider } from '@/shared/i18n/locale';
 import '@/app/styles.css';
 
 const root = document.getElementById('root');
@@ -13,8 +14,10 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <BrowserRouter>
-      <App container={createAppContainer()} />
-    </BrowserRouter>
+    <LocaleProvider>
+      <BrowserRouter>
+        <App container={createAppContainer()} />
+      </BrowserRouter>
+    </LocaleProvider>
   </StrictMode>
 );

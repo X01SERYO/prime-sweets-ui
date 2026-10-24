@@ -1,22 +1,8 @@
-.product-search form {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
-  max-width: 24rem;
-  margin-top: 1rem;
-}
-
-.product-search h1 {
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  line-height: 1.1;
-}
-
 .product-hits {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin: 1.25rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -25,7 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fff;
@@ -37,16 +23,7 @@
   font-weight: 600;
 }
 
-.product-hits .product-price {
-  color: var(--orange);
-  font-weight: 700;
-}
-
-@media (min-width: 64rem) {
-  .product-hits li {
-    display: grid;
-    grid-template-columns: minmax(12rem, 1fr) 8rem 8rem;
-    gap: 1rem;
-    align-items: baseline;
-  }
+.product-search-field {
+  flex: 1;
+  min-width: 12rem;
 }
