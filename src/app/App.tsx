@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import type { AppContainer } from '@/app/composition';
-import { CustomerList, DaySalesList, InvoiceList, LoadSheetList } from '@/app/lists/DummyLists';
+import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
+import { InvoiceList } from '@/modules/fulfillment-output/adapters/ui/views/InvoiceList';
+import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
+import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
 import { SalesDayHome } from '@/modules/sales-day/adapters/ui/views/SalesDayHome';
