@@ -1,3 +1,5 @@
+import { useInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/useInvoices';
+import { listInvoices } from '@/modules/fulfillment-output/fulfillmentOutput.composition';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -7,14 +9,9 @@ const statusKey = {
   VOIDED: 'statusVoided'
 } as const;
 
-const invoices = [
-  { id: 'i1', number: '001', customer: 'Minimercado El Vecino', total: 312000, status: 'CONFIRMED' as const },
-  { id: 'i2', number: '003', customer: 'Tienda Doña Rosa', total: 148500, status: 'CONFIRMED' as const },
-  { id: 'i3', number: '002', customer: 'Supertienda La 80', total: 90000, status: 'VOIDED' as const }
-];
-
 export function InvoiceList() {
   const { t } = useLocale();
+  const invoices = useInvoices(listInvoices);
   return (
     <section className="stack">
       <h1>{t('invoices')}</h1>

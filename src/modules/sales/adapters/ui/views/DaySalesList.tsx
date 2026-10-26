@@ -1,4 +1,6 @@
 import { Link } from 'react-router';
+import { useDaySales } from '@/modules/sales/adapters/ui/hooks/useDaySales';
+import { listDaySales } from '@/modules/sales/sales.composition';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 
@@ -8,14 +10,9 @@ const statusKey = {
   VOIDED: 'statusVoided'
 } as const;
 
-const sales = [
-  { id: 's1', customer: 'Tienda Doña Rosa', status: 'DRAFT' as const, quantity: 10, total: 148500, invoiceNumber: null },
-  { id: 's2', customer: 'Minimercado El Vecino', status: 'CONFIRMED' as const, quantity: 24, total: 312000, invoiceNumber: '001' },
-  { id: 's3', customer: 'Supertienda La 80', status: 'VOIDED' as const, quantity: 6, total: 90000, invoiceNumber: '002' }
-];
-
 export function DaySalesList() {
   const { t } = useLocale();
+  const sales = useDaySales(listDaySales);
   return (
     <section className="stack">
       <h1>{t('daySales')}</h1>
