@@ -1,6 +1,6 @@
 import type { SalesDayQueryPort } from '@/modules/sales-day/application/ports/salesDayQuery.port';
+import { SalesDaySellerRequiredError } from '@/modules/sales-day/domain/errors/salesDaySellerRequired.error';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
-import { MessageError } from '@/shared/i18n/messageError';
 
 export class GetCurrentSalesDayUseCase {
   private readonly query: SalesDayQueryPort;
@@ -12,7 +12,7 @@ export class GetCurrentSalesDayUseCase {
   async execute(sellerId: string): Promise<SalesDayModel | null> {
     const id = sellerId.trim();
     if (!id) {
-      throw new MessageError('salesDaySellerRequired');
+      throw new SalesDaySellerRequiredError();
     }
     return this.query.getCurrent(id);
   }

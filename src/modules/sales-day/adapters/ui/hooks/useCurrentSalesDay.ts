@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
+import { SalesDaySellerRequiredError } from '@/modules/sales-day/domain/errors/salesDaySellerRequired.error';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
 import { MessageError } from '@/shared/i18n/messageError';
 import type { MessageKey } from '@/shared/i18n/messages';
@@ -37,7 +38,12 @@ export function useCurrentSalesDay(sellerId: string, getCurrentSalesDay: GetCurr
           setState({
             sellerId,
             salesDay: null,
-            errorKey: caught instanceof MessageError ? caught.messageKey : 'salesDayFailed',
+            errorKey:
+              caught instanceof SalesDaySellerRequiredError
+                ? 'salesDaySellerRequired'
+                : caught instanceof MessageError
+                  ? caught.messageKey
+                  : 'salesDayFailed',
             settled: true
           });
         }
