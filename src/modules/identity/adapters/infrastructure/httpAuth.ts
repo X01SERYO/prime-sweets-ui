@@ -1,7 +1,7 @@
 import type { AuthApiPort, LoginCommand } from '@/modules/identity/application/ports/authApi.port';
 import { InvalidCredentialsError } from '@/modules/identity/domain/errors/invalidCredentials.error';
 import type { Session } from '@/modules/identity/domain/models/session';
-import { MessageError } from '@/shared/i18n/messageError';
+import { LoginResponseInvalidError } from '@/modules/identity/domain/errors/loginResponseInvalid.error';
 import { HttpRequestError, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
 interface Envelope {
@@ -21,7 +21,7 @@ export class HttpAuth implements AuthApiPort {
       const body = await this.http.post<Envelope>('/auth/login', command);
       const session = readSession(body);
       if (!session) {
-        throw new MessageError('loginFailed');
+        throw new LoginResponseInvalidError();
       }
       return session;
     } catch (error) {

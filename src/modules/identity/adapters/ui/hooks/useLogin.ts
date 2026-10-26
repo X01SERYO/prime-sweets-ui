@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { LoginUseCase } from '@/modules/identity/application/use-cases/login.useCase';
 import { InvalidCredentialsError } from '@/modules/identity/domain/errors/invalidCredentials.error';
-import { MessageError } from '@/shared/i18n/messageError';
+import { LoginResponseInvalidError } from '@/modules/identity/domain/errors/loginResponseInvalid.error';
 import type { MessageKey } from '@/shared/i18n/messages';
 import type { Session } from '@/modules/identity/domain/models/session';
 
@@ -23,8 +23,8 @@ export function useLogin(login: LoginUseCase, onLoggedIn: (session: Session) => 
     } catch (caught) {
       if (caught instanceof InvalidCredentialsError) {
         setError('invalidCredentials');
-      } else if (caught instanceof MessageError) {
-        setError(caught.messageKey);
+      } else if (caught instanceof LoginResponseInvalidError) {
+        setError('loginFailed');
       } else {
         setError('loginFailed');
       }

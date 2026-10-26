@@ -2,7 +2,7 @@ import type { ProductSearchPort } from '@/modules/catalog/application/ports/prod
 import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
 import type { HttpClient } from '@/shared/infrastructure/http/httpClient';
 import { toProductHit } from '@/modules/catalog/adapters/infrastructure/productMapper';
-import { MessageError } from '@/shared/i18n/messageError';
+import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
 
 interface ProductDto {
   id?: unknown;
@@ -26,7 +26,7 @@ export class HttpProductSearch implements ProductSearchPort {
   async search(query: string): Promise<ProductHit[]> {
     const body = await this.http.get<SearchEnvelope>(`/products/search?q=${encodeURIComponent(query)}`);
     if (!body || body.success !== true || !Array.isArray(body.data)) {
-      throw new MessageError('catalogInvalid');
+      throw new CatalogInvalidError();
     }
     return body.data.map(item => toProductHit(item as ProductDto));
   }

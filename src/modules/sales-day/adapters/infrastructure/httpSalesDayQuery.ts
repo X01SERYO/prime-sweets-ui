@@ -1,6 +1,6 @@
 import type { SalesDayQueryPort } from '@/modules/sales-day/application/ports/salesDayQuery.port';
 import type { SalesDayModel, SalesDayStatus } from '@/modules/sales-day/domain/models/salesDay';
-import { MessageError } from '@/shared/i18n/messageError';
+import { SalesDayInvalidError } from '@/modules/sales-day/domain/errors/salesDayInvalid.error';
 import { HttpRequestError, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
 interface Envelope {
@@ -20,7 +20,7 @@ export class HttpSalesDayQuery implements SalesDayQueryPort {
       const body = await this.http.get<Envelope>(`/sales-days/current?sellerId=${encodeURIComponent(sellerId)}`);
       const day = readSalesDay(body);
       if (!day) {
-        throw new MessageError('salesDayInvalid');
+        throw new SalesDayInvalidError();
       }
       return day;
     } catch (error) {

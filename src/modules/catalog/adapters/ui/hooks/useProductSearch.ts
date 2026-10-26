@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
 import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
-import { MessageError } from '@/shared/i18n/messageError';
+import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
 import type { MessageKey } from '@/shared/i18n/messages';
 
 export function useProductSearch(searchProducts: SearchProductsUseCase) {
@@ -25,7 +25,7 @@ export function useProductSearch(searchProducts: SearchProductsUseCase) {
       setProducts(await searchProducts.execute(query));
     } catch (caught) {
       setProducts([]);
-      setError(caught instanceof MessageError ? caught.messageKey : 'catalogFailed');
+      setError(caught instanceof CatalogInvalidError ? 'catalogInvalid' : 'catalogFailed');
     } finally {
       setLoading(false);
     }
