@@ -1,4 +1,4 @@
-import { formatCurrency } from '@/modules/catalog/domain/value-objects/price';
+import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
 

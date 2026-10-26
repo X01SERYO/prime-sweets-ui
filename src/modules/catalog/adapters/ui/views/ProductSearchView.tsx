@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
-import { formatCurrency } from '@/modules/catalog/domain/value-objects/price';
+import { formatCurrency } from '@/shared/domain/money';
 import { useProductSearch } from '@/modules/catalog/adapters/ui/hooks/useProductSearch';
 import { useLocale } from '@/shared/i18n/useLocale';
 import '@/modules/catalog/adapters/ui/views/productSearch.css';

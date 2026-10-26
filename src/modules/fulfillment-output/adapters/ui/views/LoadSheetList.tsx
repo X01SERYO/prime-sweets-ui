@@ -1,4 +1,4 @@
-import { formatCurrency } from '@/modules/catalog/domain/value-objects/price';
+import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 
 const lines = [
