@@ -5,8 +5,10 @@ import { HttpAuth } from '@/modules/identity/adapters/infrastructure/httpAuth';
 import { LoginUseCase } from '@/modules/identity/application/use-cases/login.useCase';
 import { LogoutUseCase } from '@/modules/identity/application/use-cases/logout.useCase';
 import type { SessionStorePort } from '@/modules/identity/application/ports/sessionStore.port';
+import { HttpSalesDayCommand } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayCommand';
 import { HttpSalesDayQuery } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayQuery';
 import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
+import { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -18,6 +20,7 @@ export interface AppContainer {
   logout: LogoutUseCase;
   searchProducts: SearchProductsUseCase;
   getCurrentSalesDay: GetCurrentSalesDayUseCase;
+  openSalesDay: OpenSalesDayUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -31,6 +34,7 @@ export function createAppContainer(): AppContainer {
     login: new LoginUseCase(auth, sessionStore),
     logout: new LogoutUseCase(auth, sessionStore),
     searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
-    getCurrentSalesDay: new GetCurrentSalesDayUseCase(new HttpSalesDayQuery(http))
+    getCurrentSalesDay: new GetCurrentSalesDayUseCase(new HttpSalesDayQuery(http)),
+    openSalesDay: new OpenSalesDayUseCase(new HttpSalesDayCommand(http))
   };
 }

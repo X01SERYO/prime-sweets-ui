@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
-import { SalesDayInvalidError } from '@/modules/sales-day/domain/errors/salesDayInvalid.error';
-import { SalesDaySellerRequiredError } from '@/modules/sales-day/domain/errors/salesDaySellerRequired.error';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
 import type { MessageKey } from '@/shared/i18n/messages';
+import { salesDayErrorKey } from '@/modules/sales-day/adapters/ui/hooks/salesDayErrorKey';
 
 interface LoadState {
   sellerId: string;
@@ -38,12 +37,7 @@ export function useCurrentSalesDay(sellerId: string, getCurrentSalesDay: GetCurr
           setState({
             sellerId,
             salesDay: null,
-            errorKey:
-              caught instanceof SalesDaySellerRequiredError
-                ? 'salesDaySellerRequired'
-                : caught instanceof SalesDayInvalidError
-                  ? 'salesDayInvalid'
-                  : 'salesDayFailed',
+            errorKey: salesDayErrorKey(caught, 'salesDayFailed'),
             settled: true
           });
         }
@@ -56,9 +50,14 @@ export function useCurrentSalesDay(sellerId: string, getCurrentSalesDay: GetCurr
   const current =
     state.sellerId === sellerId ? state : { sellerId, salesDay: null, errorKey: null, settled: false };
 
+  function show(day: SalesDayModel) {
+    setState({ sellerId, salesDay: day, errorKey: null, settled: true });
+  }
+
   return {
     salesDay: current.salesDay,
     loading: !current.settled,
-    errorKey: current.errorKey
+    errorKey: current.errorKey,
+    show
   };
 }

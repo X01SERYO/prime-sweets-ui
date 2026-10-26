@@ -59,7 +59,11 @@ export function App({ container }: AppProps) {
             path="/sales-day"
             element={
               session ? (
-                <SalesDayHome sellerId={session.user.id} getCurrentSalesDay={container.getCurrentSalesDay} />
+                <SalesDayHome
+                  sellerId={session.user.id}
+                  getCurrentSalesDay={container.getCurrentSalesDay}
+                  openSalesDay={container.openSalesDay}
+                />
               ) : (
                 <Navigate to="/login" replace />
               )

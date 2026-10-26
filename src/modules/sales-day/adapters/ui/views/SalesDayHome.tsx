@@ -1,28 +1,45 @@
 import { Link } from 'react-router';
 import { useCurrentSalesDay } from '@/modules/sales-day/adapters/ui/hooks/useCurrentSalesDay';
+import { useOpenSalesDay } from '@/modules/sales-day/adapters/ui/hooks/useOpenSalesDay';
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
+import type { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
 
 interface SalesDayHomeProps {
   sellerId: string;
   getCurrentSalesDay: GetCurrentSalesDayUseCase;
+  openSalesDay: OpenSalesDayUseCase;
 }
 
-export function SalesDayHome({ sellerId, getCurrentSalesDay }: SalesDayHomeProps) {
+export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay }: SalesDayHomeProps) {
   const { t } = useLocale();
-  const { salesDay, loading, errorKey } = useCurrentSalesDay(sellerId, getCurrentSalesDay);
+  const current = useCurrentSalesDay(sellerId, getCurrentSalesDay);
+  const openingDay = useOpenSalesDay(sellerId, openSalesDay);
+  const errorKey = openingDay.errorKey ?? current.errorKey;
+
+  async function open() {
+    const day = await openingDay.open();
+    if (day) {
+      current.show(day);
+    }
+  }
 
   return (
     <section className="stack">
       <h1>{t('salesDay')}</h1>
-      {loading ? <p className="m">{t('salesDayLoading')}</p> : null}
+      {current.loading ? <p className="m">{t('salesDayLoading')}</p> : null}
       {errorKey ? <p role="alert">{t(errorKey)}</p> : null}
-      {!loading && !errorKey && !salesDay ? <p className="m">{t('salesDayMissing')}</p> : null}
-      {salesDay ? (
+      {!current.loading && !current.salesDay ? (
+        <button className="btn" type="button" disabled={openingDay.opening} onClick={() => void open()}>
+          {openingDay.opening ? t('openingDay') : t('openDay')}
+        </button>
+      ) : null}
+      {!current.loading && !errorKey && !current.salesDay ? <p className="m">{t('salesDayMissing')}</p> : null}
+      {current.salesDay ? (
         <p className="m">
-          {salesDay.date}
+          {current.salesDay.date}
           {' · '}
-          {salesDay.status === 'OPEN' ? t('salesDayOpen') : t('salesDayClosed')}
+          {current.salesDay.status === 'OPEN' ? t('salesDayOpen') : t('salesDayClosed')}
         </p>
       ) : null}
       <Link className="btn" to="/customers">

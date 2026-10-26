@@ -1,5 +1,6 @@
 import type { SalesDayQueryPort } from '@/modules/sales-day/application/ports/salesDayQuery.port';
-import type { SalesDayModel, SalesDayStatus } from '@/modules/sales-day/domain/models/salesDay';
+import { toSalesDay } from '@/modules/sales-day/adapters/infrastructure/salesDayMapper';
+import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
 import { SalesDayInvalidError } from '@/modules/sales-day/domain/errors/salesDayInvalid.error';
 import { HttpRequestError, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -18,7 +19,7 @@ export class HttpSalesDayQuery implements SalesDayQueryPort {
   async getCurrent(sellerId: string): Promise<SalesDayModel | null> {
     try {
       const body = await this.http.get<Envelope>(`/sales-days/current?sellerId=${encodeURIComponent(sellerId)}`);
-      const day = readSalesDay(body);
+      const day = toSalesDay(body);
       if (!day) {
         throw new SalesDayInvalidError();
       }
@@ -30,19 +31,4 @@ export class HttpSalesDayQuery implements SalesDayQueryPort {
       throw error;
     }
   }
-}
-
-function readSalesDay(body: Envelope): SalesDayModel | null {
-  if (!body || body.success !== true || !body.data || typeof body.data !== 'object') {
-    return null;
-  }
-  const data = body.data as Partial<SalesDayModel>;
-  if (typeof data.id !== 'string' || typeof data.sellerId !== 'string' || typeof data.date !== 'string') {
-    return null;
-  }
-  if (data.status !== 'OPEN' && data.status !== 'CLOSED') {
-    return null;
-  }
-  const status: SalesDayStatus = data.status;
-  return { id: data.id, sellerId: data.sellerId, date: data.date, status };
 }
