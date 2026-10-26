@@ -38,7 +38,17 @@ export const messages = {
     wholesalePrice: 'Precio venta mayorista',
     profit: 'Utilidad',
     notPrintable: 'No imprimible',
-    printable: 'Imprimible'
+    printable: 'Imprimible',
+    loginTitle: 'Entrar',
+    email: 'Correo',
+    password: 'Contraseña',
+    signIn: 'Entrar',
+    signingIn: 'Entrando…',
+    loginRequired: 'Escribe correo y contraseña',
+    invalidCredentials: 'Correo o contraseña incorrectos',
+    loginFailed: 'No se pudo iniciar sesión. Revisa que la API esté en marcha.',
+    signOut: 'Salir',
+    signedInAs: 'Sesión'
   },
   en: {
     languageLabel: 'Switch language to Spanish',
@@ -77,7 +87,17 @@ export const messages = {
     wholesalePrice: 'Wholesale sale price',
     profit: 'Profit',
     notPrintable: 'Not printable',
-    printable: 'Printable'
+    printable: 'Printable',
+    loginTitle: 'Sign in',
+    email: 'Email',
+    password: 'Password',
+    signIn: 'Sign in',
+    signingIn: 'Signing in…',
+    loginRequired: 'Enter email and password',
+    invalidCredentials: 'Incorrect email or password',
+    loginFailed: 'Could not sign in. Check that the API is running.',
+    signOut: 'Sign out',
+    signedInAs: 'Session'
   }
 } as const;
 

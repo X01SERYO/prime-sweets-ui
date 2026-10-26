@@ -58,6 +58,10 @@ input {
   height: auto;
 }
 
+.topbar .lang + .lang {
+  margin-left: 0.5rem;
+}
+
 .lang {
   margin-left: auto;
   min-height: 2.25rem;
