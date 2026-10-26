@@ -5,6 +5,8 @@ import { HttpAuth } from '@/modules/identity/adapters/infrastructure/httpAuth';
 import { LoginUseCase } from '@/modules/identity/application/use-cases/login.useCase';
 import { LogoutUseCase } from '@/modules/identity/application/use-cases/logout.useCase';
 import type { SessionStorePort } from '@/modules/identity/application/ports/sessionStore.port';
+import { HttpSalesDayQuery } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayQuery';
+import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -15,6 +17,7 @@ export interface AppContainer {
   login: LoginUseCase;
   logout: LogoutUseCase;
   searchProducts: SearchProductsUseCase;
+  getCurrentSalesDay: GetCurrentSalesDayUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -27,6 +30,7 @@ export function createAppContainer(): AppContainer {
     sessionStore,
     login: new LoginUseCase(auth, sessionStore),
     logout: new LogoutUseCase(auth, sessionStore),
-    searchProducts: new SearchProductsUseCase(new HttpProductSearch(http))
+    searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
+    getCurrentSalesDay: new GetCurrentSalesDayUseCase(new HttpSalesDayQuery(http))
   };
 }

@@ -1,4 +1,5 @@
 import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
+import { MessageError } from '@/shared/i18n/messageError';
 
 interface ProductDto {
   id?: unknown;
@@ -17,7 +18,7 @@ function money(value: unknown): number | null {
 
 export function toProductHit(dto: ProductDto): ProductHit {
   if (typeof dto.id !== 'string' || typeof dto.alegraId !== 'string') {
-    throw new Error('El catálogo devolvió un producto sin id o código');
+    throw new MessageError('catalogInvalid');
   }
   return {
     id: dto.id,

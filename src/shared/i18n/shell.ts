@@ -1,0 +1,26 @@
+import { catalog } from '@/shared/i18n/catalog';
+
+export const shellMessages = catalog(
+  {
+    languageLabel: 'Cambiar idioma a inglés',
+    languageValue: 'ES | EN',
+    customers: 'Clientes',
+    sale: 'Venta',
+    daySales: 'Ventas del día',
+    loadSheet: 'Cargue',
+    invoices: 'Facturas',
+    api: 'API',
+    signOut: 'Salir'
+  },
+  {
+    languageLabel: 'Switch language to Spanish',
+    languageValue: 'ES | EN',
+    customers: 'Customers',
+    sale: 'Sale',
+    daySales: 'Day sales',
+    loadSheet: 'Load sheet',
+    invoices: 'Invoices',
+    api: 'API',
+    signOut: 'Sign out'
+  }
+);

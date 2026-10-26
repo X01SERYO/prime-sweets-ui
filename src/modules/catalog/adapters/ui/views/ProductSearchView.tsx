@@ -37,7 +37,7 @@ export function ProductSearchView({ searchProducts }: ProductSearchViewProps) {
           </button>
         </div>
       </form>
-      {error ? <p role="alert">{error === 'searchRequired' ? t('searchRequired') : error}</p> : null}
+      {error ? <p role="alert">{t(error)}</p> : null}
       {searched && !loading && !error && products.length === 0 ? <p className="m">{t('noResults')}</p> : null}
       <p className="m">{t('linesLater')}</p>
       {products.length > 0 ? (

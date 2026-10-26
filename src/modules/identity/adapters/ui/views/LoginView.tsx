@@ -44,11 +44,7 @@ export function LoginView({ login, onLoggedIn }: LoginViewProps) {
       </form>
       {form.error ? (
         <p role="alert">
-          {form.error === 'loginRequired'
-            ? t('loginRequired')
-            : form.error === 'invalidCredentials'
-              ? t('invalidCredentials')
-              : t('loginFailed')}
+          {t(form.error)}
         </p>
       ) : null}
     </section>

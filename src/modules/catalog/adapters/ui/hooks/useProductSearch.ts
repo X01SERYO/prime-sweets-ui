@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
 import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
+import { MessageError } from '@/shared/i18n/messageError';
+import type { MessageKey } from '@/shared/i18n/messages';
 
 export function useProductSearch(searchProducts: SearchProductsUseCase) {
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState<ProductHit[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageKey | null>(null);
   const [searched, setSearched] = useState(false);
 
   async function submit() {
@@ -23,7 +25,7 @@ export function useProductSearch(searchProducts: SearchProductsUseCase) {
       setProducts(await searchProducts.execute(query));
     } catch (caught) {
       setProducts([]);
-      setError(caught instanceof Error ? caught.message : 'No se pudo buscar el catálogo');
+      setError(caught instanceof MessageError ? caught.messageKey : 'catalogFailed');
     } finally {
       setLoading(false);
     }

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import type { LoginUseCase } from '@/modules/identity/application/use-cases/login.useCase';
 import { InvalidCredentialsError } from '@/modules/identity/domain/errors/invalidCredentials.error';
+import { MessageError } from '@/shared/i18n/messageError';
+import type { MessageKey } from '@/shared/i18n/messages';
 import type { Session } from '@/modules/identity/domain/models/session';
 
 export function useLogin(login: LoginUseCase, onLoggedIn: (session: Session) => void) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageKey | null>(null);
 
   async function submit() {
     if (!email.trim() || !password) {
@@ -19,7 +21,13 @@ export function useLogin(login: LoginUseCase, onLoggedIn: (session: Session) => 
     try {
       onLoggedIn(await login.execute({ email, password }));
     } catch (caught) {
-      setError(caught instanceof InvalidCredentialsError ? 'invalidCredentials' : 'loginFailed');
+      if (caught instanceof InvalidCredentialsError) {
+        setError('invalidCredentials');
+      } else if (caught instanceof MessageError) {
+        setError(caught.messageKey);
+      } else {
+        setError('loginFailed');
+      }
     } finally {
       setLoading(false);
     }
