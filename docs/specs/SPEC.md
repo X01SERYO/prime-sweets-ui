@@ -80,7 +80,7 @@ Screen-size behavior is specified in section 4.1. Viewport width does not change
 
 The mock guide is [docs/mocks/README.md](../mocks/README.md). The shell is a top bar, and Sales Day is the hub. Do not add a persistent menu of every section. Desktop sale search and lines sit side by side only when the sale lines exist.
 
-Until the API exposes authentication, sign-in stays unimplemented. Do not hardcode a `sellerId`. Sales Day open requires that id from the session.
+Sign-in is implemented. Do not hardcode a `sellerId`. Sales Day open uses the id from the session.
 
 ## 4.1 Responsive layout
 

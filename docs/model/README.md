@@ -2,7 +2,7 @@
 
 **Sources:** `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`, `src/app/composition.ts`.
 
-Sale, customer, Sales Day, Load Sheet, and invoice models are not in code. They stay in [SPEC § 6](../specs/SPEC.md) until those modules exist.
+Login session, the current Sales Day, and the four sample lists have client models. Sale lines, close, and print stay in [SPEC § 6](../specs/SPEC.md).
 
 ## Product hit
 

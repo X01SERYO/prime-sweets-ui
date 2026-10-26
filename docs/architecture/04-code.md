@@ -61,4 +61,4 @@ sequenceDiagram
   App-->>Seller: Title and base URL
 ```
 
-No `fetch` runs in this sequence. `HttpClient.get` and `HttpClient.post` throw when the response is not OK and otherwise return the JSON body. Nothing maps that body to a domain model yet.
+No `fetch` runs in this startup sequence. `HttpClient.get` and `HttpClient.post` throw when the response is not OK and otherwise return the JSON body. Login, the current Sales Day, and product search map that body in their infrastructure adapters. The four lists do not call the API.

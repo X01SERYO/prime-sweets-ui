@@ -11,7 +11,7 @@ Only the flow that exists in code is described as current. Version 1 seller flow
 3. `createAppContainer()` reads `VITE_API_BASE_URL`.
 4. `App` renders a top bar and opens `/sales-day`. That screen links to customers, the sale search, the load sheet, and invoices. There is no side menu.
 5. `ES | EN` switches the chrome between Spanish and English and stores the choice in `localStorage`. The default is Spanish.
-6. No print dialog runs. The sale route is the only screen that calls the API, and only after the seller submits a search.
+6. No print dialog runs. Login, logout, the current Sales Day, opening it, and product search call the API. The four lists read sample adapters.
 
 ## 2. Search products
 
@@ -29,9 +29,9 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 
 | Flow | UI responsibility once built |
 |---|---|
-| Language | Shell control for Spanish (default) and English. Dictionaries for chrome and API error codes. No API call. Specified in SPEC § 2.1. Not built. |
-| Sign in / sign out | Session of a seller, up to the API session limit. Blocked while the API has no authentication. |
-| Open, read, close, reopen Sales Day | Commands and confirmation. The API decides the transition. |
+| Language | Shell control for Spanish (default) and English. Dictionaries live per screen. No API call. |
+| Sign in / sign out | Built. The session token is sent as a bearer token and dies when the API process restarts. |
+| Close and reopen Sales Day | Commands and confirmation. Open and read are built. Close and reopen are not. |
 | Search or create customer | From the open Sales Day, including create during the visit. |
 | Search catalog and edit a draft sale | Server search. Quantity and item name only. No price input. |
 | Confirm sale | Show the invoice number returned by the API. |

@@ -1,0 +1,17 @@
+---
+description: Hexagonal and DDD invariants for the UI
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# UI hexagonal
+
+Follow `.cursor/skills/frontend-hexagonal-ddd/SKILL.md`.
+
+- Views render and emit events. They do not call `fetch` or embed sample rows.
+- A hook performs one action and calls a use case. The view composes hooks.
+- Domain and application do not import i18n. Adapters throw domain errors; hooks map them with `t()`.
+- Sample data is an infrastructure adapter behind a port. Wire API use cases in `src/app/composition.ts`.
+- Do not use parameter properties. `erasableSyntaxOnly` rejects them.
+- Format money with `src/shared/domain/money.ts`.
+- The seller id comes from the session.
