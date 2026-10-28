@@ -3,6 +3,7 @@ import type { SaleCommandPort } from '@/modules/sales/application/ports/saleComm
 import type { SaleQueryPort } from '@/modules/sales/application/ports/saleQuery.port';
 import { SaleDayClosedError } from '@/modules/sales/domain/errors/saleDayClosed.error';
 import { SaleInvalidError } from '@/modules/sales/domain/errors/saleInvalid.error';
+import { SaleMustContainItemsError } from '@/modules/sales/domain/errors/saleMustContainItems.error';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import { HttpRequestError, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -12,11 +13,14 @@ interface Envelope {
 }
 
 function mapSaleError(error: unknown): never {
-  if (error instanceof SaleInvalidError || error instanceof SaleDayClosedError) {
+  if (error instanceof SaleInvalidError || error instanceof SaleDayClosedError || error instanceof SaleMustContainItemsError) {
     throw error;
   }
   if (error instanceof HttpRequestError && error.code === 'SALES_DAY_NOT_OPEN') {
     throw new SaleDayClosedError();
+  }
+  if (error instanceof HttpRequestError && error.code === 'SALE_MUST_CONTAIN_ITEMS') {
+    throw new SaleMustContainItemsError();
   }
   throw error;
 }
@@ -84,6 +88,15 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
       const body = await this.http.delete<Envelope>(
         `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(productId)}`
       );
+      return toSaleEnvelope(body);
+    } catch (error) {
+      mapSaleError(error);
+    }
+  }
+
+  async confirm(saleId: string): Promise<SaleModel> {
+    try {
+      const body = await this.http.post<Envelope>(`/sales/${encodeURIComponent(saleId)}/confirm`, {});
       return toSaleEnvelope(body);
     } catch (error) {
       mapSaleError(error);

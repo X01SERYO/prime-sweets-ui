@@ -5,6 +5,7 @@ import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
 import { InvoiceList } from '@/modules/fulfillment-output/adapters/ui/views/InvoiceList';
 import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
+import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale';
 import { useDraftSale } from '@/modules/sales/adapters/ui/hooks/useDraftSale';
 import { useSaleMutations } from '@/modules/sales/adapters/ui/hooks/useSaleMutations';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
@@ -23,6 +24,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const [params] = useSearchParams();
   const customerId = params.get('customerId');
   const draft = useDraftSale(sellerId, customerId, container.getCurrentSalesDay, container.listDraftSales, container.createDraftSale);
+  const confirmation = useConfirmSale(container.confirmSale, draft.setSale);
   const lines = useSaleMutations(
     draft.sale,
     draft.setSale,
@@ -34,17 +36,22 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   return (
     <>
       <SelectedCustomer customerId={customerId} getCustomer={container.getCustomer} />
-      <ProductSearchView
-        searchProducts={container.searchProducts}
-        selecting={lines.busy}
-        onSelect={productId => void lines.add(productId)}
-      />
+      {draft.sale?.status !== 'CONFIRMED' ? (
+        <ProductSearchView
+          searchProducts={container.searchProducts}
+          selecting={lines.busy || confirmation.confirming}
+          onSelect={productId => void lines.add(productId)}
+        />
+      ) : null}
       <SaleLines
         sale={draft.sale}
         loading={draft.loading}
         error={draft.error}
         lineError={lines.error}
-        busy={lines.busy}
+        busy={lines.busy || confirmation.confirming}
+        confirming={confirmation.confirming}
+        confirmError={confirmation.error}
+        onConfirm={() => void confirmation.confirm(draft.sale)}
         onQuantity={(productId, quantity) => void lines.changeQuantity(productId, quantity)}
         onName={(productId, itemName) => void lines.changeName(productId, itemName)}
         onRemove={productId => void lines.remove(productId)}

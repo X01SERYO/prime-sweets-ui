@@ -16,6 +16,7 @@ import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-c
 import { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
 import { HttpSale } from '@/modules/sales/adapters/infrastructure/httpSale';
 import { AddSaleItemUseCase } from '@/modules/sales/application/use-cases/addSaleItem.useCase';
+import { ConfirmSaleUseCase } from '@/modules/sales/application/use-cases/confirmSale.useCase';
 import { CreateDraftSaleUseCase } from '@/modules/sales/application/use-cases/createDraftSale.useCase';
 import { ListDraftSalesUseCase } from '@/modules/sales/application/use-cases/listDraftSales.useCase';
 import { RemoveSaleItemUseCase } from '@/modules/sales/application/use-cases/removeSaleItem.useCase';
@@ -42,6 +43,7 @@ export interface AppContainer {
   updateSaleItemQuantity: UpdateSaleItemQuantityUseCase;
   updateSaleItemName: UpdateSaleItemNameUseCase;
   removeSaleItem: RemoveSaleItemUseCase;
+  confirmSale: ConfirmSaleUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -65,6 +67,7 @@ export function createAppContainer(): AppContainer {
     addSaleItem: new AddSaleItemUseCase(new HttpSale(http)),
     updateSaleItemQuantity: new UpdateSaleItemQuantityUseCase(new HttpSale(http)),
     updateSaleItemName: new UpdateSaleItemNameUseCase(new HttpSale(http)),
-    removeSaleItem: new RemoveSaleItemUseCase(new HttpSale(http))
+    removeSaleItem: new RemoveSaleItemUseCase(new HttpSale(http)),
+    confirmSale: new ConfirmSaleUseCase(new HttpSale(http))
   };
 }

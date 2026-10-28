@@ -10,6 +10,9 @@ interface SaleLinesProps {
   error: MessageKey | null;
   lineError: MessageKey | null;
   busy: boolean;
+  confirming: boolean;
+  confirmError: MessageKey | null;
+  onConfirm: () => void;
   onQuantity: (productId: string, quantity: number) => void;
   onName: (productId: string, itemName: string) => void;
   onRemove: (productId: string) => void;
@@ -21,6 +24,9 @@ export function SaleLines({
   error,
   lineError,
   busy,
+  confirming,
+  confirmError,
+  onConfirm,
   onQuantity,
   onName,
   onRemove
@@ -34,9 +40,20 @@ export function SaleLines({
       {lineError ? <p role="alert">{t(lineError)}</p> : null}
       {sale ? (
         <>
+          {sale.invoiceNumber ? (
+            <p>
+              {t('invoiceAssigned')} {sale.invoiceNumber}
+            </p>
+          ) : null}
           <p className="m">
             {t('saleTotal')} {formatCurrency(sale.totalAmount)} · {t('profit')} {formatCurrency(sale.totalProfit)}
           </p>
+          {confirmError ? <p role="alert">{t(confirmError)}</p> : null}
+          {sale.status === 'DRAFT' ? (
+            <button className="btn" type="button" disabled={busy || confirming || sale.items.length === 0} onClick={onConfirm}>
+              {confirming ? t('confirmingSale') : t('confirmSale')}
+            </button>
+          ) : null}
           {sale.items.length === 0 ? <p className="m">{t('saleEmpty')}</p> : null}
           <ul className="list">
             {sale.items.map(item => (

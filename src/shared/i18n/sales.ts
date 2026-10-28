@@ -14,7 +14,12 @@ export const salesMessages = catalog(
     saleEmpty: 'Todavía no hay líneas.',
     saleTotal: 'Total',
     itemName: 'Nombre en la factura',
-    removeItem: 'Quitar'
+    removeItem: 'Quitar',
+    confirmSale: 'Confirmar venta',
+    confirmingSale: 'Confirmando…',
+    saleMustContainItems: 'Agrega al menos un producto antes de confirmar.',
+    saleConfirmFailed: 'No se pudo confirmar la venta.',
+    invoiceAssigned: 'Número de factura'
   },
   {
     addItem: 'Add',
@@ -29,6 +34,11 @@ export const salesMessages = catalog(
     saleEmpty: 'There are no lines yet.',
     saleTotal: 'Total',
     itemName: 'Name on the invoice',
-    removeItem: 'Remove'
+    removeItem: 'Remove',
+    confirmSale: 'Confirm sale',
+    confirmingSale: 'Confirming…',
+    saleMustContainItems: 'Add at least one product before confirming.',
+    saleConfirmFailed: 'The sale could not be confirmed.',
+    invoiceAssigned: 'Invoice number'
   }
 );
