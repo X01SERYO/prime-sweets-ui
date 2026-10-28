@@ -7,9 +7,11 @@ import '@/modules/catalog/adapters/ui/views/productSearch.css';
 
 interface ProductSearchViewProps {
   searchProducts: SearchProductsUseCase;
+  onSelect?: (productId: string) => void;
+  selecting?: boolean;
 }
 
-export function ProductSearchView({ searchProducts }: ProductSearchViewProps) {
+export function ProductSearchView({ searchProducts, onSelect, selecting }: ProductSearchViewProps) {
   const { t } = useLocale();
   const { query, setQuery, submit, products, loading, error, searched } = useProductSearch(searchProducts);
 
@@ -39,7 +41,6 @@ export function ProductSearchView({ searchProducts }: ProductSearchViewProps) {
       </form>
       {error ? <p role="alert">{t(error)}</p> : null}
       {searched && !loading && !error && products.length === 0 ? <p className="m">{t('noResults')}</p> : null}
-      <p className="m">{t('linesLater')}</p>
       {products.length > 0 ? (
         <ul className="product-hits">
           {products.map(product => (
@@ -50,6 +51,11 @@ export function ProductSearchView({ searchProducts }: ProductSearchViewProps) {
                 {' · '}
                 {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)} {t('wholesale')}
               </span>
+              {onSelect ? (
+                <button className="btn btn-secondary" type="button" disabled={selecting} onClick={() => onSelect(product.id)}>
+                  {t('addItem')}
+                </button>
+              ) : null}
             </li>
           ))}
         </ul>

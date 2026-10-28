@@ -20,7 +20,7 @@ Screen: `/sales`.
 1. An empty query does not call the API. The screen asks for a name, brand, or code.
 2. Submit calls `SearchProductsUseCase`, which trims the query and calls `GET /products/search?q=`.
 3. The mapper keeps `id`, `name`, `alegraId` as `code`, and `wholesalePrice`. The API payload has no brand name, so the hit does not invent one.
-4. Wholesale price is display-only. There is no price input. When the route has `customerId`, the screen shows that customer. Adding a line is not built.
+4. Wholesale price is display-only. There is no price input and no add-to-sale action.
 5. A non-2xx response shows `error` from the body, or `HTTP {status}`. Network failure shows the client message. The list is cleared.
 
 ## 3. Search or create a customer
@@ -44,7 +44,7 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 | Sign in / sign out | Built. The session token is sent as a bearer token and dies when the API process restarts. |
 | Close and reopen Sales Day | Commands and confirmation. Open and read are built. Close and reopen are not. |
 | Search or create customer | Built. Search calls `GET /customers/search?q=`. Create sends document type, number, and name; extra fields stay behind a control. Choosing or creating a customer opens `/sales?customerId=`. |
-| Search catalog and edit a draft sale | Server search. Quantity and item name only. No price input. |
+| Search catalog and edit a draft sale | Built when `/sales` has `customerId` and today’s Sales Day is open. The UI creates or reuses a draft, then adds a line, changes quantity and item name, and removes a line. Price is display-only. Confirm and void are not built. |
 | Confirm sale | Show the invoice number returned by the API. |
 | Void sale | While the Sales Day is open. Keep the number on screen as returned. |
 | Load Sheet | Read-only, closed day only, no print. |

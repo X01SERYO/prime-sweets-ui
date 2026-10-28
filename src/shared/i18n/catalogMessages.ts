@@ -12,8 +12,7 @@ export const catalogMessages = catalog(
     catalogFailed: 'No se pudo buscar el catálogo.',
     noName: 'Sin nombre',
     noPrice: 'Sin precio',
-    wholesale: 'mayorista',
-    linesLater: 'Las líneas, el cliente y confirmar la venta llegan en el siguiente paso.'
+    wholesale: 'mayorista'
   },
   {
     searchProduct: 'Search product',
@@ -26,7 +25,6 @@ export const catalogMessages = catalog(
     catalogFailed: 'Could not search the catalog.',
     noName: 'No name',
     noPrice: 'No price',
-    wholesale: 'wholesale',
-    linesLater: 'Lines, the customer, and sale confirmation arrive in the next step.'
+    wholesale: 'wholesale'
   }
 );

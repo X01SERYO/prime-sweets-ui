@@ -14,6 +14,13 @@ import { HttpSalesDayCommand } from '@/modules/sales-day/adapters/infrastructure
 import { HttpSalesDayQuery } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayQuery';
 import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
+import { HttpSale } from '@/modules/sales/adapters/infrastructure/httpSale';
+import { AddSaleItemUseCase } from '@/modules/sales/application/use-cases/addSaleItem.useCase';
+import { CreateDraftSaleUseCase } from '@/modules/sales/application/use-cases/createDraftSale.useCase';
+import { ListDraftSalesUseCase } from '@/modules/sales/application/use-cases/listDraftSales.useCase';
+import { RemoveSaleItemUseCase } from '@/modules/sales/application/use-cases/removeSaleItem.useCase';
+import { UpdateSaleItemNameUseCase } from '@/modules/sales/application/use-cases/updateSaleItemName.useCase';
+import { UpdateSaleItemQuantityUseCase } from '@/modules/sales/application/use-cases/updateSaleItemQuantity.useCase';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -29,6 +36,12 @@ export interface AppContainer {
   searchCustomers: SearchCustomersUseCase;
   getCustomer: GetCustomerUseCase;
   createCustomer: CreateCustomerUseCase;
+  listDraftSales: ListDraftSalesUseCase;
+  createDraftSale: CreateDraftSaleUseCase;
+  addSaleItem: AddSaleItemUseCase;
+  updateSaleItemQuantity: UpdateSaleItemQuantityUseCase;
+  updateSaleItemName: UpdateSaleItemNameUseCase;
+  removeSaleItem: RemoveSaleItemUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -46,6 +59,12 @@ export function createAppContainer(): AppContainer {
     openSalesDay: new OpenSalesDayUseCase(new HttpSalesDayCommand(http)),
     searchCustomers: new SearchCustomersUseCase(new HttpCustomerQuery(http)),
     getCustomer: new GetCustomerUseCase(new HttpCustomerQuery(http)),
-    createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http))
+    createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http)),
+    listDraftSales: new ListDraftSalesUseCase(new HttpSale(http)),
+    createDraftSale: new CreateDraftSaleUseCase(new HttpSale(http)),
+    addSaleItem: new AddSaleItemUseCase(new HttpSale(http)),
+    updateSaleItemQuantity: new UpdateSaleItemQuantityUseCase(new HttpSale(http)),
+    updateSaleItemName: new UpdateSaleItemNameUseCase(new HttpSale(http)),
+    removeSaleItem: new RemoveSaleItemUseCase(new HttpSale(http))
   };
 }

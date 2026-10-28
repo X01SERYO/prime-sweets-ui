@@ -17,6 +17,8 @@ export interface RequestOptions {
 export interface HttpClient {
   get<T>(path: string, options?: RequestOptions): Promise<T>;
   post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
+  put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
+  delete<T>(path: string, options?: RequestOptions): Promise<T>;
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -50,6 +52,18 @@ export function createHttpClient(baseUrl: string, getToken?: () => string | null
         headers: headers(options),
         body: JSON.stringify(body)
       });
+      return readJson<T>(response);
+    },
+    async put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+      const response = await fetch(`${baseUrl}${path}`, {
+        method: 'PUT',
+        headers: headers(options),
+        body: JSON.stringify(body)
+      });
+      return readJson<T>(response);
+    },
+    async delete<T>(path: string, options?: RequestOptions): Promise<T> {
+      const response = await fetch(`${baseUrl}${path}`, { method: 'DELETE', headers: headers(options) });
       return readJson<T>(response);
     }
   };

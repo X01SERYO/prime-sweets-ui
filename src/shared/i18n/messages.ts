@@ -2,6 +2,7 @@ import { catalogMessages } from '@/shared/i18n/catalogMessages';
 import { customerMessages } from '@/shared/i18n/customers';
 import { identityMessages } from '@/shared/i18n/identity';
 import { listMessages } from '@/shared/i18n/lists';
+import { salesMessages } from '@/shared/i18n/sales';
 import { salesDayMessages } from '@/shared/i18n/salesDay';
 import { shellMessages } from '@/shared/i18n/shell';
 
@@ -14,6 +15,7 @@ export const messages = {
     ...salesDayMessages.es,
     ...catalogMessages.es,
     ...customerMessages.es,
+    ...salesMessages.es,
     ...listMessages.es
   },
   en: {
@@ -22,6 +24,7 @@ export const messages = {
     ...salesDayMessages.en,
     ...catalogMessages.en,
     ...customerMessages.en,
+    ...salesMessages.en,
     ...listMessages.en
   }
 } as const;

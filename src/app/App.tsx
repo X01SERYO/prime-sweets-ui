@@ -5,7 +5,10 @@ import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
 import { InvoiceList } from '@/modules/fulfillment-output/adapters/ui/views/InvoiceList';
 import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
+import { useDraftSale } from '@/modules/sales/adapters/ui/hooks/useDraftSale';
+import { useSaleMutations } from '@/modules/sales/adapters/ui/hooks/useSaleMutations';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
+import { SaleLines } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
 import { SalesDayHome } from '@/modules/sales-day/adapters/ui/views/SalesDayHome';
@@ -16,12 +19,36 @@ interface AppProps {
   container: AppContainer;
 }
 
-function SaleSearch({ container }: { container: AppContainer }) {
+function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId: string }) {
   const [params] = useSearchParams();
+  const customerId = params.get('customerId');
+  const draft = useDraftSale(sellerId, customerId, container.getCurrentSalesDay, container.listDraftSales, container.createDraftSale);
+  const lines = useSaleMutations(
+    draft.sale,
+    draft.setSale,
+    container.addSaleItem,
+    container.updateSaleItemQuantity,
+    container.updateSaleItemName,
+    container.removeSaleItem
+  );
   return (
     <>
-      <SelectedCustomer customerId={params.get('customerId')} getCustomer={container.getCustomer} />
-      <ProductSearchView searchProducts={container.searchProducts} />
+      <SelectedCustomer customerId={customerId} getCustomer={container.getCustomer} />
+      <ProductSearchView
+        searchProducts={container.searchProducts}
+        selecting={lines.busy}
+        onSelect={productId => void lines.add(productId)}
+      />
+      <SaleLines
+        sale={draft.sale}
+        loading={draft.loading}
+        error={draft.error}
+        lineError={lines.error}
+        busy={lines.busy}
+        onQuantity={(productId, quantity) => void lines.changeQuantity(productId, quantity)}
+        onName={(productId, itemName) => void lines.changeName(productId, itemName)}
+        onRemove={productId => void lines.remove(productId)}
+      />
     </>
   );
 }
@@ -94,7 +121,7 @@ export function App({ container }: AppProps) {
           <Route
             path="/sales"
             element={
-              session ? <SaleSearch container={container} /> : <Navigate to="/login" replace />
+              session ? <SaleSearch container={container} sellerId={session.user.id} /> : <Navigate to="/login" replace />
             }
           />
           <Route path="/load-sheets" element={session ? <LoadSheetList /> : <Navigate to="/login" replace />} />
