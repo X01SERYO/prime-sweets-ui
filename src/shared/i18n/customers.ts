@@ -1,0 +1,50 @@
+import { catalog } from '@/shared/i18n/catalog';
+
+export const customerMessages = catalog(
+  {
+    customerSearchHint: 'Busca por nombre o número de documento.',
+    customerSearch: 'Nombre o documento',
+    customerSearchRequired: 'Escribe un nombre o un documento.',
+    customerNoResults: 'No hay clientes con esa búsqueda.',
+    customerSearchFailed: 'No se pudo buscar clientes.',
+    customerCreate: 'Crear cliente',
+    documentType: 'Tipo de documento',
+    documentNumber: 'Número de documento',
+    customerName: 'Nombre',
+    customerFieldsRequired: 'Tipo, número y nombre son obligatorios.',
+    customerAlreadyExists: 'Ya existe un cliente con ese documento.',
+    customerInvalid: 'La respuesta del cliente no es válida.',
+    customerNotFound: 'No se encontró el cliente.',
+    customerCreateFailed: 'No se pudo crear el cliente.',
+    customerLoadFailed: 'No se pudo cargar el cliente.',
+    extraInvoicing: 'Datos de facturación',
+    phone: 'Teléfono',
+    address: 'Dirección',
+    chooseCustomer: 'Usar en la venta',
+    saleCustomer: 'Cliente de la venta',
+    saleNeedsCustomer: 'Elige o crea un cliente antes de armar la venta.'
+  },
+  {
+    customerSearchHint: 'Search by name or document number.',
+    customerSearch: 'Name or document',
+    customerSearchRequired: 'Enter a name or a document.',
+    customerNoResults: 'No customers match that search.',
+    customerSearchFailed: 'Customer search failed.',
+    customerCreate: 'Create customer',
+    documentType: 'Document type',
+    documentNumber: 'Document number',
+    customerName: 'Name',
+    customerFieldsRequired: 'Type, number, and name are required.',
+    customerAlreadyExists: 'A customer with that document already exists.',
+    customerInvalid: 'The customer response is not valid.',
+    customerNotFound: 'Customer was not found.',
+    customerCreateFailed: 'The customer could not be created.',
+    customerLoadFailed: 'The customer could not be loaded.',
+    extraInvoicing: 'Invoicing details',
+    phone: 'Phone',
+    address: 'Address',
+    chooseCustomer: 'Use on the sale',
+    saleCustomer: 'Sale customer',
+    saleNeedsCustomer: 'Choose or create a customer before building the sale.'
+  }
+);

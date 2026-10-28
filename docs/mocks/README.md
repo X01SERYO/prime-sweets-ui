@@ -12,7 +12,7 @@ The shell follows the mock chrome: a top bar and the Sales Day screen as the hub
 | Sign in, rejected credentials | PC | Same form, credential error | Built. A rejected password shows the translated error. |
 | Open Sales Day and close confirmation | Phone | Date, ABIERTA, Clientes, Ventas del día, Cerrar jornada, confirm card | Current day loads and can be opened. Close and the confirmation card are not built. |
 | Closed Sales Day | PC | CERRADA, Cargue, Facturas, Reabrir jornada | Not built. |
-| Customers, search and create error | Phone | Search, pick, create, duplicate document error | Sample list behind a port. Search and create are not built. |
+| Customers, search and create error | Phone | Search, pick, create, duplicate document error | Search, create, and the duplicate-document message call the API. Picking a customer opens the sale with `customerId`. |
 | Day sales | Phone | Draft, confirmed, and voided sales | Sample list at `/day-sales`. |
 | Sale draft | Phone | Customer, product search, lines, totals, Confirmar venta | Search card only. Lines and confirm are not built. |
 | Sale draft | PC | Search beside the line table | Search card only. The second column arrives with the lines. |

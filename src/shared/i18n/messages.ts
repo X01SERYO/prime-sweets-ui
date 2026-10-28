@@ -1,4 +1,5 @@
 import { catalogMessages } from '@/shared/i18n/catalogMessages';
+import { customerMessages } from '@/shared/i18n/customers';
 import { identityMessages } from '@/shared/i18n/identity';
 import { listMessages } from '@/shared/i18n/lists';
 import { salesDayMessages } from '@/shared/i18n/salesDay';
@@ -12,6 +13,7 @@ export const messages = {
     ...identityMessages.es,
     ...salesDayMessages.es,
     ...catalogMessages.es,
+    ...customerMessages.es,
     ...listMessages.es
   },
   en: {
@@ -19,6 +21,7 @@ export const messages = {
     ...identityMessages.en,
     ...salesDayMessages.en,
     ...catalogMessages.en,
+    ...customerMessages.en,
     ...listMessages.en
   }
 } as const;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router';
+import { Navigate, Route, Routes, useSearchParams } from 'react-router';
+import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
 import { InvoiceList } from '@/modules/fulfillment-output/adapters/ui/views/InvoiceList';
@@ -13,6 +14,16 @@ import { useLocale } from '@/shared/i18n/useLocale';
 
 interface AppProps {
   container: AppContainer;
+}
+
+function SaleSearch({ container }: { container: AppContainer }) {
+  const [params] = useSearchParams();
+  return (
+    <>
+      <SelectedCustomer customerId={params.get('customerId')} getCustomer={container.getCustomer} />
+      <ProductSearchView searchProducts={container.searchProducts} />
+    </>
+  );
 }
 
 export function App({ container }: AppProps) {
@@ -69,12 +80,21 @@ export function App({ container }: AppProps) {
               )
             }
           />
-          <Route path="/customers" element={session ? <CustomerList /> : <Navigate to="/login" replace />} />
+          <Route
+            path="/customers"
+            element={
+              session ? (
+                <CustomerList searchCustomers={container.searchCustomers} createCustomer={container.createCustomer} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
           <Route path="/day-sales" element={session ? <DaySalesList /> : <Navigate to="/login" replace />} />
           <Route
             path="/sales"
             element={
-              session ? <ProductSearchView searchProducts={container.searchProducts} /> : <Navigate to="/login" replace />
+              session ? <SaleSearch container={container} /> : <Navigate to="/login" replace />
             }
           />
           <Route path="/load-sheets" element={session ? <LoadSheetList /> : <Navigate to="/login" replace />} />

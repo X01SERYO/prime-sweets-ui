@@ -35,9 +35,9 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 |---|---|
 | Vite + React + TypeScript shell | Yes |
 | Composition root and shared HTTP client | Yes |
-| Feature modules (`catalog`, `customers`, `sales-day`, `sales`, `fulfillment-output`) | Catalog search, login, and the current Sales Day call the API. The four lists use sample adapters. |
+| Feature modules (`catalog`, `customers`, `sales-day`, `sales`, `fulfillment-output`) | Catalog search, customers, login, and the current Sales Day call the API. Day sales, the load sheet, and invoices use sample adapters. |
 | Seller session | Yes — login, logout, and the bearer token. The seller id comes from the session. |
-| Sales Day, customer, sale, Load Sheet, and invoice screens | Sales Day loads and opens. The other four screens render sample rows. Close, sale lines, and print are not built. |
+| Sales Day, customer, sale, Load Sheet, and invoice screens | Sales Day loads and opens. Customers search, create, and hand the id to `/sales`. Day sales, the load sheet, and invoices still render sample rows. Close, sale lines, and print are not built. |
 | Invoice printing through the browser print dialog | No |
 | Narrow and wide shell (SPEC § 4.1) | Partial — navigation reflows at `64rem`. Feature screens are placeholders. |
 | Spanish default and English option (SPEC § 2.1) | Partial — the shell and the sale search use the dictionaries. New screens must use them too. |
