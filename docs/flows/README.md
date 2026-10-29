@@ -41,7 +41,7 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 | Flow | UI responsibility once built |
 |---|---|
 | Language | Shell control for Spanish (default) and English. Dictionaries live per screen. No API call. |
-| Sign in / sign out | Built. The session token is sent as a bearer token and dies when the API process restarts. |
+| Sign in / sign out | Built. The session token is sent as a bearer token. The API stores the session and keeps at most three open sessions for the seller. |
 | Close and reopen Sales Day | Built. The screen asks for confirmation, then calls `POST /sales-days/:id/close` or `POST /sales-days/:id/reopen`. The API rejects a historical reopen. The load sheet stays disabled until the day is closed. Invoices are available while the day exists. |
 | Search or create customer | Built. Search calls `GET /customers/search?q=`. Create sends document type, number, and name; extra fields stay behind a control. Choosing or creating a customer opens `/sales?customerId=`. |
 | Search catalog and edit a draft sale | Built when `/sales` has `customerId` and today’s Sales Day is open. The UI creates or reuses a draft, then adds a line, changes quantity and item name, and removes a line. Price is display-only. Confirm and void are not built. |
