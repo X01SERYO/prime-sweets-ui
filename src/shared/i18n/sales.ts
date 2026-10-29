@@ -19,7 +19,13 @@ export const salesMessages = catalog(
     confirmingSale: 'Confirmando…',
     saleMustContainItems: 'Agrega al menos un producto antes de confirmar.',
     saleConfirmFailed: 'No se pudo confirmar la venta.',
-    invoiceAssigned: 'Número de factura'
+    invoiceAssigned: 'Número de factura',
+    voidSale: 'Anular venta',
+    voidingSale: 'Anulando…',
+    saleVoidFailed: 'No se pudo anular la venta.',
+    saleAlreadyVoided: 'Esta venta ya está anulada.',
+    saleCannotBeModified: 'Esta venta no se puede anular.',
+    saleVoided: 'Anulada. El número de factura se conserva.'
   },
   {
     addItem: 'Add',
@@ -39,6 +45,12 @@ export const salesMessages = catalog(
     confirmingSale: 'Confirming…',
     saleMustContainItems: 'Add at least one product before confirming.',
     saleConfirmFailed: 'The sale could not be confirmed.',
-    invoiceAssigned: 'Invoice number'
+    invoiceAssigned: 'Invoice number',
+    voidSale: 'Void sale',
+    voidingSale: 'Voiding…',
+    saleVoidFailed: 'The sale could not be voided.',
+    saleAlreadyVoided: 'This sale is already voided.',
+    saleCannotBeModified: 'This sale cannot be voided.',
+    saleVoided: 'Voided. The invoice number stays.'
   }
 );

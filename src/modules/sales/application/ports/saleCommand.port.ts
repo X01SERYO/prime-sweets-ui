@@ -7,4 +7,5 @@ export interface SaleCommandPort {
   updateName(saleId: string, productId: string, itemName: string): Promise<SaleModel>;
   removeItem(saleId: string, productId: string): Promise<SaleModel>;
   confirm(saleId: string): Promise<SaleModel>;
+  void(saleId: string): Promise<SaleModel>;
 }

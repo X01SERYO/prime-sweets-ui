@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
@@ -13,6 +13,9 @@ interface SaleLinesProps {
   confirming: boolean;
   confirmError: MessageKey | null;
   onConfirm: () => void;
+  voiding: boolean;
+  voidError: MessageKey | null;
+  onVoid: () => void;
   onQuantity: (productId: string, quantity: number) => void;
   onName: (productId: string, itemName: string) => void;
   onRemove: (productId: string) => void;
@@ -27,6 +30,9 @@ export function SaleLines({
   confirming,
   confirmError,
   onConfirm,
+  voiding,
+  voidError,
+  onVoid,
   onQuantity,
   onName,
   onRemove
@@ -49,16 +55,23 @@ export function SaleLines({
             {t('saleTotal')} {formatCurrency(sale.totalAmount)} · {t('profit')} {formatCurrency(sale.totalProfit)}
           </p>
           {confirmError ? <p role="alert">{t(confirmError)}</p> : null}
+          {sale.status === 'VOIDED' ? <p className="m">{t('saleVoided')}</p> : null}
+          {voidError ? <p role="alert">{t(voidError)}</p> : null}
           {sale.status === 'DRAFT' ? (
             <button className="btn" type="button" disabled={busy || confirming || sale.items.length === 0} onClick={onConfirm}>
               {confirming ? t('confirmingSale') : t('confirmSale')}
+            </button>
+          ) : null}
+          {sale.status === 'CONFIRMED' ? (
+            <button className="btn btn-secondary" type="button" disabled={busy || voiding} onClick={onVoid}>
+              {voiding ? t('voidingSale') : t('voidSale')}
             </button>
           ) : null}
           {sale.items.length === 0 ? <p className="m">{t('saleEmpty')}</p> : null}
           <ul className="list">
             {sale.items.map(item => (
               <SaleLine
-                key={item.productId}
+                key={`${item.productId}:${item.itemName}:${item.quantity}`}
                 itemName={item.itemName}
                 quantity={item.quantity}
                 lineTotal={item.lineTotal}
@@ -89,11 +102,6 @@ function SaleLine(props: {
   const { t } = useLocale();
   const [name, setName] = useState(props.itemName);
   const [quantity, setQuantity] = useState(String(props.quantity));
-
-  useEffect(() => {
-    setName(props.itemName);
-    setQuantity(String(props.quantity));
-  }, [props.itemName, props.quantity]);
 
   return (
     <li className="card">
