@@ -65,15 +65,17 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
           {current.salesDay.status === 'OPEN' ? t('salesDayOpen') : t('salesDayClosed')}
         </p>
       ) : null}
-      <Link className="btn" to="/customers">
-        {t('customers')}
-      </Link>
-      <Link className="btn btn-secondary" to="/day-sales">
-        {t('daySales')}
-      </Link>
-      <Link className="btn btn-secondary" to="/sales">
-        {t('sale')}
-      </Link>
+      {current.salesDay?.status === 'OPEN' ? (
+        <>
+          <Link className="btn" to="/sales">
+            {t('sale')}
+          </Link>
+          <Link className="btn btn-secondary" to="/day-sales">
+            {t('daySales')}
+          </Link>
+          <p className="m">{t('loadLater')}</p>
+        </>
+      ) : null}
       {current.salesDay?.status === 'OPEN' ? (
         <button className="btn btn-secondary" type="button" onClick={() => setPending('close')}>
           {t('closeDay')}
@@ -103,27 +105,19 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
           </div>
         </form>
       ) : null}
-      <p className="m">{t('loadLater')}</p>
-      <div className="row">
-        {closed ? (
-          <Link className="btn btn-secondary" to={`/load-sheets/${current.salesDay?.id}`}>
+      {closed && current.salesDay ? (
+        <div className="row">
+          <Link className="btn btn-secondary" to={`/load-sheets/${current.salesDay.id}`}>
             {t('loadSheet')}
           </Link>
-        ) : (
-          <button className="btn btn-secondary" type="button" disabled>
-            {t('loadSheet')}
-          </button>
-        )}
-        {current.salesDay ? (
           <Link className="btn btn-secondary" to={`/invoices/${current.salesDay.id}`}>
             {t('invoices')}
           </Link>
-        ) : (
-          <button className="btn btn-secondary" type="button" disabled>
-            {t('invoices')}
-          </button>
-        )}
-      </div>
+          <Link className="btn btn-secondary" to="/day-sales">
+            {t('daySales')}
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

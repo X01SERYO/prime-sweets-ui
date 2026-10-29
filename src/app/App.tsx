@@ -39,7 +39,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   return (
     <>
       <SelectedCustomer customerId={customerId} getCustomer={container.getCustomer} />
-      {!draft.sale || draft.sale.status === 'DRAFT' ? (
+      {draft.sale?.status === 'DRAFT' ? (
         <ProductSearchView
           searchProducts={container.searchProducts}
           selecting={lines.busy || confirmation.confirming || voiding.voiding}
@@ -132,7 +132,20 @@ export function App({ container }: AppProps) {
               )
             }
           />
-          <Route path="/day-sales" element={session ? <DaySalesList /> : <Navigate to="/login" replace />} />
+          <Route
+            path="/day-sales"
+            element={
+              session ? (
+                <DaySalesList
+                  sellerId={session.user.id}
+                  getCurrentSalesDay={container.getCurrentSalesDay}
+                  listDaySales={container.listDaySales}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
           <Route
             path="/sales"
             element={

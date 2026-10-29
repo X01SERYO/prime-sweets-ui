@@ -11,7 +11,7 @@ Only the flow that exists in code is described as current. Version 1 seller flow
 3. `createAppContainer()` reads `VITE_API_BASE_URL`.
 4. `App` renders a top bar and opens `/sales-day`. That screen links to customers, the sale search, the load sheet, and invoices. There is no side menu.
 5. `ES | EN` switches the chrome between Spanish and English and stores the choice in `localStorage`. The default is Spanish.
-6. Login, logout, the current Sales Day, opening it, product search, customer search/create, the load sheet, and invoices call the API. Day sales still reads a sample adapter. Printing invoices opens one browser print dialog.
+6. Login, logout, the current Sales Day, opening it, product search, customer search/create, day sales, the load sheet, and invoices call the API. Printing invoices opens one browser print dialog.
 
 ## 2. Search products
 
@@ -42,8 +42,9 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 |---|---|
 | Language | Shell control for Spanish (default) and English. Dictionaries live per screen. No API call. |
 | Sign in / sign out | Built. The session token is sent as a bearer token. The API stores the session and keeps at most three open sessions for the seller. |
-| Close and reopen Sales Day | Built. The screen asks for confirmation, then calls `POST /sales-days/:id/close` or `POST /sales-days/:id/reopen`. The API rejects a historical reopen. The load sheet stays disabled until the day is closed. Invoices are available while the day exists. |
+| Close and reopen Sales Day | Built. With no day, the screen only offers open. While the day is open, the seller starts sales and can close it after confirmation. Load sheet and invoices appear only after the day is closed. The API rejects a historical reopen. |
 | Search or create customer | Built. Search calls `GET /customers/search?q=`. Create sends document type, number, and name; extra fields stay behind a control. Choosing or creating a customer opens `/sales?customerId=`. |
+| List day sales | Built. The screen reads the current Sales Day and calls `GET /sales?salesDayId=`. Each row shows the customer name from `GET /customers/:id`, the status, the quantity, and the total. A draft opens `/sales?customerId=`. |
 | Search catalog and edit a draft sale | Built when `/sales` has `customerId` and today’s Sales Day is open. The UI creates or reuses a draft, then adds a line, changes quantity and item name, and removes a line. Price is display-only. Confirm and void are not built. |
 | Confirm sale | Built. `POST /sales/:id/confirm` runs only when the draft has at least one line. The screen shows `invoiceNumber` from the response. |
 | Void sale | Built for the confirmed sale on screen. `POST /sales/:id/void` runs only while that Sales Day is open. The screen keeps `invoiceNumber` from the response. |

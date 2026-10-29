@@ -3,7 +3,10 @@ import { catalog } from '@/shared/i18n/catalog';
 export const listMessages = catalog(
   {
     loadSheetLater: 'La hoja se consulta cuando la jornada está cerrada.',
-    dummyNotice: 'Datos de ejemplo. Este listado se quita cuando la pantalla lea el API.',
+    daySalesLoading: 'Consultando las ventas…',
+    daySalesEmpty: 'Esta jornada no tiene ventas.',
+    daySalesFailed: 'No se pudieron consultar las ventas.',
+    daySalesMissing: 'No hay jornada para listar las ventas.',
     statusDraft: 'Borrador',
     statusConfirmed: 'Confirmada',
     statusVoided: 'Anulada',
@@ -42,7 +45,10 @@ export const listMessages = catalog(
   },
   {
     loadSheetLater: 'The load sheet is read when the sales day is closed.',
-    dummyNotice: 'Sample data. This list is removed when the screen reads the API.',
+    daySalesLoading: 'Loading sales…',
+    daySalesEmpty: 'This sales day has no sales.',
+    daySalesFailed: 'Could not load the sales.',
+    daySalesMissing: 'There is no sales day to list.',
     statusDraft: 'Draft',
     statusConfirmed: 'Confirmed',
     statusVoided: 'Voided',
