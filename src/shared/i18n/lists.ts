@@ -15,7 +15,15 @@ export const listMessages = catalog(
     wholesalePrice: 'Precio venta mayorista',
     profit: 'Utilidad',
     notPrintable: 'No imprimible',
-    printable: 'Imprimible'
+    printable: 'Imprimible',
+    loadSheetLoading: 'Consultando la hoja…',
+    loadSheetEmpty: 'No hay productos confirmados en esta jornada.',
+    loadSheetNotClosed: 'La hoja solo se consulta con la jornada cerrada.',
+    loadSheetInvalid: 'La hoja no tiene el formato esperado.',
+    loadSheetFailed: 'No se pudo consultar la hoja.',
+    loadSheetMissingDay: 'Falta la jornada cerrada.',
+    lineName: 'Nombre',
+    brand: 'Marca'
   },
   {
     invoicesLater: 'Listing and printing invoices is still pending.',
@@ -31,6 +39,14 @@ export const listMessages = catalog(
     wholesalePrice: 'Wholesale sale price',
     profit: 'Profit',
     notPrintable: 'Not printable',
-    printable: 'Printable'
+    printable: 'Printable',
+    loadSheetLoading: 'Loading the load sheet…',
+    loadSheetEmpty: 'There are no confirmed products for this sales day.',
+    loadSheetNotClosed: 'The load sheet is available only after the sales day is closed.',
+    loadSheetInvalid: 'The load sheet response has an unexpected format.',
+    loadSheetFailed: 'Could not load the sheet.',
+    loadSheetMissingDay: 'The closed sales day is missing.',
+    lineName: 'Name',
+    brand: 'Brand'
   }
 );

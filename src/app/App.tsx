@@ -138,7 +138,10 @@ export function App({ container }: AppProps) {
               session ? <SaleSearch container={container} sellerId={session.user.id} /> : <Navigate to="/login" replace />
             }
           />
-          <Route path="/load-sheets" element={session ? <LoadSheetList /> : <Navigate to="/login" replace />} />
+          <Route
+            path="/load-sheets/:salesDayId"
+            element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
+          />
           <Route path="/invoices" element={session ? <InvoiceList /> : <Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to={session ? '/sales-day' : '/login'} replace />} />
         </Routes>

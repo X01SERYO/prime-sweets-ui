@@ -25,6 +25,8 @@ import { RemoveSaleItemUseCase } from '@/modules/sales/application/use-cases/rem
 import { UpdateSaleItemNameUseCase } from '@/modules/sales/application/use-cases/updateSaleItemName.useCase';
 import { UpdateSaleItemQuantityUseCase } from '@/modules/sales/application/use-cases/updateSaleItemQuantity.useCase';
 import { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
+import { HttpLoadSheetQuery } from '@/modules/fulfillment-output/adapters/infrastructure/httpLoadSheetQuery';
+import { ListLoadSheetUseCase } from '@/modules/fulfillment-output/application/use-cases/listLoadSheet.useCase';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -50,6 +52,7 @@ export interface AppContainer {
   removeSaleItem: RemoveSaleItemUseCase;
   confirmSale: ConfirmSaleUseCase;
   voidSale: VoidSaleUseCase;
+  listLoadSheet: ListLoadSheetUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -77,6 +80,7 @@ export function createAppContainer(): AppContainer {
     updateSaleItemName: new UpdateSaleItemNameUseCase(new HttpSale(http)),
     removeSaleItem: new RemoveSaleItemUseCase(new HttpSale(http)),
     confirmSale: new ConfirmSaleUseCase(new HttpSale(http)),
-    voidSale: new VoidSaleUseCase(new HttpSale(http))
+    voidSale: new VoidSaleUseCase(new HttpSale(http)),
+    listLoadSheet: new ListLoadSheetUseCase(new HttpLoadSheetQuery(http))
   };
 }

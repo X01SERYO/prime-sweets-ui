@@ -106,7 +106,7 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
       <p className="m">{t('loadLater')}</p>
       <div className="row">
         {closed ? (
-          <Link className="btn btn-secondary" to="/load-sheets">
+          <Link className="btn btn-secondary" to={`/load-sheets/${current.salesDay?.id}`}>
             {t('loadSheet')}
           </Link>
         ) : (

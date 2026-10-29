@@ -1,0 +1,28 @@
+.load-sheet-table {
+  display: none;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.load-sheet-table th,
+.load-sheet-table td {
+  padding: 0.55rem 0.4rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.load-sheet-table th {
+  color: var(--deep);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 64rem) {
+  .load-sheet-cards {
+    display: none;
+  }
+
+  .load-sheet-table {
+    display: table;
+  }
+}

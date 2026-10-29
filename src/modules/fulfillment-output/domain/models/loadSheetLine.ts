@@ -1,10 +1,10 @@
 export interface LoadSheetLineModel {
-  id: string;
-  brand: string;
+  productId: string;
+  brand: string | null;
   name: string;
-  cost: number | null;
-  price: number;
+  wholesaleCost: number | null;
+  wholesaleSalePrice: number | null;
   quantity: number;
-  total: number;
-  profit: number | null;
+  totalPrice: number;
+  profit: number;
 }

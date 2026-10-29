@@ -47,7 +47,7 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 | Search catalog and edit a draft sale | Built when `/sales` has `customerId` and today’s Sales Day is open. The UI creates or reuses a draft, then adds a line, changes quantity and item name, and removes a line. Price is display-only. Confirm and void are not built. |
 | Confirm sale | Built. `POST /sales/:id/confirm` runs only when the draft has at least one line. The screen shows `invoiceNumber` from the response. |
 | Void sale | Built for the confirmed sale on screen. `POST /sales/:id/void` runs only while that Sales Day is open. The screen keeps `invoiceNumber` from the response. |
-| Load Sheet | Read-only, closed day only, no print. |
+| Load Sheet | Built. `GET /load-sheets/:salesDayId` runs for a closed day. The screen does not group rows and has no print action. An open day is rejected. |
 | List invoices and print | Load API documents and open one browser print dialog, with a page break between invoices. Reprint loads the documents again. |
 
 The UI does not sync products to Alegra and does not import the Excel catalog.
