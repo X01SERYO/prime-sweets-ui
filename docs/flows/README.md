@@ -11,7 +11,7 @@ Only the flow that exists in code is described as current. Version 1 seller flow
 3. `createAppContainer()` reads `VITE_API_BASE_URL`.
 4. `App` renders a top bar and opens `/sales-day`. That screen links to customers, the sale search, the load sheet, and invoices. There is no side menu.
 5. `ES | EN` switches the chrome between Spanish and English and stores the choice in `localStorage`. The default is Spanish.
-6. No print dialog runs. Login, logout, the current Sales Day, opening it, product search, and customer search/create call the API. Day sales, the load sheet, and invoices still read sample adapters.
+6. Login, logout, the current Sales Day, opening it, product search, customer search/create, the load sheet, and invoices call the API. Day sales still reads a sample adapter. Printing invoices opens one browser print dialog.
 
 ## 2. Search products
 
@@ -42,12 +42,12 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 |---|---|
 | Language | Shell control for Spanish (default) and English. Dictionaries live per screen. No API call. |
 | Sign in / sign out | Built. The session token is sent as a bearer token and dies when the API process restarts. |
-| Close and reopen Sales Day | Built. The screen asks for confirmation, then calls `POST /sales-days/:id/close` or `POST /sales-days/:id/reopen`. The API rejects a historical reopen. Load sheet and invoices stay disabled until the day is closed. |
+| Close and reopen Sales Day | Built. The screen asks for confirmation, then calls `POST /sales-days/:id/close` or `POST /sales-days/:id/reopen`. The API rejects a historical reopen. The load sheet stays disabled until the day is closed. Invoices are available while the day exists. |
 | Search or create customer | Built. Search calls `GET /customers/search?q=`. Create sends document type, number, and name; extra fields stay behind a control. Choosing or creating a customer opens `/sales?customerId=`. |
 | Search catalog and edit a draft sale | Built when `/sales` has `customerId` and today’s Sales Day is open. The UI creates or reuses a draft, then adds a line, changes quantity and item name, and removes a line. Price is display-only. Confirm and void are not built. |
 | Confirm sale | Built. `POST /sales/:id/confirm` runs only when the draft has at least one line. The screen shows `invoiceNumber` from the response. |
 | Void sale | Built for the confirmed sale on screen. `POST /sales/:id/void` runs only while that Sales Day is open. The screen keeps `invoiceNumber` from the response. |
 | Load Sheet | Built. `GET /load-sheets/:salesDayId` runs for a closed day. The screen does not group rows and has no print action. An open day is rejected. |
-| List invoices and print | Load API documents and open one browser print dialog, with a page break between invoices. Reprint loads the documents again. |
+| List invoices and print | Built. `GET /invoices?salesDayId=` lists confirmed and voided sales. Voided sales stay on the list and cannot be printed. Preview and print call `GET /invoices/:saleId` again. One browser dialog prints the selected documents in invoice-number order, with a page break between them. |
 
 The UI does not sync products to Alegra and does not import the Excel catalog.

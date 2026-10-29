@@ -26,7 +26,7 @@ export const salesDayMessages = catalog(
     salesDayCannotReopen: 'Solo se puede reabrir la jornada de hoy.',
     salesDayCloseFailed: 'No se pudo cerrar la jornada.',
     salesDayReopenFailed: 'No se pudo reabrir la jornada.',
-    loadLater: 'Cargue y Facturas se habilitan al cerrar la jornada.'
+    loadLater: 'La hoja de carga se habilita al cerrar la jornada.'
   },
   {
     salesDay: 'Sales Day',
@@ -53,6 +53,6 @@ export const salesDayMessages = catalog(
     salesDayCannotReopen: 'Only today’s sales day can be reopened.',
     salesDayCloseFailed: 'Could not close the sales day.',
     salesDayReopenFailed: 'Could not reopen the sales day.',
-    loadLater: 'Load sheet and invoices become available after the sales day is closed.'
+    loadLater: 'The load sheet becomes available after the sales day is closed.'
   }
 );

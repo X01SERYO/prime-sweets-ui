@@ -4,6 +4,7 @@ import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
 import { InvoiceList } from '@/modules/fulfillment-output/adapters/ui/views/InvoiceList';
+import { InvoicePreview } from '@/modules/fulfillment-output/adapters/ui/views/InvoicePreview';
 import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
 import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale';
 import { useVoidSale } from '@/modules/sales/adapters/ui/hooks/useVoidSale';
@@ -142,7 +143,26 @@ export function App({ container }: AppProps) {
             path="/load-sheets/:salesDayId"
             element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
           />
-          <Route path="/invoices" element={session ? <InvoiceList /> : <Navigate to="/login" replace />} />
+          <Route
+            path="/invoices/:salesDayId"
+            element={
+              session ? (
+                <InvoiceList listInvoices={container.listInvoices} printInvoices={container.printInvoices} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/invoices/:salesDayId/:saleId"
+            element={
+              session ? (
+                <InvoicePreview generateInvoice={container.generateInvoice} printInvoices={container.printInvoices} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
           <Route path="*" element={<Navigate to={session ? '/sales-day' : '/login'} replace />} />
         </Routes>
         <p className="m">

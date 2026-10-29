@@ -25,8 +25,13 @@ import { RemoveSaleItemUseCase } from '@/modules/sales/application/use-cases/rem
 import { UpdateSaleItemNameUseCase } from '@/modules/sales/application/use-cases/updateSaleItemName.useCase';
 import { UpdateSaleItemQuantityUseCase } from '@/modules/sales/application/use-cases/updateSaleItemQuantity.useCase';
 import { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
+import { BrowserInvoicePrint } from '@/modules/fulfillment-output/adapters/infrastructure/browserInvoicePrint';
+import { HttpInvoiceQuery } from '@/modules/fulfillment-output/adapters/infrastructure/httpInvoiceQuery';
 import { HttpLoadSheetQuery } from '@/modules/fulfillment-output/adapters/infrastructure/httpLoadSheetQuery';
+import { GenerateInvoiceUseCase } from '@/modules/fulfillment-output/application/use-cases/generateInvoice.useCase';
+import { ListInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/listInvoices.useCase';
 import { ListLoadSheetUseCase } from '@/modules/fulfillment-output/application/use-cases/listLoadSheet.useCase';
+import { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -53,6 +58,9 @@ export interface AppContainer {
   confirmSale: ConfirmSaleUseCase;
   voidSale: VoidSaleUseCase;
   listLoadSheet: ListLoadSheetUseCase;
+  listInvoices: ListInvoicesUseCase;
+  generateInvoice: GenerateInvoiceUseCase;
+  printInvoices: PrintInvoicesUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -81,6 +89,9 @@ export function createAppContainer(): AppContainer {
     removeSaleItem: new RemoveSaleItemUseCase(new HttpSale(http)),
     confirmSale: new ConfirmSaleUseCase(new HttpSale(http)),
     voidSale: new VoidSaleUseCase(new HttpSale(http)),
-    listLoadSheet: new ListLoadSheetUseCase(new HttpLoadSheetQuery(http))
+    listLoadSheet: new ListLoadSheetUseCase(new HttpLoadSheetQuery(http)),
+    listInvoices: new ListInvoicesUseCase(new HttpInvoiceQuery(http)),
+    generateInvoice: new GenerateInvoiceUseCase(new HttpInvoiceQuery(http)),
+    printInvoices: new PrintInvoicesUseCase(new GenerateInvoiceUseCase(new HttpInvoiceQuery(http)), new BrowserInvoicePrint())
   };
 }

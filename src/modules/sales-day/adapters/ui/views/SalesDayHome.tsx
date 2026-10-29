@@ -114,8 +114,8 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
             {t('loadSheet')}
           </button>
         )}
-        {closed ? (
-          <Link className="btn btn-secondary" to="/invoices">
+        {current.salesDay ? (
+          <Link className="btn btn-secondary" to={`/invoices/${current.salesDay.id}`}>
             {t('invoices')}
           </Link>
         ) : (

@@ -2,7 +2,6 @@ import { catalog } from '@/shared/i18n/catalog';
 
 export const listMessages = catalog(
   {
-    invoicesLater: 'Listar e imprimir facturas queda pendiente.',
     loadSheetLater: 'La hoja se consulta cuando la jornada está cerrada.',
     dummyNotice: 'Datos de ejemplo. Este listado se quita cuando la pantalla lea el API.',
     statusDraft: 'Borrador',
@@ -23,10 +22,25 @@ export const listMessages = catalog(
     loadSheetFailed: 'No se pudo consultar la hoja.',
     loadSheetMissingDay: 'Falta la jornada cerrada.',
     lineName: 'Nombre',
-    brand: 'Marca'
+    brand: 'Marca',
+    invoiceListLoading: 'Consultando facturas…',
+    invoiceListEmpty: 'Esta jornada no tiene facturas.',
+    invoiceListFailed: 'No se pudieron consultar las facturas.',
+    invoiceMissingDay: 'Falta la jornada.',
+    invoiceInvalid: 'La factura no tiene el formato esperado.',
+    invoiceNotPrintable: 'Esa venta no se puede imprimir.',
+    companyProfileMissing: 'Falta el perfil de la empresa en el servidor.',
+    invoiceLoadLoading: 'Consultando la factura…',
+    invoiceLoadFailed: 'No se pudo consultar la factura.',
+    invoicePrintFailed: 'No se pudo preparar la impresión.',
+    invoicePrinting: 'Preparando impresión…',
+    invoiceSelectionRequired: 'Elija al menos una factura confirmada.',
+    invoicePreview: 'Vista previa',
+    printSelected: 'Imprimir selección',
+    printAll: 'Imprimir confirmadas',
+    reprint: 'Volver a imprimir'
   },
   {
-    invoicesLater: 'Listing and printing invoices is still pending.',
     loadSheetLater: 'The load sheet is read when the sales day is closed.',
     dummyNotice: 'Sample data. This list is removed when the screen reads the API.',
     statusDraft: 'Draft',
@@ -47,6 +61,22 @@ export const listMessages = catalog(
     loadSheetFailed: 'Could not load the sheet.',
     loadSheetMissingDay: 'The closed sales day is missing.',
     lineName: 'Name',
-    brand: 'Brand'
+    brand: 'Brand',
+    invoiceListLoading: 'Loading invoices…',
+    invoiceListEmpty: 'This sales day has no invoices.',
+    invoiceListFailed: 'Could not load the invoices.',
+    invoiceMissingDay: 'The sales day is missing.',
+    invoiceInvalid: 'The invoice response has an unexpected format.',
+    invoiceNotPrintable: 'That sale cannot be printed.',
+    companyProfileMissing: 'The company profile is missing on the server.',
+    invoiceLoadLoading: 'Loading the invoice…',
+    invoiceLoadFailed: 'Could not load the invoice.',
+    invoicePrintFailed: 'Could not prepare printing.',
+    invoicePrinting: 'Preparing print…',
+    invoiceSelectionRequired: 'Choose at least one confirmed invoice.',
+    invoicePreview: 'Preview',
+    printSelected: 'Print selection',
+    printAll: 'Print confirmed',
+    reprint: 'Print again'
   }
 );
