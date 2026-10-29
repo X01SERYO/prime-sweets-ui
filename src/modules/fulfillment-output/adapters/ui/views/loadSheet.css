@@ -1,5 +1,25 @@
+.load-sheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.load-sheet-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  margin: 0;
+  color: var(--deep);
+  font-weight: 700;
+}
+
+.load-sheet-scroll {
+  overflow-x: auto;
+}
+
 .load-sheet-table {
-  display: none;
   width: 100%;
   border-collapse: collapse;
 }
@@ -15,14 +35,4 @@
 .load-sheet-table th {
   color: var(--deep);
   font-size: 0.75rem;
-}
-
-@media (min-width: 64rem) {
-  .load-sheet-cards {
-    display: none;
-  }
-
-  .load-sheet-table {
-    display: table;
-  }
 }

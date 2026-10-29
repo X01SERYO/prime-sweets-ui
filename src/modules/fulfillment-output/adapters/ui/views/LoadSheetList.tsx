@@ -18,27 +18,29 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
   const { salesDayId } = useParams();
   const sheet = useLoadSheet(salesDayId, listLoadSheet);
 
+  const soldTotal = sheet.lines.reduce((sum, line) => sum + line.totalPrice, 0);
+  const profitTotal = sheet.lines.reduce((sum, line) => sum + line.profit, 0);
+
   return (
     <section className="stack">
-      <h1>{t('loadSheet')}</h1>
+      <header className="load-sheet-head">
+        <h1>{t('loadSheet')}</h1>
+        {!sheet.loading && !sheet.error ? (
+          <p className="load-sheet-totals">
+            <span>
+              {t('soldTotal')} {formatCurrency(soldTotal)}
+            </span>
+            <span>
+              {t('profitTotal')} {formatCurrency(profitTotal)}
+            </span>
+          </p>
+        ) : null}
+      </header>
       {sheet.loading ? <p className="m">{t('loadSheetLoading')}</p> : null}
       {sheet.error ? <p role="alert">{t(sheet.error)}</p> : null}
       {!sheet.loading && !sheet.error && sheet.lines.length === 0 ? <p className="m">{t('loadSheetEmpty')}</p> : null}
-      <ul className="list load-sheet-cards">
-        {sheet.lines.map(line => (
-          <li key={line.productId} className="card">
-            <b>{line.name}</b>
-            <span className="m">
-              {line.brand ?? '—'} · {t('wholesaleCost')} {moneyCell(line.wholesaleCost)} · {t('wholesalePrice')}{' '}
-              {moneyCell(line.wholesaleSalePrice)}
-            </span>
-            <span>
-              {t('quantity')} {line.quantity} · {formatCurrency(line.totalPrice)} · {t('profit')} {formatCurrency(line.profit)}
-            </span>
-          </li>
-        ))}
-      </ul>
       {sheet.lines.length > 0 ? (
+      <div className="load-sheet-scroll">
       <table className="load-sheet-table">
         <thead>
           <tr>
@@ -65,6 +67,7 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
           ))}
         </tbody>
       </table>
+      </div>
       ) : null}
     </section>
   );
