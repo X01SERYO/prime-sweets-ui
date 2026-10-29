@@ -1,4 +1,3 @@
-import { Link } from 'react-router';
 import { useSaleCustomer } from '@/modules/customers/adapters/ui/hooks/useSaleCustomer';
 import type { GetCustomerUseCase } from '@/modules/customers/application/use-cases/getCustomer.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -13,18 +12,33 @@ export function SelectedCustomer({ customerId, getCustomer }: SelectedCustomerPr
   const { customer, error } = useSaleCustomer(customerId, getCustomer);
 
   if (!customerId) {
-    return (
-      <p className="m">
-        {t('saleNeedsCustomer')} <Link to="/customers">{t('customers')}</Link>
-      </p>
-    );
+    return null;
   }
 
   return (
-    <p className="m">
-      {t('saleCustomer')}
-      {': '}
-      {error ? t(error) : customer ? `${customer.name} · ${customer.documentType} ${customer.documentNumber}` : '…'}
-    </p>
+    <section className="card">
+      <h2>{t('saleCustomer')}</h2>
+      {error ? <p role="alert">{t(error)}</p> : null}
+      {customer ? (
+        <table className="info">
+          <tbody>
+            <tr>
+              <th scope="row">{t('customerName')}</th>
+              <td>{customer.name}</td>
+            </tr>
+            <tr>
+              <th scope="row">{t('documentType')}</th>
+              <td>{customer.documentType}</td>
+            </tr>
+            <tr>
+              <th scope="row">{t('documentNumber')}</th>
+              <td>{customer.documentNumber}</td>
+            </tr>
+          </tbody>
+        </table>
+      ) : (
+        <p className="m">…</p>
+      )}
+    </section>
   );
 }

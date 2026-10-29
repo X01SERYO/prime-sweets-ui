@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { Navigate, Route, Routes, useSearchParams } from 'react-router';
+import { Link, Navigate, Route, Routes, useNavigate, useSearchParams } from 'react-router';
 import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
+import { SaleCustomerChoice } from '@/modules/customers/adapters/ui/views/SaleCustomerChoice';
 import { InvoiceList } from '@/modules/fulfillment-output/adapters/ui/views/InvoiceList';
 import { InvoicePreview } from '@/modules/fulfillment-output/adapters/ui/views/InvoicePreview';
 import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
 import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale';
-import { useVoidSale } from '@/modules/sales/adapters/ui/hooks/useVoidSale';
 import { useDraftSale } from '@/modules/sales/adapters/ui/hooks/useDraftSale';
 import { useSaleMutations } from '@/modules/sales/adapters/ui/hooks/useSaleMutations';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
-import { SaleLines } from '@/modules/sales/adapters/ui/views/SaleLines';
+import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
 import { SalesDayHome } from '@/modules/sales-day/adapters/ui/views/SalesDayHome';
@@ -23,11 +23,24 @@ interface AppProps {
 }
 
 function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId: string }) {
-  const [params] = useSearchParams();
+  const { t } = useLocale();
+  const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const customerId = params.get('customerId');
-  const draft = useDraftSale(sellerId, customerId, container.getCurrentSalesDay, container.listDraftSales, container.createDraftSale);
+  const saleId = params.get('saleId');
+  const [pending, setPending] = useState<PendingLine | null>(null);
+  const draft = useDraftSale(
+    sellerId,
+    customerId,
+    saleId,
+    container.getCurrentSalesDay,
+    container.listDraftSales,
+    container.createDraftSale,
+    container.getSale
+  );
+  const shownCustomerId = draft.sale?.customerId ?? customerId;
+  const canEditLines = !draft.sale || draft.sale.status === 'DRAFT' || draft.sale.status === 'CONFIRMED';
   const confirmation = useConfirmSale(container.confirmSale, draft.setSale);
-  const voiding = useVoidSale(container.voidSale, draft.setSale);
   const lines = useSaleMutations(
     draft.sale,
     draft.setSale,
@@ -38,12 +51,23 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   );
   return (
     <>
-      <SelectedCustomer customerId={customerId} getCustomer={container.getCustomer} />
-      {draft.sale?.status === 'DRAFT' ? (
+      <h1>{t('sale')}</h1>
+      {!shownCustomerId && !draft.loading ? (
+        <SaleCustomerChoice searchCustomers={container.searchCustomers} onSelect={id => setParams({ customerId: id })} />
+      ) : (
+        <SelectedCustomer customerId={shownCustomerId} getCustomer={container.getCustomer} />
+      )}
+      {shownCustomerId && canEditLines ? (
         <ProductSearchView
           searchProducts={container.searchProducts}
-          selecting={lines.busy || confirmation.confirming || voiding.voiding}
-          onSelect={productId => void lines.add(productId)}
+          selecting={lines.busy || confirmation.confirming}
+          onSelect={product =>
+            setPending({
+              productId: product.id,
+              name: product.name ?? product.code,
+              unitPrice: product.wholesalePrice
+            })
+          }
         />
       ) : null}
       <SaleLines
@@ -51,16 +75,28 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
         loading={draft.loading}
         error={draft.error}
         lineError={lines.error}
-        busy={lines.busy || confirmation.confirming || voiding.voiding}
+        busy={lines.busy || confirmation.confirming}
         confirming={confirmation.confirming}
         confirmError={confirmation.error}
-        onConfirm={() => void confirmation.confirm(draft.sale)}
-        voiding={voiding.voiding}
-        voidError={voiding.error}
-        onVoid={() => void voiding.voidConfirmed(draft.sale)}
+        onConfirm={() => {
+          if (draft.sale?.status === 'CONFIRMED') {
+            navigate('/sales-day');
+            return;
+          }
+          void confirmation.confirm(draft.sale).then(saved => {
+            if (saved) {
+              navigate('/sales-day');
+            }
+          });
+        }}
+        pending={pending}
+        onAcceptPending={(name, quantity) =>
+          pending ? lines.accept(pending.productId, quantity, name) : Promise.resolve(false)
+        }
+        onCancelPending={() => setPending(null)}
+        onRemove={productId => void lines.remove(productId)}
         onQuantity={(productId, quantity) => void lines.changeQuantity(productId, quantity)}
         onName={(productId, itemName) => void lines.changeName(productId, itemName)}
-        onRemove={productId => void lines.remove(productId)}
       />
     </>
   );
@@ -81,7 +117,9 @@ export function App({ container }: AppProps) {
   return (
     <div className="shell">
       <header className="topbar">
-        <img className="shell-logo" src="/logo.webp" alt="Dulcería La Principal" />
+        <Link to={session ? '/sales-day' : '/login'} aria-label={t('home')}>
+          <img className="shell-logo" src="/logo.webp" alt="Dulcería La Principal" />
+        </Link>
         {session ? (
           <button type="button" className="lang" onClick={() => void signOut()}>
             {t('signOut')}
@@ -126,7 +164,7 @@ export function App({ container }: AppProps) {
             path="/customers"
             element={
               session ? (
-                <CustomerList searchCustomers={container.searchCustomers} createCustomer={container.createCustomer} />
+                <CustomerList createCustomer={container.createCustomer} />
               ) : (
                 <Navigate to="/login" replace />
               )
@@ -140,6 +178,7 @@ export function App({ container }: AppProps) {
                   sellerId={session.user.id}
                   getCurrentSalesDay={container.getCurrentSalesDay}
                   listDaySales={container.listDaySales}
+                  voidSale={container.voidSale}
                 />
               ) : (
                 <Navigate to="/login" replace />
@@ -178,9 +217,6 @@ export function App({ container }: AppProps) {
           />
           <Route path="*" element={<Navigate to={session ? '/sales-day' : '/login'} replace />} />
         </Routes>
-        <p className="m">
-          {t('api')} <code>{container.apiBaseUrl}</code>
-        </p>
       </main>
     </div>
   );

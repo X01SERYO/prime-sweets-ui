@@ -9,11 +9,11 @@ export class UpdateSaleItemNameUseCase {
     this.command = command;
   }
 
-  async execute(saleId: string, productId: string, itemName: string): Promise<SaleModel> {
+  async execute(saleId: string, itemId: string, itemName: string): Promise<SaleModel> {
     const name = itemName.trim();
     if (!name) {
       throw new SaleInvalidError();
     }
-    return this.command.updateName(saleId, productId, name);
+    return this.command.updateName(saleId, itemId, name);
   }
 }

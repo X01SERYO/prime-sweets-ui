@@ -6,8 +6,14 @@ import type { MessageKey } from '@/shared/i18n/messages';
 
 export function useDaySales(sellerId: string, getCurrentSalesDay: GetCurrentSalesDayUseCase, listDaySales: ListDaySalesUseCase) {
   const [sales, setSales] = useState<DaySaleModel[]>([]);
+  const [dayOpen, setDayOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<MessageKey | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  function reload() {
+    setReloadKey(current => current + 1);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -19,12 +25,14 @@ export function useDaySales(sellerId: string, getCurrentSalesDay: GetCurrentSale
         if (!day) {
           if (!cancelled) {
             setSales([]);
+            setDayOpen(false);
             setError('daySalesMissing');
           }
           return;
         }
         const found = await listDaySales.execute(day.id);
         if (!cancelled) {
+          setDayOpen(day.status === 'OPEN');
           setSales(found);
         }
       })
@@ -42,7 +50,7 @@ export function useDaySales(sellerId: string, getCurrentSalesDay: GetCurrentSale
     return () => {
       cancelled = true;
     };
-  }, [sellerId, getCurrentSalesDay, listDaySales]);
+  }, [sellerId, getCurrentSalesDay, listDaySales, reloadKey]);
 
-  return { sales, loading, error };
+  return { sales, dayOpen, loading, error, reload };
 }

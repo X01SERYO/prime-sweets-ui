@@ -8,16 +8,18 @@ export function useConfirmSale(confirmSale: ConfirmSaleUseCase, onSale: (sale: S
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
 
-  async function confirm(sale: SaleModel | null) {
+  async function confirm(sale: SaleModel | null): Promise<boolean> {
     if (!sale || sale.status !== 'DRAFT') {
-      return;
+      return false;
     }
     setConfirming(true);
     setError(null);
     try {
       onSale(await confirmSale.execute(sale.id, sale.items.length));
+      return true;
     } catch (caught) {
       setError(saleErrorKey(caught, 'saleConfirmFailed'));
+      return false;
     } finally {
       setConfirming(false);
     }

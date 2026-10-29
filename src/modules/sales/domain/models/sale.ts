@@ -1,6 +1,7 @@
 export type SaleStatus = 'DRAFT' | 'CONFIRMED' | 'VOIDED';
 
 export interface SaleItemModel {
+  id: string;
   productId: string;
   itemName: string;
   quantity: number;
@@ -17,5 +18,6 @@ export interface SaleModel {
   totalAmount: number;
   totalProfit: number;
   totalQuantity: number;
+  createdAt: string;
   items: SaleItemModel[];
 }

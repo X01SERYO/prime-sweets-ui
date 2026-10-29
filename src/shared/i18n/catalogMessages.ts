@@ -2,6 +2,7 @@ import { catalog } from '@/shared/i18n/catalog';
 
 export const catalogMessages = catalog(
   {
+    saleItems: 'Ítems de la venta',
     searchProduct: 'Buscar producto',
     search: 'Buscar',
     searching: 'Buscando…',
@@ -15,6 +16,7 @@ export const catalogMessages = catalog(
     wholesale: 'mayorista'
   },
   {
+    saleItems: 'Sale items',
     searchProduct: 'Search product',
     search: 'Search',
     searching: 'Searching…',

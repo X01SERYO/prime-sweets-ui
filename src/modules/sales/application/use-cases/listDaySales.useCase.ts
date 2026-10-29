@@ -17,7 +17,7 @@ export class ListDaySalesUseCase {
     if (!id) {
       throw new SaleInvalidError();
     }
-    const sales = await this.sales.listBySalesDay(id);
+    const sales = (await this.sales.listBySalesDay(id)).slice().sort((left, right) => right.createdAt.localeCompare(left.createdAt));
     const names = new Map<string, string>();
     const rows: DaySaleModel[] = [];
     for (const sale of sales) {

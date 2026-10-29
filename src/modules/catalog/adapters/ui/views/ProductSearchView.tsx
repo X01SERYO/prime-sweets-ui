@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
+import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
 import { formatCurrency } from '@/shared/domain/money';
 import { useProductSearch } from '@/modules/catalog/adapters/ui/hooks/useProductSearch';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -7,13 +8,13 @@ import '@/modules/catalog/adapters/ui/views/productSearch.css';
 
 interface ProductSearchViewProps {
   searchProducts: SearchProductsUseCase;
-  onSelect?: (productId: string) => void;
+  onSelect?: (product: ProductHit) => void;
   selecting?: boolean;
 }
 
 export function ProductSearchView({ searchProducts, onSelect, selecting }: ProductSearchViewProps) {
   const { t } = useLocale();
-  const { query, setQuery, submit, products, loading, error, searched } = useProductSearch(searchProducts);
+  const { query, setQuery, submit, products, loading, error, searched, clear } = useProductSearch(searchProducts);
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -22,7 +23,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
 
   return (
     <section className="stack">
-      <h1>{t('sale')}</h1>
+      <h2>{t('saleItems')}</h2>
       <p className="m">{t('searchHint')}</p>
       <form className="card" onSubmit={onSubmit}>
         <label htmlFor="product-query">{t('searchProduct')}</label>
@@ -46,14 +47,23 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
           {products.map(product => (
             <li key={product.id}>
               <span>{product.name ?? t('noName')}</span>
-              <span className="m">
+              <span className="m product-hit-meta">
                 {product.code}
                 {' · '}
-                {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)} {t('wholesale')}
+                {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)}
               </span>
               {onSelect ? (
-                <button className="btn btn-secondary" type="button" disabled={selecting} onClick={() => onSelect(product.id)}>
-                  {t('addItem')}
+                <button
+                  className="btn icon-btn icon-edit"
+                  type="button"
+                  aria-label={t('addItem')}
+                  disabled={selecting}
+                  onClick={() => {
+                    onSelect(product);
+                    clear();
+                  }}
+                >
+                  <AddIcon />
                 </button>
               ) : null}
             </li>
@@ -61,5 +71,13 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
         </ul>
       ) : null}
     </section>
+  );
+}
+
+function AddIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5z" />
+    </svg>
   );
 }

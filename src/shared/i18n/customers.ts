@@ -2,6 +2,7 @@ import { catalog } from '@/shared/i18n/catalog';
 
 export const customerMessages = catalog(
   {
+    findCustomer: 'Buscar cliente',
     customerSearchHint: 'Busca por nombre o número de documento.',
     customerSearch: 'Nombre o documento',
     customerSearchRequired: 'Escribe un nombre o un documento.',
@@ -25,6 +26,7 @@ export const customerMessages = catalog(
     saleNeedsCustomer: 'Elige o crea un cliente antes de armar la venta.'
   },
   {
+    findCustomer: 'Search customer',
     customerSearchHint: 'Search by name or document number.',
     customerSearch: 'Name or document',
     customerSearchRequired: 'Enter a name or a document.',

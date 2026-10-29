@@ -19,7 +19,7 @@ export function useSaleMutations(
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<SaleModel>) {
-    if (!sale || sale.status !== 'DRAFT') {
+    if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
       return;
     }
     setBusy(true);
@@ -36,21 +36,49 @@ export function useSaleMutations(
   return {
     busy,
     error,
-    add: (productId: string) => run(() => addItem.execute(sale!.id, productId, 1)),
-    changeQuantity: (productId: string, quantity: number) => {
+    accept: async (productId: string, quantity: number, itemName: string) => {
+      if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
+        return false;
+      }
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        setError('saleQuantityInvalid');
+        return false;
+      }
+      const name = itemName.trim();
+      if (!name) {
+        setError('saleNameRequired');
+        return false;
+      }
+      setBusy(true);
+      setError(null);
+      try {
+        const next = await addItem.execute(sale.id, productId, quantity, name);
+        onSale(next);
+        return true;
+      } catch (caught) {
+        setError(saleErrorKey(caught, 'saleLineFailed'));
+        return false;
+      } finally {
+        setBusy(false);
+      }
+    },
+    changeQuantity: (itemId: string, quantity: number) => {
       if (!Number.isInteger(quantity) || quantity <= 0) {
         setError('saleQuantityInvalid');
         return;
       }
-      return run(() => updateQuantity.execute(sale!.id, productId, quantity));
+      return run(() => updateQuantity.execute(sale!.id, itemId, quantity));
     },
-    changeName: (productId: string, itemName: string) => {
+    changeName: (itemId: string, itemName: string) => {
+      if (!sale || sale.status !== 'DRAFT') {
+        return;
+      }
       if (!itemName.trim()) {
         setError('saleNameRequired');
         return;
       }
-      return run(() => updateName.execute(sale!.id, productId, itemName));
+      return run(() => updateName.execute(sale.id, itemId, itemName));
     },
-    remove: (productId: string) => run(() => removeItem.execute(sale!.id, productId))
+    remove: (itemId: string) => run(() => removeItem.execute(sale!.id, itemId))
   };
 }

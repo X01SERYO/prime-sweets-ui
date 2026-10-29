@@ -14,10 +14,16 @@ function toItem(raw: unknown): SaleItemModel {
     throw new SaleInvalidError();
   }
   const data = raw as Record<string, unknown>;
-  if (typeof data.productId !== 'string' || typeof data.itemName !== 'string' || typeof data.quantity !== 'number') {
+  if (
+    typeof data.id !== 'string' ||
+    typeof data.productId !== 'string' ||
+    typeof data.itemName !== 'string' ||
+    typeof data.quantity !== 'number'
+  ) {
     throw new SaleInvalidError();
   }
   return {
+    id: data.id,
     productId: data.productId,
     itemName: data.itemName,
     quantity: data.quantity,
@@ -50,6 +56,7 @@ export function toSale(raw: unknown): SaleModel {
     totalAmount: money(data.totalAmount),
     totalProfit: money(data.totalProfit),
     totalQuantity: money(data.totalQuantity),
+    createdAt: typeof data.createdAt === 'string' ? data.createdAt : '',
     items: data.items.map(item => toItem(item))
   };
 }

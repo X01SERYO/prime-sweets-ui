@@ -9,8 +9,8 @@ export const shellMessages = catalog(
     daySales: 'Ventas del día',
     loadSheet: 'Cargue',
     invoices: 'Facturas',
-    api: 'API',
-    signOut: 'Salir'
+    signOut: 'Salir',
+    home: 'Menú principal'
   },
   {
     languageLabel: 'Switch language to Spanish',
@@ -20,7 +20,7 @@ export const shellMessages = catalog(
     daySales: 'Day sales',
     loadSheet: 'Load sheet',
     invoices: 'Invoices',
-    api: 'API',
-    signOut: 'Sign out'
+    signOut: 'Sign out',
+    home: 'Main menu'
   }
 );

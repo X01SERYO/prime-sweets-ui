@@ -31,5 +31,11 @@ export function useProductSearch(searchProducts: SearchProductsUseCase) {
     }
   }
 
-  return { query, setQuery, submit, products, loading, error, searched };
+  function clear() {
+    setProducts([]);
+    setSearched(false);
+    setError(null);
+  }
+
+  return { query, setQuery, submit, products, loading, error, searched, clear };
 }

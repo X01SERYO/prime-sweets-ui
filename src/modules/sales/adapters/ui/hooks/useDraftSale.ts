@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { CreateDraftSaleUseCase } from '@/modules/sales/application/use-cases/createDraftSale.useCase';
+import type { GetSaleUseCase } from '@/modules/sales/application/use-cases/getSale.useCase';
 import type { ListDraftSalesUseCase } from '@/modules/sales/application/use-cases/listDraftSales.useCase';
 import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
@@ -9,16 +10,18 @@ import type { MessageKey } from '@/shared/i18n/messages';
 export function useDraftSale(
   sellerId: string,
   customerId: string | null,
+  saleId: string | null,
   getCurrentSalesDay: GetCurrentSalesDayUseCase,
   listDrafts: ListDraftSalesUseCase,
-  createDraft: CreateDraftSaleUseCase
+  createDraft: CreateDraftSaleUseCase,
+  getSale: GetSaleUseCase
 ) {
   const [sale, setSale] = useState<SaleModel | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
 
   useEffect(() => {
-    if (!customerId) {
+    if (!customerId && !saleId) {
       setSale(null);
       setError(null);
       return;
@@ -40,6 +43,12 @@ export function useDraftSale(
           if (!cancelled) {
             setError('saleDayClosed');
           }
+          return null;
+        }
+        if (saleId) {
+          return getSale.execute(saleId);
+        }
+        if (!customerId) {
           return null;
         }
         const drafts = await listDrafts.execute(day.id, customerId);
@@ -67,7 +76,7 @@ export function useDraftSale(
     return () => {
       cancelled = true;
     };
-  }, [sellerId, customerId, getCurrentSalesDay, listDrafts, createDraft]);
+  }, [sellerId, customerId, saleId, getCurrentSalesDay, listDrafts, createDraft, getSale]);
 
   return { sale, setSale, loading, error };
 }

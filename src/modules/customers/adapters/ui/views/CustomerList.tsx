@@ -1,81 +1,33 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useCreateCustomer } from '@/modules/customers/adapters/ui/hooks/useCreateCustomer';
-import { useCustomerSearch } from '@/modules/customers/adapters/ui/hooks/useCustomerSearch';
 import type { CreateCustomerUseCase } from '@/modules/customers/application/use-cases/createCustomer.useCase';
-import type { SearchCustomersUseCase } from '@/modules/customers/application/use-cases/searchCustomers.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
 
 const documentTypes = ['CC', 'NIT', 'CE', 'TI', 'PA'] as const;
 
 interface CustomerListProps {
-  searchCustomers: SearchCustomersUseCase;
   createCustomer: CreateCustomerUseCase;
 }
 
-export function CustomerList({ searchCustomers, createCustomer }: CustomerListProps) {
+export function CustomerList({ createCustomer }: CustomerListProps) {
   const { t } = useLocale();
   const navigate = useNavigate();
-  const search = useCustomerSearch(searchCustomers);
   const form = useCreateCustomer(createCustomer);
   const [showExtra, setShowExtra] = useState(false);
-
-  function openSale(customerId: string) {
-    navigate(`/sales?customerId=${encodeURIComponent(customerId)}`);
-  }
-
-  function onSearch(event: FormEvent) {
-    event.preventDefault();
-    void search.submit();
-  }
 
   async function onCreate(event: FormEvent) {
     event.preventDefault();
     const created = await form.submit();
     if (created) {
-      openSale(created.id);
+      navigate('/sales');
     }
   }
 
   return (
     <section className="stack">
-      <h1>{t('customers')}</h1>
-      <p className="m">{t('customerSearchHint')}</p>
-      <form className="card" onSubmit={onSearch}>
-        <label htmlFor="customer-query">{t('customerSearch')}</label>
-        <div className="row">
-          <input
-            id="customer-query"
-            value={search.query}
-            onChange={event => search.setQuery(event.target.value)}
-            autoComplete="off"
-          />
-          <button className="btn" type="submit" disabled={search.loading}>
-            {search.loading ? t('searching') : t('search')}
-          </button>
-        </div>
-      </form>
-      {search.error ? <p role="alert">{t(search.error)}</p> : null}
-      {search.searched && !search.loading && !search.error && search.customers.length === 0 ? (
-        <p className="m">{t('customerNoResults')}</p>
-      ) : null}
-      {search.customers.length > 0 ? (
-        <ul className="list">
-          {search.customers.map(customer => (
-            <li key={customer.id} className="card">
-              <b>{customer.name}</b>
-              <span className="m">
-                {customer.documentType} {customer.documentNumber}
-              </span>
-              <button className="btn btn-secondary" type="button" onClick={() => openSale(customer.id)}>
-                {t('chooseCustomer')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <h1>{t('customerCreate')}</h1>
       <form className="card" onSubmit={event => void onCreate(event)}>
-        <h2>{t('customerCreate')}</h2>
         <label htmlFor="document-type">{t('documentType')}</label>
         <select id="document-type" value={form.documentType} onChange={event => form.setDocumentType(event.target.value)}>
           {documentTypes.map(type => (

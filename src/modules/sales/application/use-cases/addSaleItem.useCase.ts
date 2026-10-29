@@ -9,10 +9,10 @@ export class AddSaleItemUseCase {
     this.command = command;
   }
 
-  async execute(saleId: string, productId: string, quantity: number): Promise<SaleModel> {
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+  async execute(saleId: string, productId: string, quantity: number, itemName: string): Promise<SaleModel> {
+    if (!Number.isInteger(quantity) || quantity <= 0 || !itemName.trim()) {
       throw new SaleInvalidError();
     }
-    return this.command.addItem(saleId, productId, quantity);
+    return this.command.addItem(saleId, productId, quantity, itemName.trim());
   }
 }

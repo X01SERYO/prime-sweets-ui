@@ -8,7 +8,7 @@ export class RemoveSaleItemUseCase {
     this.command = command;
   }
 
-  async execute(saleId: string, productId: string): Promise<SaleModel> {
-    return this.command.removeItem(saleId, productId);
+  async execute(saleId: string, itemId: string): Promise<SaleModel> {
+    return this.command.removeItem(saleId, itemId);
   }
 }

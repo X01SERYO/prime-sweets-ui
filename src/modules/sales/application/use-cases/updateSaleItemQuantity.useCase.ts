@@ -9,10 +9,10 @@ export class UpdateSaleItemQuantityUseCase {
     this.command = command;
   }
 
-  async execute(saleId: string, productId: string, quantity: number): Promise<SaleModel> {
+  async execute(saleId: string, itemId: string, quantity: number): Promise<SaleModel> {
     if (!Number.isInteger(quantity) || quantity <= 0) {
       throw new SaleInvalidError();
     }
-    return this.command.updateQuantity(saleId, productId, quantity);
+    return this.command.updateQuantity(saleId, itemId, quantity);
   }
 }

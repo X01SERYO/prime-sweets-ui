@@ -59,6 +59,11 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     return this.list(`/sales?salesDayId=${encodeURIComponent(salesDayId)}&customerId=${encodeURIComponent(customerId)}&status=DRAFT`);
   }
 
+  async get(saleId: string): Promise<SaleModel> {
+    const body = await this.http.get<Envelope>(`/sales/${encodeURIComponent(saleId)}`);
+    return toSaleEnvelope(body);
+  }
+
   async listBySalesDay(salesDayId: string): Promise<SaleModel[]> {
     return this.list(`/sales?salesDayId=${encodeURIComponent(salesDayId)}`);
   }
@@ -71,19 +76,23 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     return body.data.map(item => toSale(item));
   }
 
-  async addItem(saleId: string, productId: string, quantity: number): Promise<SaleModel> {
+  async addItem(saleId: string, productId: string, quantity: number, itemName: string): Promise<SaleModel> {
     try {
-      const body = await this.http.post<Envelope>(`/sales/${encodeURIComponent(saleId)}/items`, { productId, quantity });
+      const body = await this.http.post<Envelope>(`/sales/${encodeURIComponent(saleId)}/items`, {
+        productId,
+        quantity,
+        itemName
+      });
       return toSaleEnvelope(body);
     } catch (error) {
       mapSaleError(error);
     }
   }
 
-  async updateQuantity(saleId: string, productId: string, quantity: number): Promise<SaleModel> {
+  async updateQuantity(saleId: string, itemId: string, quantity: number): Promise<SaleModel> {
     try {
       const body = await this.http.put<Envelope>(
-        `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(productId)}/quantity`,
+        `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(itemId)}/quantity`,
         { quantity }
       );
       return toSaleEnvelope(body);
@@ -92,10 +101,10 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     }
   }
 
-  async updateName(saleId: string, productId: string, itemName: string): Promise<SaleModel> {
+  async updateName(saleId: string, itemId: string, itemName: string): Promise<SaleModel> {
     try {
       const body = await this.http.put<Envelope>(
-        `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(productId)}/name`,
+        `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(itemId)}/name`,
         { itemName }
       );
       return toSaleEnvelope(body);
@@ -104,10 +113,10 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     }
   }
 
-  async removeItem(saleId: string, productId: string): Promise<SaleModel> {
+  async removeItem(saleId: string, itemId: string): Promise<SaleModel> {
     try {
       const body = await this.http.delete<Envelope>(
-        `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(productId)}`
+        `/sales/${encodeURIComponent(saleId)}/items/${encodeURIComponent(itemId)}`
       );
       return toSaleEnvelope(body);
     } catch (error) {
