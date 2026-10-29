@@ -113,6 +113,8 @@ export function App({ container }: AppProps) {
                   sellerId={session.user.id}
                   getCurrentSalesDay={container.getCurrentSalesDay}
                   openSalesDay={container.openSalesDay}
+                  closeSalesDay={container.closeSalesDay}
+                  reopenSalesDay={container.reopenSalesDay}
                 />
               ) : (
                 <Navigate to="/login" replace />

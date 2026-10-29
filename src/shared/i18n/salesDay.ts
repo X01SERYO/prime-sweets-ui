@@ -15,7 +15,17 @@ export const salesDayMessages = catalog(
     salesDaySellerRequired: 'Falta el vendedor de la sesión.',
     salesDayOpen: 'Abierta',
     salesDayClosed: 'Cerrada',
-    closeLater: 'Cerrar y reabrir la jornada llegan en el siguiente paso.',
+    confirmClose: '¿Cerrar la jornada de hoy?',
+    confirmReopen: '¿Reabrir la jornada de hoy?',
+    confirmAction: 'Confirmar',
+    cancelAction: 'Cancelar',
+    reopenDay: 'Reabrir jornada',
+    closingDay: 'Cerrando…',
+    reopeningDay: 'Reabriendo…',
+    salesDayAlreadyClosed: 'La jornada ya está cerrada.',
+    salesDayCannotReopen: 'Solo se puede reabrir la jornada de hoy.',
+    salesDayCloseFailed: 'No se pudo cerrar la jornada.',
+    salesDayReopenFailed: 'No se pudo reabrir la jornada.',
     loadLater: 'Cargue y Facturas se habilitan al cerrar la jornada.'
   },
   {
@@ -32,7 +42,17 @@ export const salesDayMessages = catalog(
     salesDaySellerRequired: 'The signed-in seller is missing.',
     salesDayOpen: 'Open',
     salesDayClosed: 'Closed',
-    closeLater: 'Closing and reopening the sales day arrive in the next step.',
+    confirmClose: 'Close today’s sales day?',
+    confirmReopen: 'Reopen today’s sales day?',
+    confirmAction: 'Confirm',
+    cancelAction: 'Cancel',
+    reopenDay: 'Reopen sales day',
+    closingDay: 'Closing…',
+    reopeningDay: 'Reopening…',
+    salesDayAlreadyClosed: 'The sales day is already closed.',
+    salesDayCannotReopen: 'Only today’s sales day can be reopened.',
+    salesDayCloseFailed: 'Could not close the sales day.',
+    salesDayReopenFailed: 'Could not reopen the sales day.',
     loadLater: 'Load sheet and invoices become available after the sales day is closed.'
   }
 );

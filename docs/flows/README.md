@@ -42,7 +42,7 @@ These are Version 1. They have **no** screens or use cases in this repository. B
 |---|---|
 | Language | Shell control for Spanish (default) and English. Dictionaries live per screen. No API call. |
 | Sign in / sign out | Built. The session token is sent as a bearer token and dies when the API process restarts. |
-| Close and reopen Sales Day | Commands and confirmation. Open and read are built. Close and reopen are not. |
+| Close and reopen Sales Day | Built. The screen asks for confirmation, then calls `POST /sales-days/:id/close` or `POST /sales-days/:id/reopen`. The API rejects a historical reopen. Load sheet and invoices stay disabled until the day is closed. |
 | Search or create customer | Built. Search calls `GET /customers/search?q=`. Create sends document type, number, and name; extra fields stay behind a control. Choosing or creating a customer opens `/sales?customerId=`. |
 | Search catalog and edit a draft sale | Built when `/sales` has `customerId` and today’s Sales Day is open. The UI creates or reuses a draft, then adds a line, changes quantity and item name, and removes a line. Price is display-only. Confirm and void are not built. |
 | Confirm sale | Built. `POST /sales/:id/confirm` runs only when the draft has at least one line. The screen shows `invoiceNumber` from the response. |

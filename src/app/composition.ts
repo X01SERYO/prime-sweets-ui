@@ -14,6 +14,8 @@ import { HttpSalesDayCommand } from '@/modules/sales-day/adapters/infrastructure
 import { HttpSalesDayQuery } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayQuery';
 import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
+import { CloseSalesDayUseCase } from '@/modules/sales-day/application/use-cases/closeSalesDay.useCase';
+import { ReopenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/reopenSalesDay.useCase';
 import { HttpSale } from '@/modules/sales/adapters/infrastructure/httpSale';
 import { AddSaleItemUseCase } from '@/modules/sales/application/use-cases/addSaleItem.useCase';
 import { ConfirmSaleUseCase } from '@/modules/sales/application/use-cases/confirmSale.useCase';
@@ -35,6 +37,8 @@ export interface AppContainer {
   searchProducts: SearchProductsUseCase;
   getCurrentSalesDay: GetCurrentSalesDayUseCase;
   openSalesDay: OpenSalesDayUseCase;
+  closeSalesDay: CloseSalesDayUseCase;
+  reopenSalesDay: ReopenSalesDayUseCase;
   searchCustomers: SearchCustomersUseCase;
   getCustomer: GetCustomerUseCase;
   createCustomer: CreateCustomerUseCase;
@@ -61,6 +65,8 @@ export function createAppContainer(): AppContainer {
     searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
     getCurrentSalesDay: new GetCurrentSalesDayUseCase(new HttpSalesDayQuery(http)),
     openSalesDay: new OpenSalesDayUseCase(new HttpSalesDayCommand(http)),
+    closeSalesDay: new CloseSalesDayUseCase(new HttpSalesDayCommand(http)),
+    reopenSalesDay: new ReopenSalesDayUseCase(new HttpSalesDayCommand(http)),
     searchCustomers: new SearchCustomersUseCase(new HttpCustomerQuery(http)),
     getCustomer: new GetCustomerUseCase(new HttpCustomerQuery(http)),
     createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http)),
