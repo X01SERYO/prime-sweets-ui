@@ -3,6 +3,7 @@ import type { LoginUseCase } from '@/modules/identity/application/use-cases/logi
 import type { Session } from '@/modules/identity/domain/models/session';
 import { useLogin } from '@/modules/identity/adapters/ui/hooks/useLogin';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { ScreenTitle } from '@/shared/ui/BackButton';
 
 interface LoginViewProps {
   login: LoginUseCase;
@@ -21,7 +22,7 @@ export function LoginView({ login, onLoggedIn }: LoginViewProps) {
 
   return (
     <section className="stack">
-      <h1>{t('loginTitle')}</h1>
+      <ScreenTitle>{t('loginTitle')}</ScreenTitle>
       <form className="card" onSubmit={onSubmit}>
         <label htmlFor="login-email">{t('email')}</label>
         <input

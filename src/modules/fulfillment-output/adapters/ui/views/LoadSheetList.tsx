@@ -3,6 +3,7 @@ import { useLoadSheet } from '@/modules/fulfillment-output/adapters/ui/hooks/use
 import type { ListLoadSheetUseCase } from '@/modules/fulfillment-output/application/use-cases/listLoadSheet.useCase';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { ScreenTitle } from '@/shared/ui/BackButton';
 import '@/modules/fulfillment-output/adapters/ui/views/loadSheet.css';
 
 interface LoadSheetListProps {
@@ -24,7 +25,7 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
   return (
     <section className="stack">
       <header className="load-sheet-head">
-        <h1>{t('loadSheet')}</h1>
+        <ScreenTitle>{t('loadSheet')}</ScreenTitle>
         {!sheet.loading && !sheet.error ? (
           <p className="load-sheet-totals">
             <span>

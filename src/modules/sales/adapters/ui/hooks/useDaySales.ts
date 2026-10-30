@@ -4,9 +4,15 @@ import type { ListDaySalesUseCase } from '@/modules/sales/application/use-cases/
 import type { DaySaleModel } from '@/modules/sales/domain/models/daySale';
 import type { MessageKey } from '@/shared/i18n/messages';
 
-export function useDaySales(sellerId: string, getCurrentSalesDay: GetCurrentSalesDayUseCase, listDaySales: ListDaySalesUseCase) {
+export function useDaySales(
+  sellerId: string,
+  salesDayId: string | undefined,
+  getCurrentSalesDay: GetCurrentSalesDayUseCase,
+  listDaySales: ListDaySalesUseCase
+) {
   const [sales, setSales] = useState<DaySaleModel[]>([]);
   const [dayOpen, setDayOpen] = useState(false);
+  const [dayId, setDayId] = useState<string | null>(salesDayId ?? null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<MessageKey | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -19,26 +25,29 @@ export function useDaySales(sellerId: string, getCurrentSalesDay: GetCurrentSale
     let cancelled = false;
     setLoading(true);
     setError(null);
-    getCurrentSalesDay
-      .execute(sellerId)
-      .then(async day => {
-        if (!day) {
-          if (!cancelled) {
-            setSales([]);
-            setDayOpen(false);
-            setError('daySalesMissing');
+    const listed = salesDayId
+      ? listDaySales.execute(salesDayId).then(found => ({ found, dayOpen: false, dayId: salesDayId, missing: false }))
+      : getCurrentSalesDay.execute(sellerId).then(async day => {
+          if (!day) {
+            return { found: [] as DaySaleModel[], dayOpen: false, dayId: null, missing: true };
           }
-          return;
-        }
-        const found = await listDaySales.execute(day.id);
+          const found = await listDaySales.execute(day.id);
+          return { found, dayOpen: day.status === 'OPEN', dayId: day.id, missing: false };
+        });
+    listed
+      .then(result => {
         if (!cancelled) {
-          setDayOpen(day.status === 'OPEN');
-          setSales(found);
+          setSales(result.found);
+          setDayOpen(result.dayOpen);
+          setDayId(result.dayId);
+          setError(result.missing ? 'daySalesMissing' : null);
         }
       })
       .catch(() => {
         if (!cancelled) {
           setSales([]);
+          setDayOpen(false);
+          setDayId(salesDayId ?? null);
           setError('daySalesFailed');
         }
       })
@@ -50,7 +59,7 @@ export function useDaySales(sellerId: string, getCurrentSalesDay: GetCurrentSale
     return () => {
       cancelled = true;
     };
-  }, [sellerId, getCurrentSalesDay, listDaySales, reloadKey]);
+  }, [sellerId, salesDayId, getCurrentSalesDay, listDaySales, reloadKey]);
 
-  return { sales, dayOpen, loading, error, reload };
+  return { sales, dayOpen, dayId, loading, error, reload };
 }

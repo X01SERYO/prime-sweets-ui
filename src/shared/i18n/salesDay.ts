@@ -26,7 +26,13 @@ export const salesDayMessages = catalog(
     salesDayCannotReopen: 'Solo se puede reabrir la jornada de hoy.',
     salesDayCloseFailed: 'No se pudo cerrar la jornada.',
     salesDayReopenFailed: 'No se pudo reabrir la jornada.',
-    loadLater: 'Cargue y facturas aparecen al cerrar la jornada.'
+    loadLater: 'El cargue aparece al cerrar la jornada. Las facturas se imprimen desde las ventas del día.',
+    recentSalesDays: 'Últimos 7 días',
+    recentSalesDaysLoading: 'Consultando las jornadas…',
+    recentSalesDaysEmpty: 'No hay jornadas en los últimos 7 días.',
+    recentSalesDaysFailed: 'No se pudieron consultar las jornadas.',
+    viewSalesDay: 'Ver jornada',
+    hideSalesDay: 'Ocultar jornada'
   },
   {
     salesDay: 'Sales Day',
@@ -53,6 +59,12 @@ export const salesDayMessages = catalog(
     salesDayCannotReopen: 'Only today’s sales day can be reopened.',
     salesDayCloseFailed: 'Could not close the sales day.',
     salesDayReopenFailed: 'Could not reopen the sales day.',
-    loadLater: 'Load sheet and invoices appear after the sales day is closed.'
+    loadLater: 'The load sheet appears after the sales day is closed. Invoices are printed from the day’s sales.',
+    recentSalesDays: 'Last 7 days',
+    recentSalesDaysLoading: 'Loading sales days…',
+    recentSalesDaysEmpty: 'There are no sales days in the last 7 days.',
+    recentSalesDaysFailed: 'Could not load the sales days.',
+    viewSalesDay: 'View sales day',
+    hideSalesDay: 'Hide sales day'
   }
 );

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { useCreateCustomer } from '@/modules/customers/adapters/ui/hooks/useCreateCustomer';
 import type { CreateCustomerUseCase } from '@/modules/customers/application/use-cases/createCustomer.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { ScreenTitle } from '@/shared/ui/BackButton';
 
 const documentTypes = ['CC', 'NIT', 'CE', 'TI', 'PA'] as const;
 
@@ -26,7 +27,7 @@ export function CustomerList({ createCustomer }: CustomerListProps) {
 
   return (
     <section className="stack">
-      <h1>{t('customerCreate')}</h1>
+      <ScreenTitle>{t('customerCreate')}</ScreenTitle>
       <form className="card" onSubmit={event => void onCreate(event)}>
         <label htmlFor="document-type">{t('documentType')}</label>
         <select id="document-type" value={form.documentType} onChange={event => form.setDocumentType(event.target.value)}>

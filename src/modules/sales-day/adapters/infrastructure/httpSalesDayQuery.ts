@@ -1,5 +1,5 @@
 import type { SalesDayQueryPort } from '@/modules/sales-day/application/ports/salesDayQuery.port';
-import { toSalesDay } from '@/modules/sales-day/adapters/infrastructure/salesDayMapper';
+import { toSalesDay, toSalesDays } from '@/modules/sales-day/adapters/infrastructure/salesDayMapper';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
 import { SalesDayInvalidError } from '@/modules/sales-day/domain/errors/salesDayInvalid.error';
 import { HttpRequestError, type HttpClient } from '@/shared/infrastructure/http/httpClient';
@@ -30,5 +30,17 @@ export class HttpSalesDayQuery implements SalesDayQueryPort {
       }
       throw error;
     }
+  }
+
+  async listRecent(sellerId: string): Promise<SalesDayModel[]> {
+    const body = await this.http.get<Envelope>(`/sales-days/recent?sellerId=${encodeURIComponent(sellerId)}`);
+    if (!body || body.success !== true || !Array.isArray(body.data)) {
+      throw new SalesDayInvalidError();
+    }
+    const days = toSalesDays(body.data);
+    if (days.length !== body.data.length) {
+      throw new SalesDayInvalidError();
+    }
+    return days;
   }
 }

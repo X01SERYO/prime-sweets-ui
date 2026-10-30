@@ -1,10 +1,11 @@
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { useInvoiceDocument } from '@/modules/fulfillment-output/adapters/ui/hooks/useInvoiceDocument';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
 import type { GenerateInvoiceUseCase } from '@/modules/fulfillment-output/application/use-cases/generateInvoice.useCase';
 import type { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { ScreenTitle } from '@/shared/ui/BackButton';
 
 interface InvoicePreviewProps {
   generateInvoice: GenerateInvoiceUseCase;
@@ -13,24 +14,19 @@ interface InvoicePreviewProps {
 
 export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePreviewProps) {
   const { t } = useLocale();
-  const { salesDayId, saleId } = useParams();
+  const { saleId } = useParams();
   const loaded = useInvoiceDocument(saleId, generateInvoice);
   const printing = usePrintInvoices(printInvoices);
   const document = loaded.document;
 
   return (
     <section className="stack">
-      <h1>{t('invoicePreview')}</h1>
+      <ScreenTitle>{t('invoicePreview')}</ScreenTitle>
       {loaded.loading ? <p>{t('invoiceLoadLoading')}</p> : null}
       {loaded.error ? (
         <div className={loaded.errorKind === 'business' ? 'notice notice-business' : 'notice notice-error'} role="alert">
           <p>{t(loaded.error)}</p>
           <div className="row">
-            {salesDayId ? (
-              <Link className="btn btn-secondary" to={`/invoices/${salesDayId}`}>
-                {t('backToInvoices')}
-              </Link>
-            ) : null}
             <button className="btn" type="button" onClick={loaded.retry}>
               {t('retryInvoice')}
             </button>

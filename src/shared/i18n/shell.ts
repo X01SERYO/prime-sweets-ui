@@ -11,7 +11,8 @@ export const shellMessages = catalog(
     loadSheet: 'Cargue',
     invoices: 'Facturas',
     signOut: 'Salir',
-    home: 'Menú principal'
+    home: 'Menú principal',
+    back: 'Volver'
   },
   {
     languageLabel: 'Switch language to Spanish',
@@ -23,6 +24,7 @@ export const shellMessages = catalog(
     loadSheet: 'Load sheet',
     invoices: 'Invoices',
     signOut: 'Sign out',
-    home: 'Main menu'
+    home: 'Main menu',
+    back: 'Back'
   }
 );

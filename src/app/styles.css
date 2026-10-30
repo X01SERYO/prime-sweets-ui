@@ -53,19 +53,75 @@ select {
   min-height: 100vh;
 }
 
+.shell-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
 .topbar {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 1rem;
   background: #fff;
-  border-bottom: 1px solid var(--line);
 }
 
 .topbar a {
   display: inline-flex;
   margin-right: auto;
   line-height: 0;
+}
+
+.screen-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.screen-title h1 {
+  min-width: 0;
+}
+
+.back-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0.2rem 0.15rem;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-link svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.back-link:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 40rem) {
+  .back-link span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 .shell-logo {
@@ -81,6 +137,7 @@ select {
   margin-left: auto;
   min-height: 2.25rem;
   padding: 0 0.9rem;
+  white-space: nowrap;
   border: 1.5px solid var(--deep);
   border-radius: 99px;
   background: #fff;
@@ -310,9 +367,7 @@ select {
   justify-content: center;
 }
 
-.card.sale-confirm,
 .card.sale-close,
-.sale-confirm,
 .sale-close {
   display: flex;
   flex-direction: row;
@@ -321,7 +376,6 @@ select {
   gap: 0.85rem;
 }
 
-.sale-confirm p,
 .sale-close p {
   margin: 0;
   white-space: nowrap;
@@ -380,6 +434,111 @@ select {
   align-items: center;
   gap: 0.5rem 0.75rem;
   margin: 0;
+}
+
+.sales-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sales-day-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.sales-day-card.is-today {
+  border-color: #b7e4e1;
+  background: #f4fafa;
+}
+
+.sales-day-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sales-day-date {
+  color: var(--deep);
+  font-family: Fraunces, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sales-day-summary .tag {
+  margin-left: auto;
+}
+
+.sales-day-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1.5px solid var(--deep);
+  border-radius: 99px;
+  background: #fff;
+  color: var(--deep);
+}
+
+.sales-day-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.sales-day-toggle.open svg {
+  transform: rotate(180deg);
+}
+
+.sales-day-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.sales-day-actions .btn {
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  text-align: center;
+}
+
+@media (min-width: 40rem) {
+  .sales-day-actions.cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sales-day-actions.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sales-day-actions.cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .sales-day-actions .btn {
+    padding-right: 0.7rem;
+    padding-left: 0.7rem;
+  }
 }
 
 .notice {
@@ -513,7 +672,6 @@ select {
   font-size: 1.05rem;
 }
 
-.sale-confirm .btn,
 .sale-close .btn {
   flex: 0 0 auto;
 }
@@ -617,9 +775,7 @@ code {
 }
 
 @media (min-width: 40rem) {
-  .card.sale-confirm,
   .card.sale-close,
-  .sale-confirm,
   .sale-close {
     flex-wrap: nowrap;
   }

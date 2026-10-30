@@ -3,6 +3,7 @@ import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { parseQuantity, QuantityField } from '@/modules/sales/adapters/ui/views/QuantityField';
 
 export interface PendingLine {
@@ -158,33 +159,29 @@ export function SaleLines({
           </tbody>
         </table>
       {pendingRemoveId ? (
-        <form
-          className="card sale-close"
-          onSubmit={event => {
-            event.preventDefault();
+        <ConfirmDialog
+          title={t('removeItem')}
+          message={t('confirmRemove')}
+          confirmLabel={t('confirmLine')}
+          cancelLabel={t('cancelLine')}
+          busy={busy}
+          onConfirm={() => {
             onRemove(pendingRemoveId);
             setPendingRemoveId(null);
           }}
-        >
-          <p>{t('confirmRemove')}</p>
-          <button className="btn" type="submit" disabled={busy}>
-            {t('confirmLine')}
-          </button>
-          <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => setPendingRemoveId(null)}>
-            {t('cancelLine')}
-          </button>
-        </form>
+          onCancel={() => setPendingRemoveId(null)}
+        />
       ) : null}
       {sale ? (
         <div className="card">
           {confirmError ? <p role="alert">{t(confirmError)}</p> : null}
           {editNotice ? (
-            <EditNotice
+            <ConfirmDialog
               title={t('saleLineInProgressTitle')}
               message={t('saleLineInProgress')}
-              saveLabel={t('saveEditing')}
+              confirmLabel={t('saveEditing')}
               cancelLabel={t('cancelLine')}
-              onSave={() => {
+              onConfirm={() => {
                 void editingActions.current?.save().then(saved => {
                   onDismissEditNotice();
                   if (saved) {
@@ -305,59 +302,6 @@ function CheckIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
     </svg>
-  );
-}
-
-function EditNotice({
-  title,
-  message,
-  saveLabel,
-  cancelLabel,
-  onSave,
-  onCancel
-}: {
-  title: string;
-  message: string;
-  saveLabel: string;
-  cancelLabel: string;
-  onSave: () => void;
-  onCancel: () => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog || dialog.open) {
-      return;
-    }
-    dialog.showModal();
-    return () => {
-      if (dialog.open) {
-        dialog.close();
-      }
-    };
-  }, []);
-
-  return (
-    <dialog
-      ref={dialogRef}
-      className="modal"
-      onCancel={event => {
-        event.preventDefault();
-        onCancel();
-      }}
-    >
-      <h2>{title}</h2>
-      <p>{message}</p>
-      <div className="modal-actions">
-        <button className="btn" type="button" onClick={onSave}>
-          {saveLabel}
-        </button>
-        <button className="btn btn-secondary" type="button" onClick={onCancel}>
-          {cancelLabel}
-        </button>
-      </div>
-    </dialog>
   );
 }
 
