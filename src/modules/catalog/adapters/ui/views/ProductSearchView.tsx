@@ -24,9 +24,14 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
   return (
     <section className="stack">
       <h2>{t('saleItems')}</h2>
-      <p className="m">{t('searchHint')}</p>
       <form className="card" onSubmit={onSubmit}>
-        <label htmlFor="product-query">{t('searchProduct')}</label>
+        <div className="search-label">
+          <label htmlFor="product-query">{t('searchProduct')}</label>
+          <button type="button" className="info-tip" aria-label={t('searchHint')}>
+            <InfoIcon />
+            <span className="info-tip-text" role="tooltip">{t('searchHint')}</span>
+          </button>
+        </div>
         <div className="row">
           <input
             className="product-search-field"
@@ -47,9 +52,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
           {products.map(product => (
             <li key={product.id}>
               <span>{product.name ?? t('noName')}</span>
-              <span className="m product-hit-meta">
-                {product.code}
-                {' · '}
+              <span className="product-hit-price">
                 {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)}
               </span>
               {onSelect ? (
@@ -71,6 +74,16 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
         </ul>
       ) : null}
     </section>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.25" />
+      <path d="M8 7.25v4" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      <circle cx="8" cy="5" r="0.75" fill="currentColor" />
+    </svg>
   );
 }
 
