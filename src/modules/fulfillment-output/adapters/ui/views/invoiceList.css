@@ -1,9 +1,35 @@
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.invoice-table td {
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  text-align: left;
+}
+
+.invoice-table td:first-child {
+  width: 1.5rem;
+  padding-left: 0;
+}
+
+.invoice-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-preview {
+  width: 2.15rem;
+  text-align: right;
+}
+
 .invoice-pick {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
   margin: 0;
-  font-size: 1rem;
 }
 
 .invoice-pick input {

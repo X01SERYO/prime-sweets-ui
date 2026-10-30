@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router';
 import { useDaySales } from '@/modules/sales/adapters/ui/hooks/useDaySales';
 import { useVoidListedSale } from '@/modules/sales/adapters/ui/hooks/useVoidListedSale';
@@ -7,6 +7,7 @@ import type { VoidSaleUseCase } from '@/modules/sales/application/use-cases/void
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
+import './daySalesList.css';
 
 const statusKey = {
   DRAFT: 'statusDraft',
@@ -33,61 +34,67 @@ export function DaySalesList({ sellerId, getCurrentSalesDay, listDaySales, voidS
       {listed.error ? <p className="alert">{t(listed.error)}</p> : null}
       {voiding.error ? <p role="alert">{t(voiding.error)}</p> : null}
       {!listed.loading && !listed.error && listed.sales.length === 0 ? <p>{t('daySalesEmpty')}</p> : null}
-      <ul className="list">
-        {listed.sales.map(sale => (
-          <li key={sale.id} className="card sale-row">
-            <b>{sale.customerName}</b>
-            <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
-            <span className="m sale-meta">
-              {sale.invoiceNumber ? `${sale.invoiceNumber} · ` : ''}
-              {formatCurrency(sale.total)}
-            </span>
-            <span className="sale-col">
-              {listed.dayOpen && (sale.status === 'DRAFT' || sale.status === 'CONFIRMED') ? (
-                <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
-                  <EditIcon />
-                </Link>
+      <table className="day-sales-table">
+        <tbody>
+          {listed.sales.map(sale => (
+            <Fragment key={sale.id}>
+              <tr>
+                <td>
+                  <b>{sale.customerName}</b>
+                </td>
+                <td>
+                  <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
+                </td>
+                <td className="m">{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</td>
+                <td className="m day-sales-total">{formatCurrency(sale.total)}</td>
+                <td className="day-sales-icons">
+                  {listed.dayOpen && (sale.status === 'DRAFT' || sale.status === 'CONFIRMED') ? (
+                    <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
+                      <EditIcon />
+                    </Link>
+                  ) : null}
+                  {listed.dayOpen && sale.status === 'CONFIRMED' ? (
+                    <button
+                      className="btn icon-btn icon-void"
+                      type="button"
+                      aria-label={t('voidSale')}
+                      disabled={voiding.voidingId !== null || pendingVoidId === sale.id}
+                      onClick={() => setPendingVoidId(sale.id)}
+                    >
+                      <VoidIcon />
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+              {pendingVoidId === sale.id ? (
+                <tr>
+                  <td colSpan={5}>
+                    <form
+                      className="card sale-confirm"
+                      onSubmit={event => {
+                        event.preventDefault();
+                        void voiding.voidConfirmed(sale.id).then(saved => {
+                          if (saved) {
+                            setPendingVoidId(null);
+                          }
+                        });
+                      }}
+                    >
+                      <p>{t('confirmVoid')}</p>
+                      <button className="btn icon-void" type="submit" disabled={voiding.voidingId === sale.id}>
+                        {voiding.voidingId === sale.id ? t('voidingSale') : t('confirmAction')}
+                      </button>
+                      <button className="btn btn-secondary" type="button" onClick={() => setPendingVoidId(null)}>
+                        {t('cancelAction')}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
               ) : null}
-            </span>
-            <span className="sale-col">
-              {listed.dayOpen && sale.status === 'CONFIRMED' ? (
-                <button
-                  className="btn icon-btn icon-void"
-                  type="button"
-                  aria-label={t('voidSale')}
-                  disabled={voiding.voidingId !== null || pendingVoidId === sale.id}
-                  onClick={() => setPendingVoidId(sale.id)}
-                >
-                  <VoidIcon />
-                </button>
-              ) : null}
-            </span>
-            {pendingVoidId === sale.id ? (
-              <form
-                className="sale-confirm"
-                onSubmit={event => {
-                  event.preventDefault();
-                  void voiding.voidConfirmed(sale.id).then(saved => {
-                    if (saved) {
-                      setPendingVoidId(null);
-                    }
-                  });
-                }}
-              >
-                <p>{t('confirmVoid')}</p>
-                <div className="row">
-                  <button className="btn icon-void" type="submit" disabled={voiding.voidingId === sale.id}>
-                    {voiding.voidingId === sale.id ? t('voidingSale') : t('confirmAction')}
-                  </button>
-                  <button className="btn btn-secondary" type="button" onClick={() => setPendingVoidId(null)}>
-                    {t('cancelAction')}
-                  </button>
-                </div>
-              </form>
-            ) : null}
-          </li>
-        ))}
-      </ul>
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
     </section>
   );
 }

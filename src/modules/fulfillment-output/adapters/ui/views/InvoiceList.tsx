@@ -38,29 +38,40 @@ export function InvoiceList({ listInvoices, printInvoices }: InvoiceListProps) {
       {listed.error ? <p className="alert">{t(listed.error)}</p> : null}
       {printing.error ? <p className="alert">{t(printing.error)}</p> : null}
       {!listed.loading && !listed.error && listed.invoices.length === 0 ? <p>{t('invoiceListEmpty')}</p> : null}
-      <ul className="list">
+      <table className="invoice-table">
+        <tbody>
         {listed.invoices.map(invoice => (
-          <li key={invoice.saleId} className="card">
-            <div className="row">
+          <tr key={invoice.saleId}>
+            <td>
               <label className="invoice-pick">
                 <input
                   type="checkbox"
+                  aria-label={invoice.invoiceNumber}
                   checked={selected.includes(invoice.saleId)}
                   disabled={invoice.status !== 'CONFIRMED' || printing.printing}
                   onChange={() => toggle(invoice.saleId)}
                 />
-                <b>{invoice.invoiceNumber}</b>
               </label>
+            </td>
+            <td>
+              <b>{invoice.invoiceNumber}</b>
+            </td>
+            <td>
               <span className={`tag tag-${invoice.status.toLowerCase()}`}>{t(statusKey[invoice.status] as MessageKey)}</span>
-            </div>
-            <span className="m">{formatCurrency(invoice.totalAmount)}</span>
-            <span className="m">{invoice.status === 'VOIDED' ? t('notPrintable') : t('printable')}</span>
-            {invoice.status === 'CONFIRMED' && salesDayId ? (
-              <Link to={`/invoices/${salesDayId}/${invoice.saleId}`}>{t('invoicePreview')}</Link>
-            ) : null}
-          </li>
+            </td>
+            <td className="invoice-amount">{formatCurrency(invoice.totalAmount)}</td>
+            <td>{invoice.status === 'VOIDED' ? t('notPrintable') : t('printable')}</td>
+            <td className="invoice-preview">
+              {invoice.status === 'CONFIRMED' && salesDayId ? (
+                <Link className="btn icon-btn icon-edit" to={`/invoices/${salesDayId}/${invoice.saleId}`} aria-label={t('invoicePreview')}>
+                  <EyeIcon />
+                </Link>
+              ) : null}
+            </td>
+          </tr>
         ))}
-      </ul>
+        </tbody>
+      </table>
       <div className="row">
         <button className="btn" type="button" disabled={printing.printing || selected.length === 0} onClick={() => void printing.print(selected)}>
           {printing.printing ? t('invoicePrinting') : t('printSelected')}
@@ -75,5 +86,21 @@ export function InvoiceList({ listInvoices, printInvoices }: InvoiceListProps) {
         </button>
       </div>
     </section>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
+      />
+      <circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
   );
 }
