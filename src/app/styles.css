@@ -193,6 +193,12 @@ select {
   font-weight: 700;
 }
 
+.lines td.lines-empty {
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
 .lines td.product-cell {
   text-align: left;
 }
@@ -265,25 +271,114 @@ select {
   justify-content: center;
 }
 
+.card.sale-confirm,
+.card.sale-close,
 .sale-confirm,
 .sale-close {
   display: flex;
+  flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
   gap: 0.85rem;
 }
 
+.sale-confirm p,
+.sale-close p {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.qty input {
+  width: 4.5rem;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.4rem;
+  text-align: center;
+}
+
+.qty .btn {
+  width: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+}
+
+.pending-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5.5rem auto auto;
+  column-gap: 0.35rem;
+  row-gap: 0.25rem;
+  align-items: center;
+}
+
+.pending-fields > label {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+}
+
+.pending-fields > input,
+.pending-fields .qty input {
+  height: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.pending-fields > input {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.pending-fields > .qty {
+  display: contents;
+}
+
+.pending-fields .qty input {
+  grid-column: 2;
+  grid-row: 2;
+  width: 100%;
+}
+
+.pending-fields .qty .btn {
+  grid-row: 2;
+  min-height: 2.75rem;
+  width: 2.75rem;
+}
+
+.pending-fields .qty .btn:first-of-type {
+  grid-column: 3;
+}
+
+.pending-fields .qty .btn:last-of-type {
+  grid-column: 4;
+}
+
+.line-prices {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 1.5rem;
+  margin: 0;
+}
+
+.line-prices-total {
+  color: var(--deep);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.sale-confirm .btn,
 .sale-close .btn {
-  margin-left: auto;
   flex: 0 0 auto;
 }
 
-.sale-confirm {
-  grid-column: 1 / -1;
-}
-
-.sale-close p {
-  margin: 0;
+.sale-close .btn:first-of-type {
+  margin-left: auto;
 }
 
 .sale-row > b {

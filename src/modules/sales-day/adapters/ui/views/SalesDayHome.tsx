@@ -88,21 +88,19 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
       ) : null}
       {pending ? (
         <form
-          className="card"
+          className="card sale-confirm"
           onSubmit={event => {
             event.preventDefault();
             void confirmPending();
           }}
         >
           <p>{pending === 'close' ? t('confirmClose') : t('confirmReopen')}</p>
-          <div className="row">
-            <button className="btn" type="submit" disabled={closingDay.closing || reopeningDay.reopening}>
-              {closingDay.closing ? t('closingDay') : reopeningDay.reopening ? t('reopeningDay') : t('confirmAction')}
-            </button>
-            <button className="btn btn-secondary" type="button" onClick={() => setPending(null)}>
-              {t('cancelAction')}
-            </button>
-          </div>
+          <button className="btn" type="submit" disabled={closingDay.closing || reopeningDay.reopening}>
+            {closingDay.closing ? t('closingDay') : reopeningDay.reopening ? t('reopeningDay') : t('confirmAction')}
+          </button>
+          <button className="btn btn-secondary" type="button" onClick={() => setPending(null)}>
+            {t('cancelAction')}
+          </button>
         </form>
       ) : null}
       {closed && current.salesDay ? (

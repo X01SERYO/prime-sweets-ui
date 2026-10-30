@@ -6,6 +6,7 @@ import type { UpdateSaleItemQuantityUseCase } from '@/modules/sales/application/
 import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import type { MessageKey } from '@/shared/i18n/messages';
+import { isSellableQuantity } from '@/modules/sales/domain/quantity';
 
 export function useSaleMutations(
   sale: SaleModel | null,
@@ -40,7 +41,7 @@ export function useSaleMutations(
       if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
         return false;
       }
-      if (!Number.isInteger(quantity) || quantity <= 0) {
+      if (!isSellableQuantity(quantity)) {
         setError('saleQuantityInvalid');
         return false;
       }
@@ -63,7 +64,7 @@ export function useSaleMutations(
       }
     },
     changeQuantity: (itemId: string, quantity: number) => {
-      if (!Number.isInteger(quantity) || quantity <= 0) {
+      if (!isSellableQuantity(quantity)) {
         setError('saleQuantityInvalid');
         return;
       }

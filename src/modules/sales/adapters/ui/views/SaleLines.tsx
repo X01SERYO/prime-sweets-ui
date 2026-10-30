@@ -3,6 +3,7 @@ import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { parseQuantity, QuantityField } from '@/modules/sales/adapters/ui/views/QuantityField';
 
 export interface PendingLine {
   productId: string;
@@ -61,8 +62,7 @@ export function SaleLines({
           onCancel={onCancelPending}
         />
       ) : null}
-      {sale && sale.items.length > 0 ? (
-        <table className="lines">
+      <table className="lines">
           <thead>
             <tr>
               <th>{t('itemName')}</th>
@@ -78,7 +78,14 @@ export function SaleLines({
             </tr>
           </thead>
           <tbody>
-            {sale.items.map(item => (
+            {!sale || sale.items.length === 0 ? (
+              <tr>
+                <td className="lines-empty" colSpan={editable ? 6 : 4}>
+                  {t('saleEmpty')}
+                </td>
+              </tr>
+            ) : null}
+            {sale?.items.map(item => (
               <tr key={item.id}>
                 {editingId === item.id ? (
                   <LineEditor
@@ -123,10 +130,9 @@ export function SaleLines({
             ))}
           </tbody>
         </table>
-      ) : null}
       {pendingRemoveId ? (
         <form
-          className="sale-close"
+          className="card sale-close"
           onSubmit={event => {
             event.preventDefault();
             onRemove(pendingRemoveId);
@@ -142,7 +148,6 @@ export function SaleLines({
           </button>
         </form>
       ) : null}
-      {sale && sale.items.length === 0 && !pending ? <p className="m">{t('saleEmpty')}</p> : null}
       {sale ? (
         <div className="card">
           {confirmError ? <p role="alert">{t(confirmError)}</p> : null}
@@ -202,7 +207,7 @@ function LineEditor({
         )}
       </td>
       <td>
-        <input value={qty} disabled={busy} inputMode="numeric" onChange={event => setQty(event.target.value)} aria-label={t('quantity')} />
+        <QuantityField value={qty} disabled={busy} onChange={setQty} />
       </td>
       <td />
       <td />
@@ -213,8 +218,8 @@ function LineEditor({
           aria-label={t('confirmLine')}
           disabled={busy}
           onClick={() => {
-            const next = Number(qty);
-            if (!Number.isInteger(next) || next <= 0 || !name.trim()) {
+            const next = parseQuantity(qty);
+            if (next === null || !name.trim()) {
               return;
             }
             onSave(name.trim(), next);
@@ -273,14 +278,18 @@ function PendingCard({
   const { t } = useLocale();
   const [name, setName] = useState(pending.name);
   const [quantity, setQuantity] = useState('1');
-  const lineQuantity = Number(quantity);
-  const lineTotal = pending.unitPrice !== null && Number.isInteger(lineQuantity) && lineQuantity > 0 ? pending.unitPrice * lineQuantity : null;
+  const lineQuantity = parseQuantity(quantity);
+  const lineTotal =
+    pending.unitPrice !== null && lineQuantity !== null ? Math.round(pending.unitPrice * lineQuantity * 100) / 100 : null;
 
   return (
     <form
       className="card"
       onSubmit={event => {
         event.preventDefault();
+        if (lineQuantity === null) {
+          return;
+        }
         void onAccept(name, lineQuantity).then(saved => {
           if (saved) {
             onCancel();
@@ -289,18 +298,21 @@ function PendingCard({
       }}
     >
       <p>{pending.name}</p>
-      <label>
-        {t('itemName')}
-        <input value={name} disabled={busy} onChange={event => setName(event.target.value)} />
-      </label>
-      <label>
-        {t('quantity')}
-        <input inputMode="numeric" value={quantity} disabled={busy} onChange={event => setQuantity(event.target.value)} />
-      </label>
-      <span className="m">
-        {pending.unitPrice === null ? t('noPrice') : formatCurrency(pending.unitPrice)} {t('wholesale')}
-        {lineTotal !== null ? ` · ${formatCurrency(lineTotal)}` : ''}
-      </span>
+      <div className="pending-fields">
+        <label htmlFor="pending-name">{t('itemName')}</label>
+        <input id="pending-name" value={name} disabled={busy} onChange={event => setName(event.target.value)} />
+        <QuantityField value={quantity} disabled={busy} onChange={setQuantity} />
+      </div>
+      <p className="line-prices">
+        <span>
+          {t('unitPrice')} {pending.unitPrice === null ? t('noPrice') : formatCurrency(pending.unitPrice)}
+        </span>
+        {lineTotal !== null ? (
+          <span className="line-prices-total">
+            {t('lineTotal')} {formatCurrency(lineTotal)}
+          </span>
+        ) : null}
+      </p>
       <div className="row">
         <button className="btn" type="submit" disabled={busy}>
           {t('confirmLine')}
