@@ -3,6 +3,7 @@ export type SaleStatus = 'DRAFT' | 'CONFIRMED' | 'VOIDED';
 export interface SaleItemModel {
   id: string;
   productId: string;
+  productCode: string;
   itemName: string;
   quantity: number;
   wholesalePrice: number;

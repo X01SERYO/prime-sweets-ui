@@ -117,6 +117,45 @@ select {
   background: #fff;
 }
 
+.customer-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.customer-name {
+  margin: 0;
+  color: var(--deep);
+  font-family: Fraunces, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.customer-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-left: auto;
+  padding: 0;
+  border: 1.5px solid var(--deep);
+  border-radius: 99px;
+  background: #fff;
+  color: var(--deep);
+  cursor: pointer;
+}
+
+.customer-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.customer-toggle.open svg {
+  transform: rotate(180deg);
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -277,7 +316,7 @@ select {
 .sale-close {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.85rem;
 }
@@ -286,6 +325,108 @@ select {
 .sale-close p {
   margin: 0;
   white-space: nowrap;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, calc(100vw - 1.5rem));
+  max-height: calc(100dvh - 1.5rem);
+  margin: 0;
+  padding: 1.35rem;
+  overflow: auto;
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 24px 64px rgb(16 52 58 / 28%);
+  transform: translate(-50%, -50%);
+}
+
+.modal::backdrop {
+  background: rgb(16 52 58 / 46%);
+}
+
+.modal h2 {
+  margin-bottom: 0.4rem;
+  font-size: 1.35rem;
+}
+
+.modal p {
+  margin: 0 0 1.15rem;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.modal-actions .btn {
+  width: auto;
+  min-width: 8rem;
+}
+
+.day-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 1.05rem;
+  border-radius: var(--radius);
+}
+
+.notice p {
+  margin: 0;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.notice-business {
+  background: #fff1ea;
+  color: #9a3412;
+}
+
+.notice-error {
+  background: #fde8e8;
+  color: #9f1239;
+}
+
+.notice .btn {
+  text-decoration: none;
+}
+
+.line-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.line-actions .btn {
+  min-height: 2.25rem;
+  padding: 0 0.8rem;
+}
+
+.sale-total {
+  color: var(--deep);
+  font-family: Fraunces, serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .qty {
@@ -475,9 +616,51 @@ code {
   font-weight: 700;
 }
 
+@media (min-width: 40rem) {
+  .card.sale-confirm,
+  .card.sale-close,
+  .sale-confirm,
+  .sale-close {
+    flex-wrap: nowrap;
+  }
+
+  .modal {
+    padding: 1.6rem 1.7rem 1.45rem;
+  }
+
+  .modal .btn:not(.icon-btn) {
+    width: auto;
+    min-width: 8.5rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .icon-btn,
+  .lines .icon-btn,
+  .qty .btn,
+  .customer-toggle {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .m,
+  .load-sheet-table th,
+  .invoice-number,
+  .day-status {
+    color: var(--ink);
+    font-size: 0.875rem;
+  }
+
+  .line-actions .btn,
+  .qty input {
+    min-height: 2.75rem;
+  }
+}
+
 @media (min-width: 64rem) {
   .shell main {
-    width: min(60rem, 100%);
-    padding: 2rem 1rem;
+    width: min(52rem, 100%);
+    padding: 2rem 1.25rem;
   }
 }

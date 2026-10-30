@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { GenerateInvoiceUseCase } from '@/modules/fulfillment-output/application/use-cases/generateInvoice.useCase';
-import { invoiceErrorKey } from '@/modules/fulfillment-output/adapters/ui/hooks/invoiceErrorKey';
+import { invoiceErrorKey, invoiceErrorKind } from '@/modules/fulfillment-output/adapters/ui/hooks/invoiceErrorKey';
 import type { InvoiceDocumentModel } from '@/modules/fulfillment-output/domain/models/invoiceSummary';
 import type { MessageKey } from '@/shared/i18n/messages';
 
@@ -8,6 +8,8 @@ export function useInvoiceDocument(saleId: string | undefined, generateInvoice: 
   const [document, setDocument] = useState<InvoiceDocumentModel | null>(null);
   const [loading, setLoading] = useState(Boolean(saleId));
   const [error, setError] = useState<MessageKey | null>(null);
+  const [errorKind, setErrorKind] = useState<'business' | 'technical' | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!saleId) {
@@ -16,6 +18,7 @@ export function useInvoiceDocument(saleId: string | undefined, generateInvoice: 
     let cancelled = false;
     setLoading(true);
     setError(null);
+    setErrorKind(null);
     generateInvoice
       .execute(saleId)
       .then(found => {
@@ -27,6 +30,7 @@ export function useInvoiceDocument(saleId: string | undefined, generateInvoice: 
         if (!cancelled) {
           setDocument(null);
           setError(invoiceErrorKey(caught, 'invoiceLoadFailed'));
+          setErrorKind(invoiceErrorKind(caught));
         }
       })
       .finally(() => {
@@ -37,7 +41,7 @@ export function useInvoiceDocument(saleId: string | undefined, generateInvoice: 
     return () => {
       cancelled = true;
     };
-  }, [saleId, generateInvoice]);
+  }, [saleId, generateInvoice, attempt]);
 
-  return { document, loading, error };
+  return { document, loading, error, errorKind, retry: () => setAttempt(current => current + 1) };
 }

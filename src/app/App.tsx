@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, Navigate, Route, Routes, useNavigate, useSearchParams } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useSearchParams } from 'react-router';
 import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
@@ -29,6 +29,10 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
   const [pending, setPending] = useState<PendingLine | null>(null);
+  const [editingLine, setEditingLine] = useState(false);
+  const [editNotice, setEditNotice] = useState(false);
+  const allowLeave = useRef(false);
+  const blocker = useBlocker(() => editingLine && !allowLeave.current);
   const draft = useDraftSale(
     sellerId,
     customerId,
@@ -41,6 +45,19 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const shownCustomerId = draft.sale?.customerId ?? customerId;
   const canEditLines = !draft.sale || draft.sale.status === 'DRAFT' || draft.sale.status === 'CONFIRMED';
   const confirmation = useConfirmSale(container.confirmSale, draft.setSale);
+  useEffect(() => {
+    if (!editingLine) {
+      setEditNotice(false);
+    }
+  }, [editingLine]);
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      setEditNotice(true);
+      blocker.reset();
+    }
+  }, [blocker]);
+
   const lines = useSaleMutations(
     draft.sale,
     draft.setSale,
@@ -78,12 +95,14 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
         busy={lines.busy || confirmation.confirming}
         confirming={confirmation.confirming}
         confirmError={confirmation.error}
-        onConfirm={() => {
-          if (draft.sale?.status === 'CONFIRMED') {
-            navigate('/sales-day');
+        onConfirm={updated => {
+          const current = updated ?? draft.sale;
+          if (current?.status === 'CONFIRMED') {
+            allowLeave.current = true;
+            navigate('/day-sales');
             return;
           }
-          void confirmation.confirm(draft.sale).then(saved => {
+          void confirmation.confirm(current).then(saved => {
             if (saved) {
               navigate('/sales-day');
             }
@@ -91,12 +110,16 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
         }}
         pending={pending}
         onAcceptPending={(name, quantity) =>
-          pending ? lines.accept(pending.productId, quantity, name) : Promise.resolve(false)
+          pending ? lines.accept(pending.productId, quantity, name) : Promise.resolve(null)
         }
         onCancelPending={() => setPending(null)}
+        onEditingChange={setEditingLine}
+        editNotice={editNotice}
+        onEditBlocked={() => setEditNotice(true)}
+        onDismissEditNotice={() => setEditNotice(false)}
         onRemove={productId => void lines.remove(productId)}
-        onQuantity={(productId, quantity) => void lines.changeQuantity(productId, quantity)}
-        onName={(productId, itemName) => void lines.changeName(productId, itemName)}
+        onQuantity={(productId, quantity) => lines.changeQuantity(productId, quantity)}
+        onName={(productId, itemName) => lines.changeName(productId, itemName) ?? Promise.resolve(null)}
       />
     </>
   );

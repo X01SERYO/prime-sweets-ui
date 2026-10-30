@@ -19,7 +19,7 @@ interface SalesDayHomeProps {
 }
 
 export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, closeSalesDay, reopenSalesDay }: SalesDayHomeProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const current = useCurrentSalesDay(sellerId, getCurrentSalesDay);
   const openingDay = useOpenSalesDay(sellerId, openSalesDay);
   const closingDay = useCloseSalesDay(closeSalesDay);
@@ -59,16 +59,17 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
       ) : null}
       {!current.loading && !errorKey && !current.salesDay ? <p className="m">{t('salesDayMissing')}</p> : null}
       {current.salesDay ? (
-        <p className="m">
-          {current.salesDay.date}
-          {' · '}
-          {current.salesDay.status === 'OPEN' ? t('salesDayOpen') : t('salesDayClosed')}
+        <p className="day-status">
+          <span>{formatBusinessDate(current.salesDay.date, locale)}</span>
+          <span className={current.salesDay.status === 'OPEN' ? 'tag tag-confirmed' : 'tag tag-voided'}>
+            {current.salesDay.status === 'OPEN' ? t('salesDayOpen') : t('salesDayClosed')}
+          </span>
         </p>
       ) : null}
       {current.salesDay?.status === 'OPEN' ? (
         <>
           <Link className="btn" to="/sales">
-            {t('sale')}
+            {t('newSale')}
           </Link>
           <Link className="btn btn-secondary" to="/day-sales">
             {t('daySales')}
@@ -118,4 +119,19 @@ export function SalesDayHome({ sellerId, getCurrentSalesDay, openSalesDay, close
       ) : null}
     </section>
   );
+}
+
+function formatBusinessDate(value: string, locale: string): string {
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) {
+    return value;
+  }
+  const formatted = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'es-CO', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(year, month - 1, day));
+  const cleaned = formatted.replace(',', '');
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }

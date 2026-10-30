@@ -54,7 +54,7 @@ export function InvoiceList({ listInvoices, printInvoices }: InvoiceListProps) {
               </label>
             </td>
             <td>
-              <b>{invoice.invoiceNumber}</b>
+              <b className="invoice-number">{invoice.invoiceNumber}</b>
             </td>
             <td>
               <span className={`tag tag-${invoice.status.toLowerCase()}`}>{t(statusKey[invoice.status] as MessageKey)}</span>

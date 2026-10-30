@@ -53,7 +53,7 @@ sequenceDiagram
   Seller->>Main: Open /
   Main->>Container: createAppContainer()
   Container->>Env: read VITE_API_BASE_URL
-  Env-->>Container: base URL or http://localhost:3000
+  Env-->>Container: base URL or http://localhost:4000
   Container->>Http: createHttpClient(baseUrl)
   Http-->>Container: client
   Container-->>Main: AppContainer

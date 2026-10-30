@@ -23,6 +23,8 @@ export const customerMessages = catalog(
     address: 'Dirección',
     chooseCustomer: 'Usar en la venta',
     saleCustomer: 'Cliente de la venta',
+    showCustomerDetails: 'Ver datos del cliente',
+    hideCustomerDetails: 'Ocultar datos del cliente',
     saleNeedsCustomer: 'Elige o crea un cliente antes de armar la venta.'
   },
   {
@@ -47,6 +49,8 @@ export const customerMessages = catalog(
     address: 'Address',
     chooseCustomer: 'Use on the sale',
     saleCustomer: 'Sale customer',
+    showCustomerDetails: 'Show customer details',
+    hideCustomerDetails: 'Hide customer details',
     saleNeedsCustomer: 'Choose or create a customer before building the sale.'
   }
 );

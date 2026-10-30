@@ -4,6 +4,7 @@ import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInva
 interface ProductDto {
   id?: unknown;
   alegraId?: unknown;
+  code?: unknown;
   name?: unknown;
   wholesalePrice?: unknown;
 }
@@ -23,7 +24,7 @@ export function toProductHit(dto: ProductDto): ProductHit {
   return {
     id: dto.id,
     name: typeof dto.name === 'string' ? dto.name : null,
-    code: dto.alegraId,
+    code: typeof dto.code === 'string' && dto.code.trim() ? dto.code : dto.alegraId,
     wholesalePrice: money(dto.wholesalePrice)
   };
 }

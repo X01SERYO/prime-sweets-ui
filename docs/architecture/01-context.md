@@ -28,7 +28,7 @@ Rel(ui, api, "Bearer JSON", "HTTP")
 
 | System | Role in code |
 |---|---|
-| Prime Sweets Core API | Named by `VITE_API_BASE_URL` (default `http://localhost:3000`). Every business screen calls it with the bearer token. |
+| Prime Sweets Core API | Named by `VITE_API_BASE_URL` (default `http://localhost:4000`). Every business screen calls it with the bearer token. |
 | Alegra | Not a UI dependency. Product sync stays in the API. |
 | PostgreSQL | Not a UI dependency. |
 | Windows printer | Used only through the browser print dialog. The UI does not pick a device or speak a printer protocol. |

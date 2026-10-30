@@ -19,16 +19,19 @@ export function useSaleMutations(
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function run(action: () => Promise<SaleModel>) {
+  async function run(action: () => Promise<SaleModel>): Promise<SaleModel | null> {
     if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
-      return;
+      return null;
     }
     setBusy(true);
     setError(null);
     try {
-      onSale(await action());
+      const next = await action();
+      onSale(next);
+      return next;
     } catch (caught) {
       setError(saleErrorKey(caught, 'saleLineFailed'));
+      return null;
     } finally {
       setBusy(false);
     }
@@ -37,28 +40,28 @@ export function useSaleMutations(
   return {
     busy,
     error,
-    accept: async (productId: string, quantity: number, itemName: string) => {
+    accept: async (productId: string, quantity: number, itemName: string): Promise<SaleModel | null> => {
       if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
-        return false;
+        return null;
       }
       if (!isSellableQuantity(quantity)) {
         setError('saleQuantityInvalid');
-        return false;
+        return null;
       }
       const name = itemName.trim();
       if (!name) {
         setError('saleNameRequired');
-        return false;
+        return null;
       }
       setBusy(true);
       setError(null);
       try {
         const next = await addItem.execute(sale.id, productId, quantity, name);
         onSale(next);
-        return true;
+        return next;
       } catch (caught) {
         setError(saleErrorKey(caught, 'saleLineFailed'));
-        return false;
+        return null;
       } finally {
         setBusy(false);
       }

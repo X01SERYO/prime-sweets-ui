@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
@@ -19,13 +19,17 @@ interface SaleLinesProps {
   busy: boolean;
   confirming: boolean;
   confirmError: MessageKey | null;
-  onConfirm: () => void;
+  onConfirm: (sale?: SaleModel) => void;
   pending: PendingLine | null;
-  onAcceptPending: (name: string, quantity: number) => Promise<boolean>;
+  onAcceptPending: (name: string, quantity: number) => Promise<SaleModel | null>;
   onCancelPending: () => void;
+  onEditingChange: (editing: boolean) => void;
+  editNotice: boolean;
+  onEditBlocked: () => void;
+  onDismissEditNotice: () => void;
   onRemove: (productId: string) => void;
-  onQuantity: (productId: string, quantity: number) => void;
-  onName: (productId: string, itemName: string) => void;
+  onQuantity: (productId: string, quantity: number) => Promise<SaleModel | null>;
+  onName: (productId: string, itemName: string) => Promise<SaleModel | null>;
 }
 
 export function SaleLines({
@@ -40,6 +44,10 @@ export function SaleLines({
   pending,
   onAcceptPending,
   onCancelPending,
+  onEditingChange,
+  editNotice,
+  onEditBlocked,
+  onDismissEditNotice,
   onRemove,
   onQuantity,
   onName
@@ -48,6 +56,12 @@ export function SaleLines({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
   const editable = sale?.status === 'DRAFT' || sale?.status === 'CONFIRMED';
+  const editing = Boolean(pending) || editingId !== null;
+  const editingActions = useRef<EditingActions | null>(null);
+
+  useEffect(() => {
+    onEditingChange(editing);
+  }, [editing, onEditingChange]);
 
   return (
     <section className="stack">
@@ -58,6 +72,7 @@ export function SaleLines({
         <PendingCard
           pending={pending}
           busy={busy}
+          actions={editingActions}
           onAccept={onAcceptPending}
           onCancel={onCancelPending}
         />
@@ -65,6 +80,7 @@ export function SaleLines({
       <table className="lines">
           <thead>
             <tr>
+              <th>{t('productCode')}</th>
               <th>{t('itemName')}</th>
               <th>{t('quantity')}</th>
               <th>{t('unitPrice')}</th>
@@ -80,7 +96,7 @@ export function SaleLines({
           <tbody>
             {!sale || sale.items.length === 0 ? (
               <tr>
-                <td className="lines-empty" colSpan={editable ? 6 : 4}>
+                <td className="lines-empty" colSpan={editable ? 7 : 5}>
                   {t('saleEmpty')}
                 </td>
               </tr>
@@ -89,23 +105,34 @@ export function SaleLines({
               <tr key={item.id}>
                 {editingId === item.id ? (
                   <LineEditor
+                    productCode={item.productCode}
                     itemName={item.itemName}
                     quantity={item.quantity}
                     allowName={sale?.status === 'DRAFT'}
                     busy={busy}
-                    onSave={(name, quantity) => {
+                    actions={editingActions}
+                    onSave={async (name, quantity) => {
+                      let next: SaleModel | null = sale;
                       if (sale?.status === 'DRAFT' && name !== item.itemName) {
-                        onName(item.id, name);
+                        next = await onName(item.id, name);
+                        if (!next) {
+                          return null;
+                        }
                       }
                       if (quantity !== item.quantity) {
-                        onQuantity(item.id, quantity);
+                        next = await onQuantity(item.id, quantity);
+                        if (!next) {
+                          return null;
+                        }
                       }
                       setEditingId(null);
+                      return next;
                     }}
                     onCancel={() => setEditingId(null)}
                   />
                 ) : (
                   <>
+                    <td>{item.productCode}</td>
                     <td className="product-cell">{item.itemName}</td>
                     <td>{item.quantity}</td>
                     <td>{formatCurrency(item.wholesalePrice)}</td>
@@ -151,6 +178,26 @@ export function SaleLines({
       {sale ? (
         <div className="card">
           {confirmError ? <p role="alert">{t(confirmError)}</p> : null}
+          {editNotice ? (
+            <EditNotice
+              title={t('saleLineInProgressTitle')}
+              message={t('saleLineInProgress')}
+              saveLabel={t('saveEditing')}
+              cancelLabel={t('cancelLine')}
+              onSave={() => {
+                void editingActions.current?.save().then(saved => {
+                  onDismissEditNotice();
+                  if (saved) {
+                    onConfirm(saved);
+                  }
+                });
+              }}
+              onCancel={() => {
+                editingActions.current?.cancel();
+                onDismissEditNotice();
+              }}
+            />
+          ) : null}
           {sale.status === 'VOIDED' ? <p className="m">{t('saleVoided')}</p> : null}
           <div className="sale-close">
             {sale.invoiceNumber ? (
@@ -158,7 +205,7 @@ export function SaleLines({
                 {t('invoiceAssigned')} {sale.invoiceNumber}
               </p>
             ) : null}
-            <p>
+            <p className="sale-total">
               {t('saleTotal')} {formatCurrency(sale.totalAmount)}
             </p>
             {sale.status === 'DRAFT' || sale.status === 'CONFIRMED' ? (
@@ -166,7 +213,13 @@ export function SaleLines({
                 className="btn"
                 type="button"
                 disabled={busy || confirming || (sale.status === 'DRAFT' && sale.items.length === 0)}
-                onClick={onConfirm}
+                onClick={() => {
+                  if (editing) {
+                    onEditBlocked();
+                    return;
+                  }
+                  onConfirm();
+                }}
               >
                 {confirming ? t('confirmingSale') : t('confirmSale')}
               </button>
@@ -178,27 +231,49 @@ export function SaleLines({
   );
 }
 
+type EditingActions = { save: () => Promise<SaleModel | null>; cancel: () => void };
+
 function LineEditor({
+  productCode,
   itemName,
   quantity,
   allowName,
   busy,
+  actions,
   onSave,
   onCancel
 }: {
+  productCode: string;
   itemName: string;
   quantity: number;
   allowName: boolean;
   busy: boolean;
-  onSave: (name: string, quantity: number) => void;
+  actions: MutableRefObject<EditingActions | null>;
+  onSave: (name: string, quantity: number) => Promise<SaleModel | null>;
   onCancel: () => void;
 }) {
   const { t } = useLocale();
   const [name, setName] = useState(itemName);
   const [qty, setQty] = useState(String(quantity));
 
+  function save() {
+    const next = parseQuantity(qty);
+    if (next === null || !name.trim()) {
+      return Promise.resolve(null);
+    }
+    return onSave(name.trim(), next);
+  }
+
+  useEffect(() => {
+    actions.current = { save, cancel: onCancel };
+    return () => {
+      actions.current = null;
+    };
+  });
+
   return (
     <>
+      <td>{productCode}</td>
       <td className="product-cell">
         {allowName ? (
           <input value={name} disabled={busy} onChange={event => setName(event.target.value)} aria-label={t('itemName')} />
@@ -212,19 +287,7 @@ function LineEditor({
       <td />
       <td />
       <td className="line-col">
-        <button
-          className="btn icon-btn icon-edit"
-          type="button"
-          aria-label={t('confirmLine')}
-          disabled={busy}
-          onClick={() => {
-            const next = parseQuantity(qty);
-            if (next === null || !name.trim()) {
-              return;
-            }
-            onSave(name.trim(), next);
-          }}
-        >
+        <button className="btn icon-btn icon-edit" type="button" aria-label={t('saveEditing')} disabled={busy} onClick={save}>
           <CheckIcon />
         </button>
       </td>
@@ -242,6 +305,59 @@ function CheckIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
     </svg>
+  );
+}
+
+function EditNotice({
+  title,
+  message,
+  saveLabel,
+  cancelLabel,
+  onSave,
+  onCancel
+}: {
+  title: string;
+  message: string;
+  saveLabel: string;
+  cancelLabel: string;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || dialog.open) {
+      return;
+    }
+    dialog.showModal();
+    return () => {
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
+  }, []);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="modal"
+      onCancel={event => {
+        event.preventDefault();
+        onCancel();
+      }}
+    >
+      <h2>{title}</h2>
+      <p>{message}</p>
+      <div className="modal-actions">
+        <button className="btn" type="button" onClick={onSave}>
+          {saveLabel}
+        </button>
+        <button className="btn btn-secondary" type="button" onClick={onCancel}>
+          {cancelLabel}
+        </button>
+      </div>
+    </dialog>
   );
 }
 
@@ -267,12 +383,14 @@ function RemoveIcon() {
 function PendingCard({
   pending,
   busy,
+  actions,
   onAccept,
   onCancel
 }: {
   pending: PendingLine;
   busy: boolean;
-  onAccept: (name: string, quantity: number) => Promise<boolean>;
+  actions: MutableRefObject<EditingActions | null>;
+  onAccept: (name: string, quantity: number) => Promise<SaleModel | null>;
   onCancel: () => void;
 }) {
   const { t } = useLocale();
@@ -282,19 +400,31 @@ function PendingCard({
   const lineTotal =
     pending.unitPrice !== null && lineQuantity !== null ? Math.round(pending.unitPrice * lineQuantity * 100) / 100 : null;
 
+  function save() {
+    if (lineQuantity === null) {
+      return Promise.resolve(null);
+    }
+    return onAccept(name, lineQuantity).then(saved => {
+      if (saved) {
+        onCancel();
+      }
+      return saved;
+    });
+  }
+
+  useEffect(() => {
+    actions.current = { save, cancel: onCancel };
+    return () => {
+      actions.current = null;
+    };
+  });
+
   return (
     <form
       className="card"
       onSubmit={event => {
         event.preventDefault();
-        if (lineQuantity === null) {
-          return;
-        }
-        void onAccept(name, lineQuantity).then(saved => {
-          if (saved) {
-            onCancel();
-          }
-        });
+        save();
       }}
     >
       <p>{pending.name}</p>

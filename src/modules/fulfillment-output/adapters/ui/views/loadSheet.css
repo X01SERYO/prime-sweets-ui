@@ -35,4 +35,5 @@
 .load-sheet-table th {
   color: var(--deep);
   font-size: 0.75rem;
+  font-weight: 700;
 }

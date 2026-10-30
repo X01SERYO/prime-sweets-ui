@@ -15,3 +15,10 @@ export function invoiceErrorKey(caught: unknown, fallback: MessageKey): MessageK
   }
   return fallback;
 }
+
+export function invoiceErrorKind(caught: unknown): 'business' | 'technical' {
+  if (caught instanceof InvoiceNotPrintableError || caught instanceof CompanyProfileNotConfiguredError) {
+    return 'business';
+  }
+  return 'technical';
+}

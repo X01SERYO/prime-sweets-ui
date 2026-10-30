@@ -21,7 +21,7 @@ The search response does not include the brand name. `brandName` from the SPEC i
 
 | Field | Source | Meaning |
 |---|---|---|
-| `apiBaseUrl` | `import.meta.env.VITE_API_BASE_URL` | Core API origin. Falls back to `http://localhost:3000` when the variable is missing. |
+| `apiBaseUrl` | `import.meta.env.VITE_API_BASE_URL` | Core API origin. Falls back to `http://localhost:4000` when the variable is missing. |
 
 `.env.example` documents the variable. `.env` is local and is not committed.
 

@@ -21,9 +21,22 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
   return (
     <section className="stack">
       <h1>{t('invoicePreview')}</h1>
-      {salesDayId ? <Link to={`/invoices/${salesDayId}`}>{t('invoices')}</Link> : null}
       {loaded.loading ? <p>{t('invoiceLoadLoading')}</p> : null}
-      {loaded.error ? <p className="alert">{t(loaded.error)}</p> : null}
+      {loaded.error ? (
+        <div className={loaded.errorKind === 'business' ? 'notice notice-business' : 'notice notice-error'} role="alert">
+          <p>{t(loaded.error)}</p>
+          <div className="row">
+            {salesDayId ? (
+              <Link className="btn btn-secondary" to={`/invoices/${salesDayId}`}>
+                {t('backToInvoices')}
+              </Link>
+            ) : null}
+            <button className="btn" type="button" onClick={loaded.retry}>
+              {t('retryInvoice')}
+            </button>
+          </div>
+        </div>
+      ) : null}
       {printing.error ? <p className="alert">{t(printing.error)}</p> : null}
       {document ? (
         <article className="card stack">

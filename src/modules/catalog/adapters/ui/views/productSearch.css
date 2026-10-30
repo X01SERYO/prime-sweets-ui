@@ -18,12 +18,18 @@
   background: #fff;
 }
 
-.product-hits li span:first-child {
+.product-hits li span:nth-child(2) {
   flex: 1;
   min-width: 0;
   color: var(--deep);
   font-family: Fraunces, serif;
   font-weight: 600;
+}
+
+.product-hit-code {
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .product-hit-price {
@@ -90,7 +96,10 @@
   display: block;
 }
 
-.product-search-field {
-  flex: 1;
-  min-width: 12rem;
+.product-search-modal {
+  width: min(36rem, calc(100vw - 1.5rem));
+}
+
+.product-search-modal .product-hits {
+  margin-bottom: 1rem;
 }
