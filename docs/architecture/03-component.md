@@ -2,7 +2,7 @@
 
 **Sources:** `src/app/`, `src/shared/`, `src/modules/`.
 
-The SPA has a composition root and a shared HTTP helper. `src/modules/` has no feature code.
+The SPA has a composition root, a shared HTTP client, and one hexagonal module per seller area: identity, catalog, customers, sales day, sales, and fulfillment output.
 
 ## Diagram
 
@@ -13,9 +13,9 @@ title Prime Sweets UI — Components (current)
 Container_Boundary(spa, "Prime Sweets UI") {
   Component(boot, "Browser entry", "main.tsx", "Finds #root and renders App inside StrictMode")
   Component(composition, "Composition root", "createAppContainer", "Reads env and builds the HTTP client")
-  Component(shell, "App shell", "App.tsx, styles.css, shared/i18n", "Top bar, ES/EN, Sales Day hub. Placeholders do not call use cases")
+  Component(shell, "App shell", "App.tsx, styles.css, shared/i18n", "Top bar, ES/EN, and the signed-in routes")
   Component(env, "Environment", "shared/config/env.ts", "VITE_API_BASE_URL")
-  Component(http, "HTTP client", "createHttpClient", "get and post JSON. No caller yet")
+  Component(http, "HTTP client", "createHttpClient", "JSON with the bearer token")
 }
 
 System_Ext(api, "Prime Sweets Core API")
@@ -24,8 +24,8 @@ Rel(boot, composition, "Creates the container")
 Rel(boot, shell, "Passes the container")
 Rel(composition, env, "Reads the base URL")
 Rel(composition, http, "Builds the client")
-Rel(shell, composition, "Reads apiBaseUrl")
-Rel(http, api, "Not called by the shell")
+Rel(shell, composition, "Calls use cases")
+Rel(http, api, "Bearer JSON")
 ```
 
 ## Folder map

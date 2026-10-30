@@ -2,7 +2,7 @@
 
 This folder is the **only** C4 description of the frontend. It documents the SPA as implemented in this repository.
 
-Version 1 (feature modules, seller flows, print dialog) is the decision in [ADR-001](../adrs/ADR-001.md) and the guide in [SPEC](../specs/SPEC.md). It is not duplicated here as a second C4 model.
+The seller flows in this folder are the running SPA. Product rules stay in the [PDR](../pdrs/PDR.md) and [SPEC](../specs/SPEC.md). They are not duplicated here as a second C4 model.
 
 | Level | Question | Document |
 |---|---|---|

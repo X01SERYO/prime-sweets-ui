@@ -13,13 +13,13 @@ title Prime Sweets UI — Containers (current)
 Person(seller, "Seller", "Browser user")
 
 Container_Boundary(client, "Prime Sweets UI") {
-  Container(spa, "Web application", "Vite 7, React 19, TypeScript, React Router", "Renders the shell. The sale route searches products. Other routes are placeholders")
+  Container(spa, "Web application", "Vite 7, React 19, TypeScript, React Router", "Seller screens for the day, customers, sales, the load sheet, and invoices")
 }
 
 System_Ext(api, "Prime Sweets Core API", "Express process. Default base URL http://localhost:3000")
 
 Rel(seller, spa, "Loads index.html", "HTTPS or HTTP")
-Rel(spa, api, "GET /products/search when the seller submits a query", "fetch")
+Rel(spa, api, "Bearer JSON for the signed-in seller", "fetch")
 ```
 
 ## Web application
@@ -32,13 +32,13 @@ Stack: TypeScript ESM, React 19, Vite 7, ESLint 9 flat config, Prettier 3.
 
 ## Core API
 
-Configured only. Feature calls are not wired. Authentication headers are not sent because the shell has no session.
+The composition root builds the HTTP client and the use cases. The bearer token comes from the session in `sessionStorage`.
 
 ## Deployment notes (verified)
 
 | Topic | Current behavior |
 |---|---|
 | Deployable | Static files from `dist/` after `npm run build`. |
-| Runtime data | None stored in the browser. |
-| Print | None. |
-| Layout | Narrow by default. At `min-width: 64rem` the shell places navigation beside the page. No user-agent check. Feature screens do not yet reflow their own tables. |
+| Runtime data | Session in `sessionStorage`. Language in `localStorage`. No draft sale and no printed flag. |
+| Print | Browser print dialog for selected invoice documents. |
+| Layout | Narrow by default. At `min-width: 64rem` the shell places navigation beside the page. Lists stay one table. |

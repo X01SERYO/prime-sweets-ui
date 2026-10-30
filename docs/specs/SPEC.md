@@ -78,7 +78,7 @@ Sales Day
 
 Screen-size behavior is specified in section 4.1. Viewport width does not change this route map.
 
-The mock guide is [docs/mocks/README.md](../mocks/README.md). The shell is a top bar, and Sales Day is the hub. Do not add a persistent menu of every section. Desktop sale search and lines sit side by side only when the sale lines exist.
+The shell is a top bar, and Sales Day is the hub. Do not add a persistent menu of every section. The sale screen stays one column: customer, search, lines, and total.
 
 Sign-in is implemented. Do not hardcode a `sellerId`. Sales Day open uses the id from the session.
 
@@ -157,7 +157,7 @@ Search calls `GET /products/search?q=`. The UI does not download the full catalo
 - `GetSale`
 - `ListSales`
 
-`AddSaleItem` sends `productId`, a positive integer `quantity`, and an optional `itemName`. The price fields are absent from the request. When the seller does not edit the name, the client omits `itemName` and shows the name returned on the sale.
+`AddSaleItem` sends `productId`, a positive `quantity` with at most 3 decimal places, and an optional `itemName`. The price fields are absent from the request. When the seller does not edit the name, the client omits `itemName` and shows the name returned on the sale. The quantity control steps by 1 and also accepts a typed decimal.
 
 `UpdateSaleItemName` is offered only when the sale status is `DRAFT` and the loaded Sales Day status is `OPEN`. If the API rejects the call, the screen shows that error and keeps the stored name.
 

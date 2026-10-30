@@ -3,16 +3,16 @@
 **Document role:** UI debt that is visible in the current shell.
 **Status:** Active.
 
-Business gaps (authentication, capture, print) are specified in the [PDR](./pdrs/PDR.md) and [SPEC](./specs/SPEC.md). They are not repeated here as debt.
+Authentication, sale capture, the Load Sheet, and invoice print are implemented. They are not debt. Remaining items are coverage and tooling.
 
 ## Confirmed
 
 | ID | Item | Where | Notes |
 |---|---|---|---|
-| TD-01 | Sample lists are not API-backed | `src/modules/customers`, `src/modules/sales`, `src/modules/fulfillment-output` | Customers, day sales, the load sheet, and invoices read in-memory sample adapters. Replace each `Sample*` class with an HTTP adapter and register the use case in `src/app/composition.ts`. |
+| TD-01 | ~~Sample lists are not API-backed~~ | `src/app/composition.ts` | **[RESOLVED]** Customers, day sales, the load sheet, invoices, and sales call HTTP adapters. There is no `Sample*` class. |
 | TD-02 | ~~HTTP client drops the API error body~~ | `src/shared/infrastructure/http/httpClient.ts` | **[RESOLVED]** `HttpRequestError` keeps `status`, `message`, and `code` when the body sends them. |
 | TD-03 | Thin automated tests | `src/test/architecture.test.ts` | `npm test` covers currency format and domain error codes. Screen flows are not covered. |
-| TD-13 | ~~Dummy list files~~ | `src/shared/dev/dummyLists.ts`, `src/app/lists/DummyLists.tsx` | **[RESOLVED]** Those files are gone. Sample rows now sit behind module ports. |
+| TD-13 | ~~Dummy list files~~ | `src/shared/dev/dummyLists.ts`, `src/app/lists/DummyLists.tsx` | **[RESOLVED]** Those files are gone. The screens read the API. |
 | TD-04 | ESLint 9 is outside the current support window | `package.json` | `npm install` warns that ESLint 9 is deprecated. Lint still passes. Moving to ESLint 10 is a tooling change, not a feature. |
 
 ## Resolved with the shell

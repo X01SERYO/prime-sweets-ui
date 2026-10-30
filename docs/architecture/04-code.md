@@ -1,10 +1,10 @@
 # C4 Level 4 — Code (current)
 
-**Verified flow:** boot the SPA and show the configured API base URL.
+**Verified flow:** boot the SPA, restore the session, and open the Sales Day when the seller is signed in.
 
 **Sources:** `src/main.tsx`, `src/app/composition.ts`, `src/app/App.tsx`, `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`.
 
-Seller capture, Load Sheet, and invoice print are not in this diagram. They are specified in the [SPEC](../specs/SPEC.md) and listed as pending in [flows](../flows/README.md).
+Sale capture, the Load Sheet, and invoice print are use cases behind this boot path. Their screens are in [flows](../flows/README.md).
 
 ## Dependencies
 

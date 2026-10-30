@@ -2,7 +2,7 @@
 
 **Sources:** `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`, `src/app/composition.ts`.
 
-Login session, the current Sales Day, and the four sample lists have client models. Sale lines, close, and print stay in [SPEC § 6](../specs/SPEC.md).
+The client models the session, the current Sales Day, the product hit, the customer, the sale and its lines, the day-sale row, the load sheet, and the invoice summary and document.
 
 ## Product hit
 
@@ -29,15 +29,15 @@ The search response does not include the brand name. `brandName` from the SPEC i
 
 | Operation | Behavior |
 |---|---|
-| `get(path)` | `GET {apiBaseUrl}{path}`. Parses JSON on a 2xx response. Throws `Error` with `HTTP {status}` otherwise. |
+| `get(path)` | `GET {apiBaseUrl}{path}` with the bearer token when a session exists. Parses JSON on a 2xx response. |
 | `post(path, body)` | `POST` with `Content-Type: application/json`. Same success and error behavior as `get`. |
 
-The client is untyped at the boundary (`Promise<T>` asserted from `response.json()`). Feature mappers are not written yet. There is no error `code` field on this client.
+A non-2xx response throws `HttpRequestError` with `status`, `message`, and `code` when the body sends them. Feature mappers turn the JSON into domain models.
 
 ## Composition
 
-`AppContainer` is `{ http, apiBaseUrl }`. `App` reads `apiBaseUrl` only.
+`AppContainer` wires the HTTP client and the use cases for identity, catalog, customers, the Sales Day, sales, the load sheet, and invoices. `App` uses those use cases. It does not call the API itself.
 
-## Not stored
+## Browser storage
 
-The browser does not persist a session, a draft sale, or a printed flag. There is no IndexedDB, `localStorage`, or offline queue in this repository.
+The session is stored in `sessionStorage`. The language choice is stored in `localStorage`. A draft sale and a printed flag are not stored in the browser. There is no IndexedDB and no offline queue.

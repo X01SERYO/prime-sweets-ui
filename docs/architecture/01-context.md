@@ -2,7 +2,7 @@
 
 **Sources:** `src/`, `package.json`, `.env.example`.
 
-The UI is a browser shell with five routes. The sale route searches the catalog through `GET /products/search?q=`. The other routes are placeholders. It does not open a Sales Day, create a sale, or open a print dialog. Sign-in is not a route.
+The UI is the seller SPA. Routes cover login, the current Sales Day, customers, day sales, a sale, the load sheet, the invoice list, and invoice preview. Signed-out visitors go to `/login`. Printing uses the browser print dialog.
 
 ## Diagram
 
@@ -11,24 +11,24 @@ C4Context
 title Prime Sweets UI — System Context (current)
 
 Person(seller, "Seller", "Opens the web application in a browser")
-System(ui, "Prime Sweets UI", "Vite/React shell that reads VITE_API_BASE_URL and renders a startup page")
-System_Ext(api, "Prime Sweets Core API", "Catalog, customers, Sales Day, sales, Load Sheet, and invoice documents. Not called at startup")
+System(ui, "Prime Sweets UI", "Vite/React SPA for the seller day, sales, load sheet, and invoices")
+System_Ext(api, "Prime Sweets Core API", "Identity, catalog, customers, Sales Day, sales, Load Sheet, and invoice documents")
 
-Rel(seller, ui, "Opens the page")
-Rel(ui, api, "No request on the current screen", "HTTP JSON when a feature module exists")
+Rel(seller, ui, "Signs in and works the day")
+Rel(ui, api, "Bearer JSON", "HTTP")
 ```
 
 ## People
 
 | Person | Relationship in code |
 |---|---|
-| Seller | Opens the SPA. There is no sign-in screen and no role switch. |
+| Seller | Signs in, works today's Sales Day, and prints invoices from the browser. |
 
 ## External systems
 
 | System | Role in code |
 |---|---|
-| Prime Sweets Core API | Named by `VITE_API_BASE_URL` (default `http://localhost:3000`). The shell constructs an HTTP client and does not issue a request. |
+| Prime Sweets Core API | Named by `VITE_API_BASE_URL` (default `http://localhost:3000`). Every business screen calls it with the bearer token. |
 | Alegra | Not a UI dependency. Product sync stays in the API. |
 | PostgreSQL | Not a UI dependency. |
-| Windows printer | Not used. Printing is specified in the PDR and is not implemented. |
+| Windows printer | Used only through the browser print dialog. The UI does not pick a device or speak a printer protocol. |
