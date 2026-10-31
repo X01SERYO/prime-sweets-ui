@@ -4,6 +4,7 @@ export interface SaleItemModel {
   id: string;
   productId: string;
   productCode: string;
+  catalogName: string;
   itemName: string;
   quantity: number;
   wholesalePrice: number;

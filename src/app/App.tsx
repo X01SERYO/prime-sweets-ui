@@ -48,6 +48,8 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
   const [pending, setPending] = useState<PendingLine | null>(null);
+  const [searchOutcome, setSearchOutcome] = useState<{ id: number; added: boolean } | null>(null);
+  const searchOutcomeId = useRef(0);
   const [editingLine, setEditingLine] = useState(false);
   const [editNotice, setEditNotice] = useState(false);
   const allowLeave = useRef(false);
@@ -86,7 +88,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
     container.removeSaleItem
   );
   return (
-    <>
+    <div className="sale-screen">
       <ScreenTitle>{t('sale')}</ScreenTitle>
       {!shownCustomerId && !draft.loading ? (
         <SaleCustomerChoice searchCustomers={container.searchCustomers} onSelect={id => setParams({ customerId: id })} />
@@ -97,6 +99,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
         <ProductSearchView
           searchProducts={container.searchProducts}
           selecting={lines.busy || confirmation.confirming}
+          outcome={searchOutcome}
           onSelect={product =>
             setPending({
               productId: product.id,
@@ -128,10 +131,24 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
           });
         }}
         pending={pending}
-        onAcceptPending={(name, quantity) =>
-          pending ? lines.accept(pending.productId, quantity, name) : Promise.resolve(null)
-        }
-        onCancelPending={() => setPending(null)}
+        onAcceptPending={(name, quantity) => {
+          if (!pending) {
+            return Promise.resolve(null);
+          }
+          return lines.accept(pending.productId, quantity, name).then(saved => {
+            if (saved) {
+              searchOutcomeId.current += 1;
+              setSearchOutcome({ id: searchOutcomeId.current, added: true });
+              setPending(null);
+            }
+            return saved;
+          });
+        }}
+        onCancelPending={() => {
+          setPending(null);
+          searchOutcomeId.current += 1;
+          setSearchOutcome({ id: searchOutcomeId.current, added: false });
+        }}
         onEditingChange={setEditingLine}
         editNotice={editNotice}
         onEditBlocked={() => setEditNotice(true)}
@@ -140,7 +157,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
         onQuantity={(productId, quantity) => lines.changeQuantity(productId, quantity)}
         onName={(productId, itemName) => lines.changeName(productId, itemName) ?? Promise.resolve(null)}
       />
-    </>
+    </div>
   );
 }
 

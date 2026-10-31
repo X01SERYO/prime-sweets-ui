@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
 import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
 import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
@@ -11,21 +11,24 @@ export function useProductSearch(searchProducts: SearchProductsUseCase) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const [searched, setSearched] = useState(false);
+  const openedQuery = useRef('');
 
   const canSearch = isProductSearchTerm(query);
 
   async function submit() {
-    if (!canSearch) {
+    const term = query;
+    if (!isProductSearchTerm(term)) {
       setProducts([]);
       setSearched(false);
       setError('searchRequired');
       return;
     }
+    openedQuery.current = term;
     setLoading(true);
     setError(null);
     setSearched(true);
     try {
-      setProducts(await searchProducts.execute(query));
+      setProducts(await searchProducts.execute(term));
     } catch (caught) {
       setProducts([]);
       setError(caught instanceof CatalogInvalidError ? 'catalogInvalid' : 'catalogFailed');
@@ -34,11 +37,24 @@ export function useProductSearch(searchProducts: SearchProductsUseCase) {
     }
   }
 
-  function clear() {
+  const closeResults = useCallback(() => {
+    setQuery(openedQuery.current);
     setProducts([]);
     setSearched(false);
     setError(null);
-  }
+  }, []);
 
-  return { query, setQuery, submit, products, loading, error, searched, canSearch, clear };
+  const keepQuery = useCallback(() => {
+    setQuery(openedQuery.current);
+  }, []);
+
+  const resetQuery = useCallback(() => {
+    openedQuery.current = '';
+    setQuery('');
+    setProducts([]);
+    setSearched(false);
+    setError(null);
+  }, []);
+
+  return { query, setQuery, submit, products, loading, error, searched, canSearch, closeResults, keepQuery, resetQuery };
 }

@@ -2,7 +2,6 @@ import { catalog } from '@/shared/i18n/catalog';
 
 export const catalogMessages = catalog(
   {
-    saleItems: 'Ítems de la venta',
     searchProduct: 'Buscar producto',
     search: 'Buscar',
     searching: 'Buscando…',

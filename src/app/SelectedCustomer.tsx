@@ -18,54 +18,48 @@ export function SelectedCustomer({ customerId, getCustomer }: SelectedCustomerPr
   }
 
   return (
-    <section className="card">
-      <h2>{t('saleCustomer')}</h2>
+    <section className="card customer-card">
       {error ? <p role="alert">{t(error)}</p> : null}
       {customer ? (
         <>
-          <div className="customer-summary">
-            <p className="customer-name">{customer.name}</p>
-            <button
-              className={open ? 'customer-toggle open' : 'customer-toggle'}
-              type="button"
-              aria-expanded={open}
-              aria-label={open ? t('hideCustomerDetails') : t('showCustomerDetails')}
-              onClick={() => setOpen(current => !current)}
-            >
-              <ChevronIcon />
-            </button>
-          </div>
+          <button
+            className={open ? 'customer-summary open' : 'customer-summary'}
+            type="button"
+            aria-expanded={open}
+            aria-label={open ? t('hideCustomerDetails') : t('showCustomerDetails')}
+            onClick={() => setOpen(current => !current)}
+          >
+            <span className="customer-text">
+              <span className="customer-kicker">{t('saleCustomer')}</span>
+              <span className="customer-name">{customer.name}</span>
+            </span>
+            <ChevronIcon />
+          </button>
           {open ? (
-            <table className="info">
-              <tbody>
-                <tr>
-                  <th scope="row">{t('documentType')}</th>
-                  <td>{customer.documentType}</td>
-                </tr>
-                <tr>
-                  <th scope="row">{t('documentNumber')}</th>
-                  <td>{customer.documentNumber}</td>
-                </tr>
-                {customer.phone ? (
-                  <tr>
-                    <th scope="row">{t('phone')}</th>
-                    <td>{customer.phone}</td>
-                  </tr>
-                ) : null}
-                {customer.email ? (
-                  <tr>
-                    <th scope="row">{t('email')}</th>
-                    <td>{customer.email}</td>
-                  </tr>
-                ) : null}
-                {customer.address ? (
-                  <tr>
-                    <th scope="row">{t('address')}</th>
-                    <td>{customer.address}</td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
+            <dl className="customer-details">
+              <dt>{t('documentType')}</dt>
+              <dd>{customer.documentType}</dd>
+              <dt>{t('documentNumber')}</dt>
+              <dd>{customer.documentNumber}</dd>
+              {customer.phone ? (
+                <>
+                  <dt>{t('phone')}</dt>
+                  <dd>{customer.phone}</dd>
+                </>
+              ) : null}
+              {customer.email ? (
+                <>
+                  <dt>{t('email')}</dt>
+                  <dd>{customer.email}</dd>
+                </>
+              ) : null}
+              {customer.address ? (
+                <>
+                  <dt>{t('address')}</dt>
+                  <dd>{customer.address}</dd>
+                </>
+              ) : null}
+            </dl>
           ) : null}
         </>
       ) : (

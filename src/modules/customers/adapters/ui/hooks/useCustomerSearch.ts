@@ -31,5 +31,11 @@ export function useCustomerSearch(searchCustomers: SearchCustomersUseCase) {
     }
   }
 
-  return { query, setQuery, submit, customers, loading, error, searched };
+  function closeResults() {
+    setCustomers([]);
+    setSearched(false);
+    setError(null);
+  }
+
+  return { query, setQuery, submit, customers, loading, error, searched, closeResults };
 }

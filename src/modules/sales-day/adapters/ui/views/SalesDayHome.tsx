@@ -60,9 +60,9 @@ export function SalesDayHome({
   const openingDay = useOpenSalesDay(sellerId, openSalesDay);
   const closingDay = useCloseSalesDay(closeSalesDay);
   const reopeningDay = useReopenSalesDay(reopenSalesDay);
-  const [pending, setPending] = useState<'close' | 'reopen' | null>(null);
+  const [pending, setPending] = useState<{ action: 'close' | 'reopen'; salesDayId: string } | null>(null);
   const [openId, setOpenId] = useState<string | null>(readOpenSalesDay);
-  const actionError = pending === 'close' ? closingDay.errorKey : pending === 'reopen' ? reopeningDay.errorKey : null;
+  const actionError = pending?.action === 'close' ? closingDay.errorKey : pending?.action === 'reopen' ? reopeningDay.errorKey : null;
   const errorKey = pending
     ? (openingDay.errorKey ?? current.errorKey ?? recent.errorKey)
     : (reopeningDay.errorKey ?? closingDay.errorKey ?? openingDay.errorKey ?? current.errorKey ?? recent.errorKey);
@@ -77,13 +77,15 @@ export function SalesDayHome({
   }
 
   async function confirmPending() {
-    if (!current.salesDay || !pending) {
+    if (!pending) {
       return;
     }
     const day =
-      pending === 'close' ? await closingDay.close(current.salesDay.id) : await reopeningDay.reopen(current.salesDay.id);
+      pending.action === 'close' ? await closingDay.close(pending.salesDayId) : await reopeningDay.reopen(pending.salesDayId);
     if (day) {
-      current.show(day);
+      if (current.salesDay?.id === day.id) {
+        current.show(day);
+      }
       setPending(null);
       recent.reload();
     }
@@ -107,8 +109,13 @@ export function SalesDayHome({
             {days.map(day => {
               const isToday = current.salesDay?.id === day.id;
               const expanded = openId === day.id;
-              const showSheet = !isToday || day.status === 'CLOSED';
-              const actionCount = 1 + (showSheet ? 1 : 0) + (isToday ? 1 : 0) + (isToday && day.status === 'OPEN' ? 1 : 0);
+              const pastOpen = !isToday && day.status === 'OPEN';
+              const showSheet = !pastOpen && (!isToday || day.status === 'CLOSED');
+              const showNewSale = isToday && day.status === 'OPEN';
+              const showDaySales = !pastOpen;
+              const showClose = day.status === 'OPEN';
+              const showReopen = isToday && day.status === 'CLOSED';
+              const actionCount = [showSheet, showNewSale, showDaySales, showClose, showReopen].filter(Boolean).length;
               return (
                 <li key={day.id} className={isToday ? 'sales-day-card is-today' : 'sales-day-card'}>
                   <button
@@ -137,21 +144,23 @@ export function SalesDayHome({
                           {t('loadSheet')}
                         </Link>
                       ) : null}
-                      {isToday && day.status === 'OPEN' ? (
+                      {showNewSale ? (
                         <Link className="btn" to="/sales">
                           {t('newSale')}
                         </Link>
                       ) : null}
-                      <Link className="btn btn-secondary" to={isToday && day.status === 'OPEN' ? '/day-sales' : `/day-sales/${day.id}`}>
-                        {t('daySales')}
-                      </Link>
-                      {isToday && day.status === 'OPEN' ? (
-                        <button className="btn btn-secondary" type="button" onClick={() => setPending('close')}>
+                      {showDaySales ? (
+                        <Link className="btn btn-secondary" to={isToday && day.status === 'OPEN' ? '/day-sales' : `/day-sales/${day.id}`}>
+                          {t('daySales')}
+                        </Link>
+                      ) : null}
+                      {showClose ? (
+                        <button className="btn btn-secondary" type="button" onClick={() => setPending({ action: 'close', salesDayId: day.id })}>
                           {t('closeDay')}
                         </button>
                       ) : null}
-                      {isToday && day.status === 'CLOSED' ? (
-                        <button className="btn btn-secondary" type="button" onClick={() => setPending('reopen')}>
+                      {showReopen ? (
+                        <button className="btn btn-secondary" type="button" onClick={() => setPending({ action: 'reopen', salesDayId: day.id })}>
                           {t('reopenDay')}
                         </button>
                       ) : null}
@@ -166,8 +175,8 @@ export function SalesDayHome({
       ) : null}
       {pending ? (
         <ConfirmDialog
-          title={pending === 'close' ? t('closeDay') : t('reopenDay')}
-          message={pending === 'close' ? t('confirmClose') : t('confirmReopen')}
+          title={pending.action === 'close' ? t('closeDay') : t('reopenDay')}
+          message={pending.action === 'close' ? t('confirmClose') : t('confirmReopen')}
           confirmLabel={
             closingDay.closing ? t('closingDay') : reopeningDay.reopening ? t('reopeningDay') : t('confirmAction')
           }

@@ -10,11 +10,25 @@ interface ProductSearchViewProps {
   searchProducts: SearchProductsUseCase;
   onSelect?: (product: ProductHit) => void;
   selecting?: boolean;
+  outcome?: { id: number; added: boolean } | null;
 }
 
-export function ProductSearchView({ searchProducts, onSelect, selecting }: ProductSearchViewProps) {
+export function ProductSearchView({ searchProducts, onSelect, selecting, outcome }: ProductSearchViewProps) {
   const { t } = useLocale();
-  const { query, setQuery, submit, products, loading, error, searched, canSearch, clear } = useProductSearch(searchProducts);
+  const { query, setQuery, submit, products, loading, error, searched, canSearch, closeResults, keepQuery, resetQuery } = useProductSearch(searchProducts);
+  const seenOutcome = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!outcome || seenOutcome.current === outcome.id) {
+      return;
+    }
+    seenOutcome.current = outcome.id;
+    if (outcome.added) {
+      resetQuery();
+      return;
+    }
+    keepQuery();
+  }, [keepQuery, outcome, resetQuery]);
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -23,7 +37,6 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
 
   return (
     <section className="stack">
-      <h2>{t('saleItems')}</h2>
       <form className="card" onSubmit={onSubmit}>
         <div className="search-label">
           <label htmlFor="product-query">{t('searchProduct')}</label>
@@ -32,16 +45,21 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
             <span className="info-tip-text" role="tooltip">{t('searchHint')}</span>
           </button>
         </div>
-        <div className="row">
+        <div className="search-row">
           <input
-            className="product-search-field"
+            className="search-field"
             id="product-query"
             value={query}
             onChange={event => setQuery(event.target.value)}
             autoComplete="off"
           />
-          <button className="btn" type="submit" disabled={!canSearch || loading}>
-            {loading ? t('searching') : t('search')}
+          <button
+            className="btn search-submit"
+            type="submit"
+            aria-label={loading ? t('searching') : t('search')}
+            disabled={!canSearch || loading}
+          >
+            <SearchIcon />
           </button>
         </div>
       </form>
@@ -49,7 +67,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
         <SearchResults
           title={t('searchResults')}
           closeLabel={t('closeSearch')}
-          onClose={clear}
+          onClose={closeResults}
         >
           {error ? <p role="alert">{t(error)}</p> : null}
           {!loading && !error && products.length === 0 ? <p className="m">{t('noResults')}</p> : null}
@@ -70,7 +88,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting }: Produ
                       disabled={selecting}
                       onClick={() => {
                         onSelect(product);
-                        clear();
+                        closeResults();
                       }}
                     >
                       <AddIcon />
@@ -121,14 +139,31 @@ function SearchResults({
         onClose();
       }}
     >
-      <h2>{title}</h2>
-      {children}
-      <div className="modal-actions">
-        <button className="btn btn-secondary" type="button" onClick={onClose}>
-          {closeLabel}
+      <div className="modal-toolbar">
+        <h2>{title}</h2>
+        <button className="modal-x" type="button" aria-label={closeLabel} onClick={onClose}>
+          <CloseIcon />
         </button>
       </div>
+      <div className="modal-scroll">{children}</div>
     </dialog>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M18.3 5.71 12 12.01l6.3 6.3-1.42 1.41L10.59 13.4l-6.3 6.3-1.41-1.42 6.3-6.29-6.3-6.3 1.42-1.41 6.29 6.29 6.3-6.3z" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
   );
 }
 

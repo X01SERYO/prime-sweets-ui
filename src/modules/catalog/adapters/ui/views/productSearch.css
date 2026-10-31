@@ -27,8 +27,9 @@
 }
 
 .product-hit-code {
-  color: var(--ink);
-  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -39,67 +40,16 @@
   white-space: nowrap;
 }
 
-.search-label {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-bottom: 0.25rem;
-}
-
-.search-label label {
-  margin: 0;
-  line-height: 1;
-}
-
-.info-tip {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--muted, #6b6258);
-  line-height: 0;
-  cursor: help;
-}
-
-.info-tip svg {
-  display: block;
-  width: 16px;
-  height: 16px;
-}
-
-.info-tip-text {
-  display: none;
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 0.35rem);
-  transform: translateX(-50%);
-  z-index: 2;
-  width: max-content;
-  max-width: 14rem;
-  padding: 0.35rem 0.55rem;
-  border-radius: var(--radius);
-  background: var(--deep);
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1.3;
-  white-space: nowrap;
-}
-
-.info-tip:hover .info-tip-text,
-.info-tip:focus-visible .info-tip-text {
-  display: block;
-}
-
-.product-search-modal {
+dialog.product-search-modal {
   width: min(36rem, calc(100vw - 1.5rem));
 }
 
+@media (min-width: 40rem) {
+  dialog.product-search-modal {
+    width: min(48rem, calc(100vw - 2.5rem));
+  }
+}
+
 .product-search-modal .product-hits {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }

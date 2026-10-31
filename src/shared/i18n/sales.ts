@@ -14,6 +14,8 @@ export const salesMessages = catalog(
     increaseQuantity: 'Aumentar cantidad',
     saleNameRequired: 'El nombre de la línea no puede quedar vacío.',
     saleEmpty: 'Vacío',
+    showLineDetails: 'Ver detalle del producto',
+    hideLineDetails: 'Ocultar detalle del producto',
     saleTotal: 'Total',
     itemName: 'Producto',
     productCode: 'Código',

@@ -27,6 +27,7 @@ function toItem(raw: unknown): SaleItemModel {
     productId: data.productId,
     itemName: data.itemName,
     productCode: typeof data.productCode === 'string' ? data.productCode : '',
+    catalogName: typeof data.catalogName === 'string' && data.catalogName.trim() ? data.catalogName : data.itemName,
     quantity: data.quantity,
     wholesalePrice: money(data.wholesalePrice),
     lineTotal: money(data.totalPrice)
