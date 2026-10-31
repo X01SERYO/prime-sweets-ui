@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ConfirmSaleUseCase } from '@/modules/sales/application/use-cases/confirmSale.useCase';
 import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
+import { canConfirmSale } from '@/modules/sales/domain/saleStatus';
 import type { MessageKey } from '@/shared/i18n/messages';
 
 export function useConfirmSale(confirmSale: ConfirmSaleUseCase, onSale: (sale: SaleModel) => void) {
@@ -9,7 +10,7 @@ export function useConfirmSale(confirmSale: ConfirmSaleUseCase, onSale: (sale: S
   const [error, setError] = useState<MessageKey | null>(null);
 
   async function confirm(sale: SaleModel | null): Promise<boolean> {
-    if (!sale || sale.status !== 'DRAFT') {
+    if (!sale || !canConfirmSale(sale.status)) {
       return false;
     }
     setConfirming(true);

@@ -7,6 +7,7 @@ import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { isSellableQuantity } from '@/modules/sales/domain/quantity';
+import { canEditSaleLines, canRenameSaleLine } from '@/modules/sales/domain/saleStatus';
 
 export function useSaleMutations(
   sale: SaleModel | null,
@@ -20,7 +21,7 @@ export function useSaleMutations(
   const [busy, setBusy] = useState(false);
 
   async function run(action: () => Promise<SaleModel>): Promise<SaleModel | null> {
-    if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
+    if (!sale || !canEditSaleLines(sale.status)) {
       return null;
     }
     setBusy(true);
@@ -41,7 +42,7 @@ export function useSaleMutations(
     busy,
     error,
     accept: async (productId: string, quantity: number, itemName: string): Promise<SaleModel | null> => {
-      if (!sale || (sale.status !== 'DRAFT' && sale.status !== 'CONFIRMED')) {
+      if (!sale || !canEditSaleLines(sale.status)) {
         return null;
       }
       if (!isSellableQuantity(quantity)) {
@@ -74,7 +75,7 @@ export function useSaleMutations(
       return run(() => updateQuantity.execute(sale!.id, itemId, quantity));
     },
     changeName: (itemId: string, itemName: string) => {
-      if (!sale || sale.status !== 'DRAFT') {
+      if (!sale || !canRenameSaleLine(sale.status)) {
         return;
       }
       if (!itemName.trim()) {

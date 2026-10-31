@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
 import type { SaleItemModel, SaleModel } from '@/modules/sales/domain/models/sale';
+import { addedSaleLineName, previewLineTotal } from '@/modules/sales/domain/saleLineName';
+import { canConfirmSale, canEditSaleLines, canRenameSaleLine } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -58,7 +60,7 @@ export function SaleLines({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
-  const editable = sale?.status === 'DRAFT' || sale?.status === 'CONFIRMED';
+  const editable = sale ? canEditSaleLines(sale.status) : false;
   const editing = Boolean(pending) || editingId !== null;
   const editingActions = useRef<EditingActions | null>(null);
 
@@ -68,7 +70,7 @@ export function SaleLines({
 
   async function saveItem(item: SaleItemModel, name: string, quantity: number) {
     let next: SaleModel | null = sale;
-    if (sale?.status === 'DRAFT' && name !== item.itemName) {
+    if (sale && canRenameSaleLine(sale.status) && name !== item.itemName) {
       next = await onName(item.id, name);
       if (!next) {
         return null;
@@ -163,7 +165,7 @@ export function SaleLines({
                 catalogName={item.catalogName}
                 quantity={item.quantity}
                 wholesalePrice={item.wholesalePrice}
-                allowName={sale?.status === 'DRAFT'}
+                allowName={sale ? canRenameSaleLine(sale.status) : false}
                     busy={busy}
                     actions={editingActions}
                     onSave={async (name, quantity) => saveItem(item, name, quantity)}
@@ -247,11 +249,11 @@ export function SaleLines({
             <p className="sale-total">
               {t('saleTotal')} {formatCurrency(sale.totalAmount)}
             </p>
-            {sale.status === 'DRAFT' || sale.status === 'CONFIRMED' ? (
+            {canEditSaleLines(sale.status) ? (
               <button
                 className="btn"
                 type="button"
-                disabled={busy || confirming || (sale.status === 'DRAFT' && sale.items.length === 0)}
+                disabled={busy || confirming || (canConfirmSale(sale.status) && sale.items.length === 0)}
                 onClick={() => {
                   if (editing) {
                     onEditBlocked();
@@ -322,7 +324,7 @@ function SaleLineCards({
                 catalogName={item.catalogName}
                 quantity={item.quantity}
                 wholesalePrice={item.wholesalePrice}
-                allowName={sale.status === 'DRAFT'}
+                allowName={canRenameSaleLine(sale.status)}
                 busy={busy}
                 actions={actions}
                 onSave={(name, quantity) => onSave(item, name, quantity)}
@@ -435,7 +437,7 @@ function LineEditor({
   });
 
   const lineQuantity = parseQuantity(qty);
-  const lineTotal = lineQuantity === null ? null : Math.round(wholesalePrice * lineQuantity * 100) / 100;
+  const lineTotal = lineQuantity === null ? null : previewLineTotal(wholesalePrice, lineQuantity);
   const saveButton = (
     <button className="btn icon-btn icon-edit" type="button" aria-label={t('saveEditing')} disabled={busy} onClick={save}>
       <CheckIcon />
@@ -501,7 +503,7 @@ function LineEditor({
 }
 
 function ItemName({ name, catalogName }: { name: string; catalogName: string }) {
-  const extra = addedName(catalogName, name);
+  const extra = addedSaleLineName(catalogName, name);
   if (!extra) {
     return name;
   }
@@ -511,15 +513,6 @@ function ItemName({ name, catalogName }: { name: string; catalogName: string }) 
       <span className="item-name-added">{extra}</span>
     </>
   );
-}
-
-function addedName(catalogName: string, itemName: string): string | null {
-  const base = catalogName.trim();
-  if (!base || itemName === base || !itemName.startsWith(base)) {
-    return null;
-  }
-  const extra = itemName.slice(base.length);
-  return extra.trim() ? extra : null;
 }
 
 function useNarrowLayout() {

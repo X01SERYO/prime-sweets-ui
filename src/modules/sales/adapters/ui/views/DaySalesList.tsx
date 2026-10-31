@@ -7,6 +7,7 @@ import { useVoidListedSale } from '@/modules/sales/adapters/ui/hooks/useVoidList
 import type { ListDaySalesUseCase } from '@/modules/sales/application/use-cases/listDaySales.useCase';
 import type { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
+import { canEditSaleLines, canPreviewInvoice, canVoidSale } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
@@ -36,7 +37,7 @@ export function DaySalesList({ sellerId, salesDayId, getCurrentSalesDay, listDay
   const [pendingVoidId, setPendingVoidId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const readOnly = !listed.dayOpen && Boolean(listed.dayId);
-  const printable = listed.sales.filter(sale => sale.status === 'CONFIRMED');
+  const printable = listed.sales.filter(sale => canPreviewInvoice(sale.status));
 
   function toggle(saleId: string) {
     setSelected(current => (current.includes(saleId) ? current.filter(id => id !== saleId) : [...current, saleId]));
@@ -61,7 +62,7 @@ export function DaySalesList({ sellerId, salesDayId, getCurrentSalesDay, listDay
                       type="checkbox"
                       aria-label={sale.invoiceNumber ?? sale.customerName}
                       checked={selected.includes(sale.id)}
-                      disabled={sale.status !== 'CONFIRMED' || printing.printing}
+                      disabled={!canPreviewInvoice(sale.status) || printing.printing}
                       onChange={() => toggle(sale.id)}
                     />
                   </label>
@@ -76,7 +77,7 @@ export function DaySalesList({ sellerId, salesDayId, getCurrentSalesDay, listDay
               <td className="m">{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</td>
               <td className="m day-sales-total">{formatCurrency(sale.total)}</td>
               <td className="day-sales-icons">
-                {readOnly && sale.status === 'CONFIRMED' && listed.dayId ? (
+                {readOnly && canPreviewInvoice(sale.status) && listed.dayId ? (
                   <Link
                     className="btn icon-btn icon-edit"
                     to={`/invoices/${listed.dayId}/${sale.id}`}
@@ -85,12 +86,12 @@ export function DaySalesList({ sellerId, salesDayId, getCurrentSalesDay, listDay
                     <EyeIcon />
                   </Link>
                 ) : null}
-                {listed.dayOpen && (sale.status === 'DRAFT' || sale.status === 'CONFIRMED') ? (
+                {listed.dayOpen && canEditSaleLines(sale.status) ? (
                   <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
                     <EditIcon />
                   </Link>
                 ) : null}
-                {listed.dayOpen && sale.status === 'CONFIRMED' ? (
+                {listed.dayOpen && canVoidSale(sale.status) ? (
                   <button
                     className="btn icon-btn icon-void"
                     type="button"
