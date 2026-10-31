@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { salesDayErrorKey } from '@/modules/sales-day/adapters/ui/hooks/salesDayErrorKey';
-import type { ListRecentSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
+import type { ListCurrentWeekSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
 import type { MessageKey } from '@/shared/i18n/messages';
 
-export function useRecentSalesDays(sellerId: string, listRecentSalesDays: ListRecentSalesDaysUseCase) {
+export function useRecentSalesDays(sellerId: string, listCurrentWeekSalesDays: ListCurrentWeekSalesDaysUseCase) {
   const [days, setDays] = useState<SalesDayModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorKey, setErrorKey] = useState<MessageKey | null>(null);
@@ -18,7 +18,7 @@ export function useRecentSalesDays(sellerId: string, listRecentSalesDays: ListRe
     let active = true;
     setLoading(true);
     setErrorKey(null);
-    void listRecentSalesDays
+    void listCurrentWeekSalesDays
       .execute(sellerId)
       .then(found => {
         if (active) {
@@ -39,7 +39,7 @@ export function useRecentSalesDays(sellerId: string, listRecentSalesDays: ListRe
     return () => {
       active = false;
     };
-  }, [sellerId, listRecentSalesDays, reloadKey]);
+  }, [sellerId, listCurrentWeekSalesDays, reloadKey]);
 
   return { days, loading, errorKey, reload };
 }

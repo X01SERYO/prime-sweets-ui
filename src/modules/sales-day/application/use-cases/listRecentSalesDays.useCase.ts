@@ -2,7 +2,7 @@ import type { SalesDayQueryPort } from '@/modules/sales-day/application/ports/sa
 import { SalesDaySellerRequiredError } from '@/modules/sales-day/domain/errors/salesDaySellerRequired.error';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
 
-export class ListRecentSalesDaysUseCase {
+export class ListCurrentWeekSalesDaysUseCase {
   private readonly query: SalesDayQueryPort;
 
   constructor(query: SalesDayQueryPort) {
@@ -14,6 +14,6 @@ export class ListRecentSalesDaysUseCase {
     if (!id) {
       throw new SalesDaySellerRequiredError();
     }
-    return this.query.listRecent(id);
+    return this.query.listCurrentWeek(id);
   }
 }

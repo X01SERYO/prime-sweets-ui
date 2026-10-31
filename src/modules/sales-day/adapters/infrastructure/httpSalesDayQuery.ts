@@ -32,8 +32,8 @@ export class HttpSalesDayQuery implements SalesDayQueryPort {
     }
   }
 
-  async listRecent(sellerId: string): Promise<SalesDayModel[]> {
-    const body = await this.http.get<Envelope>(`/sales-days/recent?sellerId=${encodeURIComponent(sellerId)}`);
+  async listCurrentWeek(sellerId: string): Promise<SalesDayModel[]> {
+    const body = await this.http.get<Envelope>(`/sales-days/current-week?sellerId=${encodeURIComponent(sellerId)}`);
     if (!body || body.success !== true || !Array.isArray(body.data)) {
       throw new SalesDayInvalidError();
     }

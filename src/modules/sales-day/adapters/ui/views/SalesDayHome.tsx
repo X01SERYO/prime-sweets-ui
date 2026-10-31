@@ -7,7 +7,7 @@ import { useRecentSalesDays } from '@/modules/sales-day/adapters/ui/hooks/useRec
 import { useReopenSalesDay } from '@/modules/sales-day/adapters/ui/hooks/useReopenSalesDay';
 import type { CloseSalesDayUseCase } from '@/modules/sales-day/application/use-cases/closeSalesDay.useCase';
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
-import type { ListRecentSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
+import type { ListCurrentWeekSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
 import type { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
 import type { ReopenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/reopenSalesDay.useCase';
 import type { SalesDayModel } from '@/modules/sales-day/domain/models/salesDay';
@@ -40,7 +40,7 @@ function rememberOpenSalesDay(id: string | null) {
 interface SalesDayHomeProps {
   sellerId: string;
   getCurrentSalesDay: GetCurrentSalesDayUseCase;
-  listRecentSalesDays: ListRecentSalesDaysUseCase;
+  listRecentSalesDays: ListCurrentWeekSalesDaysUseCase;
   openSalesDay: OpenSalesDayUseCase;
   closeSalesDay: CloseSalesDayUseCase;
   reopenSalesDay: ReopenSalesDayUseCase;

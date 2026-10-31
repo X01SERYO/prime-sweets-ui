@@ -13,7 +13,7 @@ import type { SessionStorePort } from '@/modules/identity/application/ports/sess
 import { HttpSalesDayCommand } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayCommand';
 import { HttpSalesDayQuery } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayQuery';
 import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
-import { ListRecentSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
+import { ListCurrentWeekSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
 import { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
 import { CloseSalesDayUseCase } from '@/modules/sales-day/application/use-cases/closeSalesDay.useCase';
 import { ReopenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/reopenSalesDay.useCase';
@@ -46,7 +46,7 @@ export interface AppContainer {
   logout: LogoutUseCase;
   searchProducts: SearchProductsUseCase;
   getCurrentSalesDay: GetCurrentSalesDayUseCase;
-  listRecentSalesDays: ListRecentSalesDaysUseCase;
+  listRecentSalesDays: ListCurrentWeekSalesDaysUseCase;
   openSalesDay: OpenSalesDayUseCase;
   closeSalesDay: CloseSalesDayUseCase;
   reopenSalesDay: ReopenSalesDayUseCase;
@@ -82,7 +82,7 @@ export function createAppContainer(): AppContainer {
     logout: new LogoutUseCase(auth, sessionStore),
     searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
     getCurrentSalesDay: new GetCurrentSalesDayUseCase(salesDayQuery),
-    listRecentSalesDays: new ListRecentSalesDaysUseCase(salesDayQuery),
+    listRecentSalesDays: new ListCurrentWeekSalesDaysUseCase(salesDayQuery),
     openSalesDay: new OpenSalesDayUseCase(new HttpSalesDayCommand(http)),
     closeSalesDay: new CloseSalesDayUseCase(new HttpSalesDayCommand(http)),
     reopenSalesDay: new ReopenSalesDayUseCase(new HttpSalesDayCommand(http)),
