@@ -49,7 +49,8 @@ export class HttpInvoiceQuery implements InvoiceQueryPort {
       if (!body || body.success !== true) {
         throw new InvoiceInvalidError();
       }
-      return toInvoiceDocument(body.data);
+      const document = toInvoiceDocument(body.data);
+      return { ...document, logo: this.http.url(document.logo) };
     } catch (error) {
       mapInvoiceError(error);
     }

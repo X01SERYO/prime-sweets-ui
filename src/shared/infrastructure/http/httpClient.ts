@@ -19,6 +19,7 @@ export interface HttpClient {
   post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
   put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
   delete<T>(path: string, options?: RequestOptions): Promise<T>;
+  url(path: string): string;
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -65,6 +66,13 @@ export function createHttpClient(baseUrl: string, getToken?: () => string | null
     async delete<T>(path: string, options?: RequestOptions): Promise<T> {
       const response = await fetch(`${baseUrl}${path}`, { method: 'DELETE', headers: headers(options) });
       return readJson<T>(response);
+    },
+    url(path: string): string {
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+      }
+      const base = baseUrl.replace(/\/$/, '');
+      return `${base}${path.startsWith('/') ? path : `/${path}`}`;
     }
   };
 }

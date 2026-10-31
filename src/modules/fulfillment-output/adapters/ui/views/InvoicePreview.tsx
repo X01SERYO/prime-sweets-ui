@@ -7,6 +7,19 @@ import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
 
+function saleDay(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat('es-CO', {
+    timeZone: 'America/Bogota',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date);
+}
+
 interface InvoicePreviewProps {
   generateInvoice: GenerateInvoiceUseCase;
   printInvoices: PrintInvoicesUseCase;
@@ -35,35 +48,77 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
       ) : null}
       {printing.error ? <p className="alert">{t(printing.error)}</p> : null}
       {document ? (
-        <article className="card stack">
-          {document.logo ? <img alt="" src={document.logo} /> : null}
-          <b>{document.companyName}</b>
-          <span>
-            {document.companyNit} · {document.city} · {document.country}
-          </span>
-          <span>{document.telephone}</span>
-          <span>{document.taxRegime}</span>
-          <span>
-            {document.customerDocumentType} {document.customerDocumentNumber} · {document.customerName}
-          </span>
-          <span>
-            {document.invoiceNumber} · {document.saleDate}
-          </span>
-          <ul className="list">
-            {document.lines.map(line => (
-              <li key={`${line.productId}:${line.productName}`}>
-                {line.productId} · {line.productName} · {line.quantity} · {formatCurrency(line.unitValue)} · {formatCurrency(line.totalValue)}
-              </li>
-            ))}
-          </ul>
-          <span>
-            {formatCurrency(document.subtotal)} · {formatCurrency(document.total)}
-          </span>
-          <p>{document.legalText}</p>
+        <>
+          <article className="invoice-sheet">
+            {document.logo ? <img className="invoice-logo" alt="" src={document.logo} /> : null}
+            <p className="invoice-name">{document.companyName}</p>
+            <p className="b">NIT {document.companyNit}</p>
+            <p className="small">
+              {document.city}, {document.country}
+            </p>
+            <p className="small">
+              <b>Teléfono:</b> {document.telephone}
+            </p>
+            <p className="small">
+              <b>Régimen:</b> {document.taxRegime}
+            </p>
+            <hr />
+            <p>
+              {document.customerDocumentType} {document.customerDocumentNumber}
+            </p>
+            <p className="b">{document.customerName}</p>
+            <hr />
+            <p className="b small">Factura</p>
+            <p className="b small">No {document.invoiceNumber}</p>
+            <p className="small">
+              <b>Fecha:</b> {saleDay(document.saleDate)}
+            </p>
+            <p className="small">
+              <b>Método de pago:</b> Efectivo
+            </p>
+            <p className="small">
+              <b>Vencimiento:</b> {saleDay(document.saleDate)}
+            </p>
+            <table>
+              <colgroup>
+                <col className="col-qty" />
+                <col className="col-product" />
+                <col className="col-money" />
+                <col className="col-money" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>
+                    <span className="qty">CANT</span>
+                  </th>
+                  <th>PRODUCTO</th>
+                  <th>V/UND</th>
+                  <th>V/TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {document.lines.map(line => (
+                  <tr key={`${line.productId}:${line.productName}`}>
+                    <td>
+                      <span className="qty">{line.quantity}</span>
+                    </td>
+                    <td className="product">{line.productName}</td>
+                    <td className="num">{formatCurrency(line.unitValue)}</td>
+                    <td className="num">{formatCurrency(line.totalValue)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <hr className="invoice-before-total" />
+            <p className="invoice-total">
+              <span>Total</span>
+              <span>{formatCurrency(document.total)}</span>
+            </p>
+          </article>
           <button className="btn" type="button" disabled={printing.printing} onClick={() => void printing.print([saleId ?? ''])}>
             {printing.printing ? t('invoicePrinting') : t('reprint')}
           </button>
-        </article>
+        </>
       ) : null}
     </section>
   );

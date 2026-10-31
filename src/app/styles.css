@@ -1530,3 +1530,134 @@ code {
     padding: 2rem 1.25rem;
   }
 }
+
+.invoice-sheet {
+  box-sizing: border-box;
+  width: min(100%, 36rem);
+  margin: 0 auto;
+  padding: 1.25rem;
+  overflow: hidden;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  font: 17px "Courier New", Courier, monospace;
+  text-align: center;
+}
+
+.invoice-sheet p {
+  margin: 1mm 0;
+}
+
+.invoice-logo {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+  margin: 0 auto 1.25rem;
+}
+
+.invoice-name {
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.invoice-sheet .small {
+  font-size: 14px;
+}
+
+.invoice-sheet .b,
+.invoice-sheet b {
+  font-weight: 700;
+}
+
+.invoice-sheet hr {
+  border: 0;
+  border-top: 1px solid #000;
+  margin: 2mm 0;
+}
+
+.invoice-sheet table {
+  width: 100%;
+  margin-top: 1.75rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+}
+
+.invoice-sheet th,
+.invoice-sheet td {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0.35rem 0.25rem;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.invoice-sheet th *,
+.invoice-sheet td * {
+  font-weight: 700;
+}
+
+.invoice-sheet th {
+  font-size: 13px;
+  font-weight: 700;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  text-align: left;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.invoice-sheet td.product {
+  text-align: left;
+}
+
+.invoice-sheet .num {
+  font-size: 14px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.invoice-sheet th:first-child,
+.invoice-sheet td:first-child {
+  padding-right: 0.15rem;
+}
+
+.invoice-sheet .col-product {
+  width: 46%;
+}
+
+.invoice-sheet .qty {
+  display: inline-block;
+  width: 4ch;
+  text-align: right;
+}
+
+.invoice-sheet th .qty {
+  text-align: left;
+}
+
+.invoice-sheet .col-qty {
+  width: 3rem;
+}
+
+.invoice-sheet .col-money {
+  width: 22%;
+}
+
+.invoice-sheet hr.invoice-before-total {
+  margin: 3.5rem 0 2rem;
+}
+
+.invoice-total,
+.invoice-total span {
+  font-weight: 700;
+}
+
+.invoice-total {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  margin: 0;
+  text-align: left;
+}
