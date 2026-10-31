@@ -37,11 +37,11 @@ Screen: `/customers`.
 ## 4. Sales Day, day sales, and the sale
 
 1. `/login` stores the session in `sessionStorage` and sends it as a bearer token. Logout clears it.
-2. `/sales-day` loads the current day. With no day, the only action is open. An open day can be closed after confirmation. A closed current day can be reopened after confirmation. Load sheet and invoices are linked only when the day is closed. Confirmations stay in their card, on one row.
-3. `/day-sales` lists the day's sales newest first. Each row is one line: customer, status, `Factura {number}` when a number exists, amount, and the edit or void icon while the day is open.
-4. `/sales?customerId=` creates or reuses the draft while the day is open. With no confirmed lines the table still shows its headers and one centered row, "Vacío".
+2. `/sales-day` loads the current day and lists the Sales Days of the current week, Monday through today. With no day, the only action is open. An open day can be closed after confirmation. A closed current day can be reopened after confirmation. Load sheet and invoices are linked only when the day is closed. Confirmations stay in their card, on one row.
+3. `/day-sales` lists the day's sales newest first. Each row is one line: customer, status, `Factura {number}` when a number exists, amount, and the edit or void icon while the day is open. A closed day shows the list without those actions until it is reopened.
+4. `/sales?customerId=` opens a modal with the remaining days of the week, from today through Sunday, only while today's Sales Day is open. Today is labeled "Hoy". Later days show the weekday and the day number, such as "domingo 1". Choosing a day creates or reuses the draft for that date. With no confirmed lines the table still shows its headers and one centered row, "Vacío".
 5. A pending line has the product name and a quantity control on one row. Quantity starts at 1, steps by 1, and accepts up to 3 decimal places. The screen shows the unit price and the line total before the seller confirms the line.
-6. Confirm sale calls `POST /sales/:id/confirm` only when the draft has at least one line. Void calls `POST /sales/:id/void` only while the day is open. The invoice number stays on the screen.
+6. Confirm sale calls `POST /sales/:id/confirm` only when the draft has at least one line and the day is open. Void calls `POST /sales/:id/void` only while the day is open. The invoice number stays on the screen.
 
 ## 5. Load Sheet and invoices
 
@@ -53,6 +53,6 @@ Screen: `/customers`.
 
 | Area | Where it lives |
 |---|---|
-| Catalog Excel import | Not in this client. |
-| Alegra product sync | API only, on product update. |
+| Catalog Excel import and Alegra sync | API [PDR-002](../../../prime-sweets-api/docs/pdrs/PDR-002.md). Not a screen in this client. |
+| Load sheet by delivery date | UI [SPEC-002](../specs/SPEC-002.md) section 3. Not built. |
 | Choosing a printer or a printer protocol | Windows print dialog. The UI does not record that an invoice was printed. |

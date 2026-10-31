@@ -11,8 +11,11 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | Document | Role | Status vs code |
 |---|---|---|
 | [pdrs/PDR.md](./pdrs/PDR.md) | UI product design requirement for Version 1 | Proposal. Not a description of the running UI. |
+| [pdrs/PDR-002.md](./pdrs/PDR-002.md) | Current week, delivery date, and sale correction | Proposal. Not implemented. Excel and Alegra stay on the API. |
 | [specs/SPEC.md](./specs/SPEC.md) | Frontend implementation specification for Version 1 | Proposed target. Use it as the implementation guide. |
+| [specs/SPEC-002.md](./specs/SPEC-002.md) | Implementation guide for UI PDR-002 | Proposed. Do not copy it into architecture, model, or flows until the code lands. |
 | [adrs/ADR-001.md](./adrs/ADR-001.md) | Architecture decision: one SPA, feature modules, hexagon per module | Proposed. Binding for Version 1. Current runtime shape is in `architecture/`. |
+| [adrs/ADR-002.md](./adrs/ADR-002.md) | Extend `sales-day`, `sales`, and `fulfillment-output` | Proposed. Binding for PDR-002. |
 | [architecture/](./architecture/README.md) | C4 model of **the current UI** | Implemented. One C4 set only. |
 | [model/](./model/README.md) | Client structures verified in code | Session, catalog hit, sales day, sale, load sheet, and invoice models. |
 | [flows/](./flows/README.md) | User and application flows verified in code | Login through invoice print. Remaining gaps are listed, not invented. |

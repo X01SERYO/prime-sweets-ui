@@ -206,7 +206,7 @@ These are the client models to introduce when each module is built. They are not
 
 `productId`, `brand`, `name`, `wholesaleCost`, `wholesaleSalePrice`, `quantity`, `totalPrice`, `profit`.
 
-`wholesaleCost` and `wholesaleSalePrice` may be null when the API could not show one unit snapshot. The UI prints those cells blank. It does not average them.
+`wholesaleCost` and `wholesaleSalePrice` are the shared sale snapshot when every contribution used the same unit prices. When the snapshots differ, those cells are the current catalog prices and `priceGroups` lists each price with its quantity, total, and profit. The row shows an alert and can expand those groups. The UI does not average the prices.
 
 ### Invoice document
 
