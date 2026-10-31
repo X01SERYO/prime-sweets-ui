@@ -1,3 +1,11 @@
+export interface LoadSheetPriceGroupModel {
+  wholesaleCost: number;
+  wholesaleSalePrice: number;
+  quantity: number;
+  totalPrice: number;
+  profit: number;
+}
+
 export interface LoadSheetLineModel {
   productId: string;
   brand: string | null;
@@ -7,4 +15,5 @@ export interface LoadSheetLineModel {
   quantity: number;
   totalPrice: number;
   profit: number;
+  priceGroups: LoadSheetPriceGroupModel[];
 }

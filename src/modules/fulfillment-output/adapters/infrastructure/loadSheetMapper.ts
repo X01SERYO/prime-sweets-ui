@@ -1,5 +1,5 @@
 import { LoadSheetInvalidError } from '@/modules/fulfillment-output/domain/errors/loadSheetInvalid.error';
-import type { LoadSheetLineModel } from '@/modules/fulfillment-output/domain/models/loadSheetLine';
+import type { LoadSheetLineModel, LoadSheetPriceGroupModel } from '@/modules/fulfillment-output/domain/models/loadSheetLine';
 
 function money(value: unknown): number {
   const amount = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN;
@@ -7,6 +7,28 @@ function money(value: unknown): number {
     throw new LoadSheetInvalidError();
   }
   return amount;
+}
+
+function priceGroups(value: unknown): LoadSheetPriceGroupModel[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.map(item => {
+    if (!item || typeof item !== 'object') {
+      throw new LoadSheetInvalidError();
+    }
+    const group = item as Record<string, unknown>;
+    if (typeof group.quantity !== 'number') {
+      throw new LoadSheetInvalidError();
+    }
+    return {
+      wholesaleCost: money(group.wholesaleCost),
+      wholesaleSalePrice: money(group.wholesaleSalePrice),
+      quantity: group.quantity,
+      totalPrice: money(group.totalPrice),
+      profit: money(group.profit)
+    };
+  });
 }
 
 function moneyOrNull(value: unknown): number | null {
@@ -36,7 +58,8 @@ export function toLoadSheetLines(raw: unknown): LoadSheetLineModel[] {
       wholesaleSalePrice: moneyOrNull(line.wholesaleSalePrice),
       quantity: line.quantity,
       totalPrice: money(line.totalPrice),
-      profit: money(line.profit)
+      profit: money(line.profit),
+      priceGroups: priceGroups(line.priceGroups)
     };
   });
 }
