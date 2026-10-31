@@ -8,7 +8,8 @@ export function useDaySales(
   sellerId: string,
   salesDayId: string | undefined,
   getCurrentSalesDay: GetCurrentSalesDayUseCase,
-  listDaySales: ListDaySalesUseCase
+  listDaySales: ListDaySalesUseCase,
+  enabled = true
 ) {
   const [sales, setSales] = useState<DaySaleModel[]>([]);
   const [dayOpen, setDayOpen] = useState(false);
@@ -23,6 +24,10 @@ export function useDaySales(
 
   useEffect(() => {
     let cancelled = false;
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     const listed = salesDayId
@@ -59,7 +64,7 @@ export function useDaySales(
     return () => {
       cancelled = true;
     };
-  }, [sellerId, salesDayId, getCurrentSalesDay, listDaySales, reloadKey]);
+  }, [sellerId, salesDayId, getCurrentSalesDay, listDaySales, reloadKey, enabled]);
 
   return { sales, dayOpen, dayId, loading, error, reload };
 }

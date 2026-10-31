@@ -3,8 +3,10 @@ import { Link } from 'react-router';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
 import type { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
 import { useDaySales } from '@/modules/sales/adapters/ui/hooks/useDaySales';
+import { useDeliverySales } from '@/modules/sales/adapters/ui/hooks/useDeliverySales';
 import { useVoidListedSale } from '@/modules/sales/adapters/ui/hooks/useVoidListedSale';
 import type { ListDaySalesUseCase } from '@/modules/sales/application/use-cases/listDaySales.useCase';
+import type { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application/use-cases/listSalesByDeliveryDate.useCase';
 import type { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
 import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import { canEditSaleLines, canPreviewInvoice, canVoidSale } from '@/modules/sales/domain/saleStatus';
@@ -13,6 +15,22 @@ import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import './daySalesList.css';
+
+function formatDeliveryHeading(value: string, locale: string): string {
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) {
+    return value;
+  }
+  const language = locale === 'en' ? 'en-US' : 'es-CO';
+  const formatted = new Intl.DateTimeFormat(language, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC'
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+  const cleaned = formatted.replace(',', '');
+  return cleaned.charAt(0).toLocaleUpperCase(language) + cleaned.slice(1);
+}
 
 const statusKey = {
   DRAFT: 'statusDraft',
@@ -25,13 +43,28 @@ interface DaySalesListProps {
   salesDayId?: string;
   getCurrentSalesDay: GetCurrentSalesDayUseCase;
   listDaySales: ListDaySalesUseCase;
+  deliveryDate?: string;
+  listDeliverySales?: ListSalesByDeliveryDateUseCase;
   voidSale: VoidSaleUseCase;
   printInvoices: PrintInvoicesUseCase;
 }
 
-export function DaySalesList({ sellerId, salesDayId, getCurrentSalesDay, listDaySales, voidSale, printInvoices }: DaySalesListProps) {
-  const { t } = useLocale();
-  const listed = useDaySales(sellerId, salesDayId, getCurrentSalesDay, listDaySales);
+export function DaySalesList({
+  sellerId,
+  salesDayId,
+  getCurrentSalesDay,
+  listDaySales,
+  deliveryDate,
+  listDeliverySales,
+  voidSale,
+  printInvoices
+}: DaySalesListProps) {
+  const { t, locale } = useLocale();
+  const byDay = useDaySales(sellerId, salesDayId, getCurrentSalesDay, listDaySales, !deliveryDate);
+  const byDelivery = useDeliverySales(deliveryDate, listDeliverySales);
+  const listed = deliveryDate
+    ? { sales: byDelivery.sales, dayOpen: true, dayId: null, loading: byDelivery.loading, error: byDelivery.error, reload: byDelivery.reload }
+    : byDay;
   const voiding = useVoidListedSale(voidSale, listed.reload);
   const printing = usePrintInvoices(printInvoices);
   const [pendingVoidId, setPendingVoidId] = useState<string | null>(null);
@@ -45,12 +78,17 @@ export function DaySalesList({ sellerId, salesDayId, getCurrentSalesDay, listDay
 
   return (
     <section className="stack">
-      <ScreenTitle>{t('daySales')}</ScreenTitle>
+      <div>
+        <ScreenTitle>{deliveryDate ? t('deliverySales') : t('daySales')}</ScreenTitle>
+        {deliveryDate ? <p className="load-sheet-date">{formatDeliveryHeading(deliveryDate, locale)}</p> : null}
+      </div>
       {listed.loading ? <p>{t('daySalesLoading')}</p> : null}
       {listed.error ? <p className="alert">{t(listed.error)}</p> : null}
       {voiding.error && !pendingVoidId ? <p role="alert">{t(voiding.error)}</p> : null}
       {readOnly && printing.error ? <p className="alert">{t(printing.error)}</p> : null}
-      {!listed.loading && !listed.error && listed.sales.length === 0 ? <p>{t('daySalesEmpty')}</p> : null}
+      {!listed.loading && !listed.error && listed.sales.length === 0 ? (
+        <p>{deliveryDate ? t('deliverySalesEmpty') : t('daySalesEmpty')}</p>
+      ) : null}
       <table className="day-sales-table">
         <tbody>
           {listed.sales.map(sale => (

@@ -28,6 +28,21 @@ function InvoiceListRedirect() {
   return <Navigate to={salesDayId ? `/day-sales/${salesDayId}` : '/sales-day'} replace />;
 }
 
+function DeliverySalesPage({ container, sellerId }: { container: AppContainer; sellerId: string }) {
+  const [params] = useSearchParams();
+  return (
+    <DaySalesList
+      sellerId={sellerId}
+      deliveryDate={params.get('deliveryDate') ?? undefined}
+      getCurrentSalesDay={container.getCurrentSalesDay}
+      listDaySales={container.listDaySales}
+      listDeliverySales={container.listDeliverySales}
+      voidSale={container.voidSale}
+      printInvoices={container.printInvoices}
+    />
+  );
+}
+
 function DaySalesPage({ container, sellerId }: { container: AppContainer; sellerId: string }) {
   const { salesDayId } = useParams();
   return (
@@ -245,6 +260,10 @@ export function App({ container }: AppProps) {
                 <Navigate to="/login" replace />
               )
             }
+          />
+          <Route
+            path="/delivery-sales"
+            element={session ? <DeliverySalesPage container={container} sellerId={session.user.id} /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/day-sales/:salesDayId?"

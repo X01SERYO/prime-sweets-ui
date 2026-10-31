@@ -83,6 +83,10 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     return this.list(`/sales?salesDayId=${encodeURIComponent(salesDayId)}`);
   }
 
+  async listByDeliveryDate(deliveryDate: string): Promise<SaleModel[]> {
+    return this.list(`/sales?deliveryDate=${encodeURIComponent(deliveryDate)}`);
+  }
+
   private async list(path: string): Promise<SaleModel[]> {
     const body = await this.http.get<Envelope>(path);
     if (!body || body.success !== true || !Array.isArray(body.data)) {

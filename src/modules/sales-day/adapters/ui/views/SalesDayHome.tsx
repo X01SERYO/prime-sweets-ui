@@ -59,6 +59,7 @@ export function SalesDayHome({
   const { t, locale } = useLocale();
   const navigate = useNavigate();
   const [choosingLoadSheet, setChoosingLoadSheet] = useState(false);
+  const [choosingDeliverySales, setChoosingDeliverySales] = useState(false);
   const current = useCurrentSalesDay(sellerId, getCurrentSalesDay);
   const recent = useRecentSalesDays(sellerId, listRecentSalesDays);
   const openingDay = useOpenSalesDay(sellerId, openSalesDay);
@@ -109,9 +110,14 @@ export function SalesDayHome({
       {days.length > 0 ? (
         <>
           <h2>{t('recentSalesDays')}</h2>
-          <button className="btn btn-secondary" type="button" onClick={() => setChoosingLoadSheet(true)}>
-            {t('loadSheet')}
-          </button>
+          <div className="week-shortcuts">
+            <button className="btn btn-secondary" type="button" onClick={() => setChoosingLoadSheet(true)}>
+              {t('loadSheet')}
+            </button>
+            <button className="btn btn-secondary" type="button" onClick={() => setChoosingDeliverySales(true)}>
+              {t('deliverySales')}
+            </button>
+          </div>
           <ul className="sales-day-list">
             {days.map(day => {
               const isToday = current.salesDay?.id === day.id;
@@ -186,6 +192,17 @@ export function SalesDayHome({
           error={actionError ? t(actionError) : null}
           onConfirm={() => void confirmPending()}
           onCancel={() => setPending(null)}
+        />
+      ) : null}
+      {choosingDeliverySales ? (
+        <DeliveryDateModal
+          title={t('deliverySalesPrompt')}
+          days={weekDeliveryDays(businessToday())}
+          onClose={() => setChoosingDeliverySales(false)}
+          onSelect={deliveryDate => {
+            setChoosingDeliverySales(false);
+            navigate(`/delivery-sales?deliveryDate=${encodeURIComponent(deliveryDate)}`);
+          }}
         />
       ) : null}
       {choosingLoadSheet ? (

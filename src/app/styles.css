@@ -1030,6 +1030,22 @@ dialog.pending-modal {
   transform: rotate(180deg);
 }
 
+.week-shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 40rem) {
+  .week-shortcuts {
+    flex-direction: row;
+  }
+
+  .week-shortcuts .btn {
+    flex: 1;
+  }
+}
+
 .sales-day-actions {
   display: grid;
   grid-template-columns: 1fr;
