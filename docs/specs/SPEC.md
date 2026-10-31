@@ -99,7 +99,7 @@ Rules:
 
 - Viewport width does not show or hide a use case. In particular, the narrow layout does not remove invoice print, and the wide layout does not remove capture.
 - Detecting a phone user-agent is not a layout mechanism. A desktop window that is narrow follows the narrow layout. A phone that is wide follows the wide layout.
-- The invoice print stylesheet is not a screen breakpoint. It only formats the invoice documents for the existing thermal-roll width, with the page break between invoices already required by the PDR. The Load Sheet has no print stylesheet.
+- The invoice print stylesheet is not a screen breakpoint. It formats each document for a 70 mm page with no margin and a page break between invoices. The Load Sheet has no print stylesheet.
 - Touch targets and text must remain usable in the narrow class without pinch-zoom as the only way to read the sale form.
 
 Where the code lives:
@@ -174,9 +174,9 @@ Search calls `GET /products/search?q=`. The UI does not download the full catalo
 
 `GenerateLoadSheet` calls `GET /load-sheets/:salesDayId`. The screen does not group rows and does not offer print.
 
-`ListInvoices` calls `GET /invoices?salesDayId=`. `OPEN` and `CLOSED` are both valid.
+`ListInvoices` calls `GET /invoices?salesDayId=`. `OPEN` and `CLOSED` are both valid. The closed-day screen is the day-sales list. `/invoices/:salesDayId` redirects there.
 
-`GenerateInvoice` calls `GET /invoices/:saleId` for a confirmed sale. `PrintInvoices` loads one document per selected sale, in invoice-number order, and passes them to the print adapter. Reprint calls `GenerateInvoice` again. Voided sales are listed and are not printable, because invoice generation rejects them.
+`GenerateInvoice` calls `GET /invoices/:saleId` for a confirmed sale. `PrintInvoices` loads one document per selected sale, in invoice-number order, and passes them to the print adapter. Reprint calls `GenerateInvoice` again. Voided sales are listed and are not printable, because invoice generation rejects them. A relative `logo` path is resolved with the HTTP client's base URL.
 
 ## 6. View models
 
@@ -210,7 +210,7 @@ These are the client models to introduce when each module is built. They are not
 
 ### Invoice document
 
-Company profile (`name`, `nit`, `city`, `country`, `telephone`, `logo`, `legalText`), tax regime text, customer document and name, `invoiceNumber`, `saleDate`, lines (`productId`, `itemName`, `quantity`, `unitValue`, `lineTotal`), `subtotal`, `total`.
+Company profile (`name`, `nit`, `city`, `country`, `telephone`, `logo`, `legalText`), tax regime text, customer document and name, `invoiceNumber`, `saleDate`, lines (`productId`, `itemName`, `quantity`, `unitValue`, `lineTotal`), `subtotal`, `total`. The preview and the print omit `productId` and `subtotal`. The print adds payment method `Efectivo` and a due date equal to the sale date, and it shows `legalText`. The preview does not show `legalText`. Line columns are quantity, product name, unit value, and line total.
 
 ## 7. HTTP adapter
 
@@ -233,11 +233,11 @@ Known codes the screens must not treat as a crash include `SALES_DAY_NOT_CLOSED`
 
 `PrintInvoices` depends on a `InvoicePrintPort`. The browser adapter:
 
-1. Renders the selected documents in invoice-number order.
+1. Renders the selected documents in invoice-number order on a 70 mm page with no margin.
 2. Inserts a page break between documents.
-3. Calls the browser print dialog once.
+3. Waits until the logo image is loaded, then calls the browser print dialog once.
 
-The adapter does not pick a printer, does not send ESC/POS, and does not persist a printed flag. The Load Sheet view has no print action.
+The adapter does not pick a printer, does not send ESC/POS, and does not persist a printed flag. The Load Sheet view has no print action. The printed page includes the legal text. The preview screen does not.
 
 ## 9. Input checks (client only)
 

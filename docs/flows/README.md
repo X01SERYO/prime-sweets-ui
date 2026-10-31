@@ -46,8 +46,8 @@ Screen: `/customers`.
 ## 5. Load Sheet and invoices
 
 1. `/load-sheets/:salesDayId` calls `GET /load-sheets/:salesDayId` for a closed day. The screen is one table. Beside the title it shows the sold total and the profit total. There is no print action.
-2. `/invoices/:salesDayId` lists confirmed and voided invoices newest first. Each row is one line: selection, number, status, amount, whether it can be printed, and an eye icon for preview. Voided rows cannot be selected for print.
-3. Preview calls `GET /invoices/:saleId`. Print loads each selected document and opens one browser dialog. Inside that dialog the documents follow ascending invoice number, with a page break between them. Reprint requests the same documents again.
+2. `/invoices/:salesDayId` redirects to the day-sales list for that day. When the day is closed, each confirmed row can be selected and previewed. Voided rows stay on the list and cannot be printed.
+3. Preview calls `GET /invoices/:saleId` and shows the ticket without the legal text. Print loads each selected document, orders them by ascending invoice number, and opens one browser dialog. Each page is 70 mm wide with no margin and a page break between invoices. The printed ticket includes the legal text. Reprint requests the same documents again. The black logo comes from the API. The color logo in the header is `public/logo.webp` in this application.
 
 ## Still outside this UI
 
