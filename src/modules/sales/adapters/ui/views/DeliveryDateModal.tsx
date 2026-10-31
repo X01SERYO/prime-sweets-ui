@@ -50,7 +50,7 @@ export function DeliveryDateModal({ onSelect, onClose, days, title }: DeliveryDa
       </div>
       <div className="delivery-days">
         {options.map(day => (
-          <button key={day.date} className="btn" type="button" onClick={() => onSelect(day.date)}>
+          <button key={day.date} className="btn btn-secondary" type="button" onClick={() => onSelect(day.date)}>
             {day.date === today ? t('today') : weekdayLabel(day.date, day.dayOfMonth, locale)}
           </button>
         ))}
