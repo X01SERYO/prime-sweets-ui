@@ -1,17 +1,19 @@
 import { useEffect, useRef } from 'react';
-import { businessToday, deliveryDaysThroughSunday } from '@/modules/sales/domain/deliveryDays';
+import { businessToday, deliveryDaysThroughSunday, type WeekDeliveryDay } from '@/modules/sales/domain/deliveryDays';
 import { useLocale } from '@/shared/i18n/useLocale';
 
 interface DeliveryDateModalProps {
   onSelect: (deliveryDate: string) => void;
   onClose: () => void;
+  days?: WeekDeliveryDay[];
+  title?: string;
 }
 
-export function DeliveryDateModal({ onSelect, onClose }: DeliveryDateModalProps) {
+export function DeliveryDateModal({ onSelect, onClose, days, title }: DeliveryDateModalProps) {
   const { t, locale } = useLocale();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const today = businessToday();
-  const days = deliveryDaysThroughSunday(today);
+  const options = days ?? deliveryDaysThroughSunday(today);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -36,7 +38,7 @@ export function DeliveryDateModal({ onSelect, onClose }: DeliveryDateModalProps)
       }}
     >
       <div className="modal-toolbar">
-        <h2>{t('deliveryDate')}</h2>
+        <h2>{title ?? t('deliveryDate')}</h2>
         <button className="modal-x" type="button" aria-label={t('close')} onClick={onClose}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -47,7 +49,7 @@ export function DeliveryDateModal({ onSelect, onClose }: DeliveryDateModalProps)
         </button>
       </div>
       <div className="delivery-days">
-        {days.map(day => (
+        {options.map(day => (
           <button key={day.date} className="btn" type="button" onClick={() => onSelect(day.date)}>
             {day.date === today ? t('today') : weekdayLabel(day.date, day.dayOfMonth, locale)}
           </button>

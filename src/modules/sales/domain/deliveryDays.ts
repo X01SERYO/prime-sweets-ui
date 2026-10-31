@@ -18,13 +18,44 @@ export function businessToday(now: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
-export function deliveryDaysThroughSunday(today: string): WeekDeliveryDay[] {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(today);
-  if (!match) {
+export function weekDeliveryDays(today: string): WeekDeliveryDay[] {
+  const cursor = parseBusinessDate(today);
+  if (!cursor) {
     return [];
   }
+  const weekday = cursor.getUTCDay();
+  const daysFromMonday = weekday === 0 ? 6 : weekday - 1;
+  cursor.setUTCDate(cursor.getUTCDate() - daysFromMonday);
+  const days: WeekDeliveryDay[] = [];
+  for (let step = 0; step < 7; step += 1) {
+    days.push({
+      date: cursor.toISOString().slice(0, 10),
+      dayOfMonth: cursor.getUTCDate()
+    });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return days;
+}
+
+function parseBusinessDate(today: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(today);
+  if (!match) {
+    return null;
+  }
   const cursor = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
-  if (Number.isNaN(cursor.getTime())) {
+  if (
+    cursor.getUTCFullYear() !== Number(match[1]) ||
+    cursor.getUTCMonth() !== Number(match[2]) - 1 ||
+    cursor.getUTCDate() !== Number(match[3])
+  ) {
+    return null;
+  }
+  return cursor;
+}
+
+export function deliveryDaysThroughSunday(today: string): WeekDeliveryDay[] {
+  const cursor = parseBusinessDate(today);
+  if (!cursor) {
     return [];
   }
   const days: WeekDeliveryDay[] = [];

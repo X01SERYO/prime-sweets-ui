@@ -56,6 +56,14 @@ export function createHttpClient(baseUrl: string, getToken?: () => string | null
       });
       return readJson<T>(response);
     },
+    async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+      const response = await fetch(`${baseUrl}${path}`, {
+        method: 'PATCH',
+        headers: headers(options),
+        body: JSON.stringify(body)
+      });
+      return readJson<T>(response);
+    },
     async put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
       const response = await fetch(`${baseUrl}${path}`, {
         method: 'PUT',

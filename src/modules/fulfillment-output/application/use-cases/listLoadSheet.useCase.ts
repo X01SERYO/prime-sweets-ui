@@ -9,11 +9,11 @@ export class ListLoadSheetUseCase {
     this.query = query;
   }
 
-  async execute(salesDayId: string): Promise<LoadSheetLineModel[]> {
-    const id = salesDayId.trim();
-    if (!id) {
+  async execute(deliveryDate: string): Promise<LoadSheetLineModel[]> {
+    const date = deliveryDate.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       throw new LoadSheetInvalidError();
     }
-    return this.query.get(id);
+    return this.query.getByDeliveryDate(date);
   }
 }

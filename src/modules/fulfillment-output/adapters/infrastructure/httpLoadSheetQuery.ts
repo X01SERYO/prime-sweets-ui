@@ -17,9 +17,9 @@ export class HttpLoadSheetQuery implements LoadSheetQueryPort {
     this.http = http;
   }
 
-  async get(salesDayId: string): Promise<LoadSheetLineModel[]> {
+  async getByDeliveryDate(deliveryDate: string): Promise<LoadSheetLineModel[]> {
     try {
-      const body = await this.http.get<Envelope>(`/load-sheets/${encodeURIComponent(salesDayId)}`);
+      const body = await this.http.get<Envelope>(`/load-sheets?deliveryDate=${encodeURIComponent(deliveryDate)}`);
       if (!body || body.success !== true) {
         throw new LoadSheetInvalidError();
       }

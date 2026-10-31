@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { useLoadSheet } from '@/modules/fulfillment-output/adapters/ui/hooks/useLoadSheet';
 import type { ListLoadSheetUseCase } from '@/modules/fulfillment-output/application/use-cases/listLoadSheet.useCase';
 import type { LoadSheetLineModel } from '@/modules/fulfillment-output/domain/models/loadSheetLine';
@@ -96,14 +96,31 @@ function ChevronIcon() {
   );
 }
 
+function formatDeliveryHeading(value: string, locale: string): string {
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) {
+    return value;
+  }
+  const language = locale === 'en' ? 'en-US' : 'es-CO';
+  const formatted = new Intl.DateTimeFormat(language, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC'
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+  const cleaned = formatted.replace(',', '');
+  return cleaned.charAt(0).toLocaleUpperCase(language) + cleaned.slice(1);
+}
+
 function moneyCell(value: number | null): string {
   return value === null ? '—' : formatCurrency(value);
 }
 
 export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
-  const { t } = useLocale();
-  const { salesDayId } = useParams();
-  const sheet = useLoadSheet(salesDayId, listLoadSheet);
+  const { t, locale } = useLocale();
+  const [params] = useSearchParams();
+  const deliveryDate = params.get('deliveryDate') ?? undefined;
+  const sheet = useLoadSheet(deliveryDate, listLoadSheet);
   const [openProductId, setOpenProductId] = useState<string | null>(null);
 
   const soldTotal = sheet.lines.reduce((sum, line) => sum + line.totalPrice, 0);
@@ -112,7 +129,10 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
   return (
     <section className="stack">
       <header className="load-sheet-head">
-        <ScreenTitle>{t('loadSheet')}</ScreenTitle>
+        <div>
+          <ScreenTitle>{t('loadSheet')}</ScreenTitle>
+          {deliveryDate ? <p className="load-sheet-date">{formatDeliveryHeading(deliveryDate, locale)}</p> : null}
+        </div>
         {!sheet.loading && !sheet.error ? (
           <p className="load-sheet-totals">
             <span>

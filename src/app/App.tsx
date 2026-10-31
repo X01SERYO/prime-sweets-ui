@@ -96,7 +96,11 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
       {!shownCustomerId && !draft.loading ? (
         <SaleCustomerChoice searchCustomers={container.searchCustomers} onSelect={id => setParams({ customerId: id })} />
       ) : (
-        <SelectedCustomer customerId={shownCustomerId} getCustomer={container.getCustomer} />
+        <SelectedCustomer
+          customerId={shownCustomerId}
+          deliveryDate={draft.sale?.deliveryDate || deliveryDate}
+          getCustomer={container.getCustomer}
+        />
       )}
       {shownCustomerId && !saleId && !draft.sale && !draft.loading ? (
         <DeliveryDateModal
@@ -253,7 +257,7 @@ export function App({ container }: AppProps) {
             }
           />
           <Route
-            path="/load-sheets/:salesDayId"
+            path="/load-sheets"
             element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
           />
           <Route path="/invoices/:salesDayId" element={<InvoiceListRedirect />} />

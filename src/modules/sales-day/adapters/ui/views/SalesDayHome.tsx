@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { DeliveryDateModal } from '@/modules/sales/adapters/ui/views/DeliveryDateModal';
+import { businessToday, weekDeliveryDays } from '@/modules/sales/domain/deliveryDays';
 import { useCloseSalesDay } from '@/modules/sales-day/adapters/ui/hooks/useCloseSalesDay';
 import { useCurrentSalesDay } from '@/modules/sales-day/adapters/ui/hooks/useCurrentSalesDay';
 import { useOpenSalesDay } from '@/modules/sales-day/adapters/ui/hooks/useOpenSalesDay';
@@ -55,6 +57,8 @@ export function SalesDayHome({
   reopenSalesDay
 }: SalesDayHomeProps) {
   const { t, locale } = useLocale();
+  const navigate = useNavigate();
+  const [choosingLoadSheet, setChoosingLoadSheet] = useState(false);
   const current = useCurrentSalesDay(sellerId, getCurrentSalesDay);
   const recent = useRecentSalesDays(sellerId, listRecentSalesDays);
   const openingDay = useOpenSalesDay(sellerId, openSalesDay);
@@ -105,17 +109,19 @@ export function SalesDayHome({
       {days.length > 0 ? (
         <>
           <h2>{t('recentSalesDays')}</h2>
+          <button className="btn btn-secondary" type="button" onClick={() => setChoosingLoadSheet(true)}>
+            {t('loadSheet')}
+          </button>
           <ul className="sales-day-list">
             {days.map(day => {
               const isToday = current.salesDay?.id === day.id;
               const expanded = openId === day.id;
               const pastOpen = !isToday && day.status === 'OPEN';
-              const showSheet = !pastOpen && (!isToday || day.status === 'CLOSED');
               const showNewSale = isToday && day.status === 'OPEN';
               const showDaySales = !pastOpen;
               const showClose = day.status === 'OPEN';
               const showReopen = isToday && day.status === 'CLOSED';
-              const actionCount = [showSheet, showNewSale, showDaySales, showClose, showReopen].filter(Boolean).length;
+              const actionCount = [showNewSale, showDaySales, showClose, showReopen].filter(Boolean).length;
               return (
                 <li key={day.id} className={isToday ? 'sales-day-card is-today' : 'sales-day-card'}>
                   <button
@@ -139,11 +145,6 @@ export function SalesDayHome({
                   </button>
                   {expanded ? (
                     <div className={`sales-day-actions cols-${actionCount}`}>
-                      {showSheet ? (
-                        <Link className="btn btn-secondary" to={`/load-sheets/${day.id}`}>
-                          {t('loadSheet')}
-                        </Link>
-                      ) : null}
                       {showNewSale ? (
                         <Link className="btn" to="/sales">
                           {t('newSale')}
@@ -185,6 +186,17 @@ export function SalesDayHome({
           error={actionError ? t(actionError) : null}
           onConfirm={() => void confirmPending()}
           onCancel={() => setPending(null)}
+        />
+      ) : null}
+      {choosingLoadSheet ? (
+        <DeliveryDateModal
+          title={t('loadSheetDate')}
+          days={weekDeliveryDays(businessToday())}
+          onClose={() => setChoosingLoadSheet(false)}
+          onSelect={deliveryDate => {
+            setChoosingLoadSheet(false);
+            navigate(`/load-sheets?deliveryDate=${encodeURIComponent(deliveryDate)}`);
+          }}
         />
       ) : null}
     </section>

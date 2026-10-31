@@ -4,20 +4,20 @@ import { loadSheetErrorKey } from '@/modules/fulfillment-output/adapters/ui/hook
 import type { LoadSheetLineModel } from '@/modules/fulfillment-output/domain/models/loadSheetLine';
 import type { MessageKey } from '@/shared/i18n/messages';
 
-export function useLoadSheet(salesDayId: string | undefined, listLoadSheet: ListLoadSheetUseCase) {
+export function useLoadSheet(deliveryDate: string | undefined, listLoadSheet: ListLoadSheetUseCase) {
   const [lines, setLines] = useState<LoadSheetLineModel[]>([]);
-  const [loading, setLoading] = useState(Boolean(salesDayId));
+  const [loading, setLoading] = useState(Boolean(deliveryDate));
   const [error, setError] = useState<MessageKey | null>(null);
 
   useEffect(() => {
-    if (!salesDayId) {
+    if (!deliveryDate) {
       return;
     }
     let cancelled = false;
     setLoading(true);
     setError(null);
     listLoadSheet
-      .execute(salesDayId)
+      .execute(deliveryDate)
       .then(found => {
         if (!cancelled) {
           setLines(found);
@@ -37,9 +37,9 @@ export function useLoadSheet(salesDayId: string | undefined, listLoadSheet: List
     return () => {
       cancelled = true;
     };
-  }, [salesDayId, listLoadSheet]);
+  }, [deliveryDate, listLoadSheet]);
 
-  if (!salesDayId) {
+  if (!deliveryDate) {
     return { lines: [], loading: false, error: 'loadSheetMissingDay' as MessageKey };
   }
 
