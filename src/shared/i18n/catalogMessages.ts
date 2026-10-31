@@ -17,7 +17,6 @@ export const catalogMessages = catalog(
     wholesale: 'mayorista'
   },
   {
-    saleItems: 'Sale items',
     searchProduct: 'Search product',
     search: 'Search',
     searching: 'Searching…',

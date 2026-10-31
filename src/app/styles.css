@@ -912,6 +912,17 @@ dialog.customer-search-modal {
   min-width: 8rem;
 }
 
+.delivery-days {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.delivery-days .btn {
+  background: var(--teal);
+  text-transform: none;
+}
+
 dialog.pending-modal {
   width: min(36rem, calc(100vw - 1.5rem));
 }

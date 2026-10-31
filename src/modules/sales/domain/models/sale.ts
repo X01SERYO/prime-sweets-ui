@@ -15,6 +15,7 @@ export interface SaleModel {
   id: string;
   salesDayId: string;
   customerId: string;
+  deliveryDate: string;
   status: SaleStatus;
   invoiceNumber: string | null;
   totalAmount: number;

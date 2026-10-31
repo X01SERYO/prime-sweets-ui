@@ -53,6 +53,7 @@ export function toSale(raw: unknown): SaleModel {
     id: data.id,
     salesDayId: data.salesDayId,
     customerId: data.customerId,
+    deliveryDate: typeof data.deliveryDate === 'string' ? data.deliveryDate.slice(0, 10) : '',
     status,
     invoiceNumber: typeof data.invoiceNumber === 'string' ? data.invoiceNumber : null,
     totalAmount: money(data.totalAmount),

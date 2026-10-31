@@ -9,6 +9,7 @@ import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/Lo
 import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale';
 import { useDraftSale } from '@/modules/sales/adapters/ui/hooks/useDraftSale';
 import { useSaleMutations } from '@/modules/sales/adapters/ui/hooks/useSaleMutations';
+import { DeliveryDateModal } from '@/modules/sales/adapters/ui/views/DeliveryDateModal';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
@@ -47,6 +48,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const [params, setParams] = useSearchParams();
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
+  const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingLine | null>(null);
   const [searchOutcome, setSearchOutcome] = useState<{ id: number; added: boolean } | null>(null);
   const searchOutcomeId = useRef(0);
@@ -58,6 +60,7 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
     sellerId,
     customerId,
     saleId,
+    deliveryDate,
     container.getCurrentSalesDay,
     container.listDraftSales,
     container.createDraftSale,
@@ -95,7 +98,13 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
       ) : (
         <SelectedCustomer customerId={shownCustomerId} getCustomer={container.getCustomer} />
       )}
-      {shownCustomerId && canEditLines ? (
+      {shownCustomerId && !saleId && !draft.sale && !draft.loading ? (
+        <DeliveryDateModal
+          onSelect={setDeliveryDate}
+          onClose={() => setParams({})}
+        />
+      ) : null}
+      {shownCustomerId && draft.sale && canEditLines ? (
         <ProductSearchView
           searchProducts={container.searchProducts}
           selecting={lines.busy || confirmation.confirming}

@@ -1,6 +1,9 @@
 import { toSale, toSaleEnvelope } from '@/modules/sales/adapters/infrastructure/saleMapper';
 import type { SaleCommandPort } from '@/modules/sales/application/ports/saleCommand.port';
 import type { SaleQueryPort } from '@/modules/sales/application/ports/saleQuery.port';
+import { DeliveryDateBeforeSaleError } from '@/modules/sales/domain/errors/deliveryDateBeforeSale.error';
+import { DeliveryDateRequiredError } from '@/modules/sales/domain/errors/deliveryDateRequired.error';
+import { SaleOutsideEditWindowError } from '@/modules/sales/domain/errors/saleOutsideEditWindow.error';
 import { SaleAlreadyVoidedError } from '@/modules/sales/domain/errors/saleAlreadyVoided.error';
 import { SaleCannotBeModifiedError } from '@/modules/sales/domain/errors/saleCannotBeModified.error';
 import { SaleDayClosedError } from '@/modules/sales/domain/errors/saleDayClosed.error';
@@ -20,7 +23,10 @@ function mapSaleError(error: unknown): never {
     error instanceof SaleDayClosedError ||
     error instanceof SaleMustContainItemsError ||
     error instanceof SaleAlreadyVoidedError ||
-    error instanceof SaleCannotBeModifiedError
+    error instanceof SaleCannotBeModifiedError ||
+    error instanceof SaleOutsideEditWindowError ||
+    error instanceof DeliveryDateRequiredError ||
+    error instanceof DeliveryDateBeforeSaleError
   ) {
     throw error;
   }
@@ -36,6 +42,15 @@ function mapSaleError(error: unknown): never {
   if (error instanceof HttpRequestError && error.code === 'SALE_CANNOT_BE_MODIFIED') {
     throw new SaleCannotBeModifiedError();
   }
+  if (error instanceof HttpRequestError && error.code === 'SALE_OUTSIDE_EDIT_WINDOW') {
+    throw new SaleOutsideEditWindowError();
+  }
+  if (error instanceof HttpRequestError && error.code === 'DELIVERY_DATE_REQUIRED') {
+    throw new DeliveryDateRequiredError();
+  }
+  if (error instanceof HttpRequestError && error.code === 'DELIVERY_DATE_BEFORE_SALE') {
+    throw new DeliveryDateBeforeSaleError();
+  }
   throw error;
 }
 
@@ -46,9 +61,9 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     this.http = http;
   }
 
-  async create(salesDayId: string, customerId: string): Promise<SaleModel> {
+  async create(salesDayId: string, customerId: string, deliveryDate: string): Promise<SaleModel> {
     try {
-      const body = await this.http.post<Envelope>('/sales', { salesDayId, customerId });
+      const body = await this.http.post<Envelope>('/sales', { salesDayId, customerId, deliveryDate });
       return toSaleEnvelope(body);
     } catch (error) {
       mapSaleError(error);
@@ -74,6 +89,15 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
       throw new SaleInvalidError();
     }
     return body.data.map(item => toSale(item));
+  }
+
+  async setDeliveryDate(saleId: string, deliveryDate: string): Promise<SaleModel> {
+    try {
+      const body = await this.http.patch<Envelope>(`/sales/${encodeURIComponent(saleId)}/delivery-date`, { deliveryDate });
+      return toSaleEnvelope(body);
+    } catch (error) {
+      mapSaleError(error);
+    }
   }
 
   async addItem(saleId: string, productId: string, quantity: number, itemName: string): Promise<SaleModel> {

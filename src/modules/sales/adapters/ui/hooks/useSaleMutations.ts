@@ -70,17 +70,17 @@ export function useSaleMutations(
     changeQuantity: (itemId: string, quantity: number) => {
       if (!isSellableQuantity(quantity)) {
         setError('saleQuantityInvalid');
-        return;
+        return Promise.resolve(null);
       }
       return run(() => updateQuantity.execute(sale!.id, itemId, quantity));
     },
     changeName: (itemId: string, itemName: string) => {
       if (!sale || !canRenameSaleLine(sale.status)) {
-        return;
+        return Promise.resolve(null);
       }
       if (!itemName.trim()) {
         setError('saleNameRequired');
-        return;
+        return Promise.resolve(null);
       }
       return run(() => updateName.execute(sale.id, itemId, itemName));
     },

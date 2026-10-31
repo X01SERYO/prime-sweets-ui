@@ -11,6 +11,7 @@ export function useDraftSale(
   sellerId: string,
   customerId: string | null,
   saleId: string | null,
+  deliveryDate: string | null,
   getCurrentSalesDay: GetCurrentSalesDayUseCase,
   listDrafts: ListDraftSalesUseCase,
   createDraft: CreateDraftSaleUseCase,
@@ -39,23 +40,24 @@ export function useDraftSale(
           }
           return null;
         }
+        if (saleId) {
+          return getSale.execute(saleId);
+        }
         if (day.status !== 'OPEN') {
           if (!cancelled) {
             setError('saleDayClosed');
           }
           return null;
         }
-        if (saleId) {
-          return getSale.execute(saleId);
-        }
-        if (!customerId) {
+        if (!customerId || !deliveryDate) {
           return null;
         }
         const drafts = await listDrafts.execute(day.id, customerId);
-        if (drafts[0]) {
-          return drafts[0];
+        const existing = drafts.find(draft => draft.deliveryDate === deliveryDate) ?? null;
+        if (existing) {
+          return existing;
         }
-        return createDraft.execute(day.id, customerId);
+        return createDraft.execute(day.id, customerId, deliveryDate);
       })
       .then(draft => {
         if (!cancelled && draft) {
@@ -76,7 +78,7 @@ export function useDraftSale(
     return () => {
       cancelled = true;
     };
-  }, [sellerId, customerId, saleId, getCurrentSalesDay, listDrafts, createDraft, getSale]);
+  }, [sellerId, customerId, saleId, deliveryDate, getCurrentSalesDay, listDrafts, createDraft, getSale]);
 
   return { sale, setSale, loading, error };
 }
