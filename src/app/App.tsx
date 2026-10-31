@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
+import { DeliveryDayCard } from '@/app/DeliveryDayCard';
 import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
@@ -7,9 +8,11 @@ import { SaleCustomerChoice } from '@/modules/customers/adapters/ui/views/SaleCu
 import { InvoicePreview } from '@/modules/fulfillment-output/adapters/ui/views/InvoicePreview';
 import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
 import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale';
+import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import { useDraftSale } from '@/modules/sales/adapters/ui/hooks/useDraftSale';
 import { useSaleMutations } from '@/modules/sales/adapters/ui/hooks/useSaleMutations';
 import { DeliveryDateModal } from '@/modules/sales/adapters/ui/views/DeliveryDateModal';
+import { businessToday, deliveryDaysThroughSunday } from '@/modules/sales/domain/deliveryDays';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
@@ -17,6 +20,7 @@ import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
 import { SalesDayHome } from '@/modules/sales-day/adapters/ui/views/SalesDayHome';
 import type { Session } from '@/modules/identity/domain/models/session';
 import { useLocale } from '@/shared/i18n/useLocale';
+import type { MessageKey } from '@/shared/i18n/messages';
 import { NavigationHistory, ScreenTitle } from '@/shared/ui/BackButton';
 
 interface AppProps {
@@ -64,6 +68,8 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
+  const [changingDelivery, setChangingDelivery] = useState(false);
+  const [deliveryError, setDeliveryError] = useState<MessageKey | null>(null);
   const [pending, setPending] = useState<PendingLine | null>(null);
   const [searchOutcome, setSearchOutcome] = useState<{ id: number; added: boolean } | null>(null);
   const searchOutcomeId = useRef(0);
@@ -111,12 +117,35 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
       {!shownCustomerId && !draft.loading ? (
         <SaleCustomerChoice searchCustomers={container.searchCustomers} onSelect={id => setParams({ customerId: id })} />
       ) : (
-        <SelectedCustomer
-          customerId={shownCustomerId}
-          deliveryDate={draft.sale?.deliveryDate || deliveryDate}
-          getCustomer={container.getCustomer}
-        />
+        <SelectedCustomer customerId={shownCustomerId} getCustomer={container.getCustomer} />
       )}
+      {draft.sale?.deliveryDate ? (
+        <DeliveryDayCard
+          deliveryDate={draft.sale.deliveryDate}
+          onChange={canEditLines ? () => setChangingDelivery(true) : undefined}
+        />
+      ) : null}
+      {deliveryError ? <p role="alert">{t(deliveryError)}</p> : null}
+      {changingDelivery && draft.sale ? (
+        <DeliveryDateModal
+          title={t('changeDeliveryDay')}
+          days={deliveryDaysThroughSunday(businessToday())}
+          onClose={() => setChangingDelivery(false)}
+          onSelect={date => {
+            void container.setSaleDeliveryDate
+              .execute(draft.sale!.id, date)
+              .then(saved => {
+                draft.setSale(saved);
+                setDeliveryError(null);
+                setChangingDelivery(false);
+              })
+              .catch((caught: unknown) => {
+                setDeliveryError(saleErrorKey(caught, 'saleLineFailed'));
+                setChangingDelivery(false);
+              });
+          }}
+        />
+      ) : null}
       {shownCustomerId && !saleId && !draft.sale && !draft.loading ? (
         <DeliveryDateModal
           onSelect={setDeliveryDate}

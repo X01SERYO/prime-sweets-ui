@@ -5,12 +5,11 @@ import { useLocale } from '@/shared/i18n/useLocale';
 
 interface SelectedCustomerProps {
   customerId: string | null;
-  deliveryDate: string | null;
   getCustomer: GetCustomerUseCase;
 }
 
-export function SelectedCustomer({ customerId, deliveryDate, getCustomer }: SelectedCustomerProps) {
-  const { t, locale } = useLocale();
+export function SelectedCustomer({ customerId, getCustomer }: SelectedCustomerProps) {
+  const { t } = useLocale();
   const { customer, error } = useSaleCustomer(customerId, getCustomer);
   const [open, setOpen] = useState(false);
 
@@ -38,12 +37,6 @@ export function SelectedCustomer({ customerId, deliveryDate, getCustomer }: Sele
           </button>
           {open ? (
             <dl className="customer-details">
-              {deliveryDate ? (
-                <>
-                  <dt>{t('deliveryDay')}</dt>
-                  <dd>{formatDeliveryHeading(deliveryDate, locale)}</dd>
-                </>
-              ) : null}
               <dt>{t('documentType')}</dt>
               <dd>{customer.documentType}</dd>
               <dt>{t('documentNumber')}</dt>
@@ -74,22 +67,6 @@ export function SelectedCustomer({ customerId, deliveryDate, getCustomer }: Sele
       )}
     </section>
   );
-}
-
-function formatDeliveryHeading(value: string, locale: string): string {
-  const [year, month, day] = value.split('-').map(Number);
-  if (!year || !month || !day) {
-    return value;
-  }
-  const language = locale === 'en' ? 'en-US' : 'es-CO';
-  const formatted = new Intl.DateTimeFormat(language, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'UTC'
-  }).format(new Date(Date.UTC(year, month - 1, day)));
-  const cleaned = formatted.replace(',', '');
-  return cleaned.charAt(0).toLocaleUpperCase(language) + cleaned.slice(1);
 }
 
 function ChevronIcon() {
