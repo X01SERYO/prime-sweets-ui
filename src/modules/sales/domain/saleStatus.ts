@@ -13,7 +13,7 @@ export function canConfirmSale(status: SaleStatus): boolean {
 }
 
 export function canVoidSale(status: SaleStatus): boolean {
-  return status === 'CONFIRMED';
+  return status === 'DRAFT' || status === 'CONFIRMED';
 }
 
 export function canPreviewInvoice(status: SaleStatus): boolean {

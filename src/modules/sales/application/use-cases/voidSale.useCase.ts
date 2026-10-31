@@ -11,7 +11,7 @@ export class VoidSaleUseCase {
 
   async execute(saleId: string): Promise<SaleModel> {
     const sale = await this.command.void(saleId.trim());
-    if (sale.status !== 'VOIDED' || !sale.invoiceNumber) {
+    if (sale.status !== 'VOIDED') {
       throw new SaleInvalidError();
     }
     return sale;
