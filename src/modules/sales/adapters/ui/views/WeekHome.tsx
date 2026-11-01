@@ -32,9 +32,14 @@ export function WeekHome({ listSales }: WeekHomeProps) {
 
   return (
     <section className="stack">
-      <Link className="btn" to={`/sales?deliveryDate=${encodeURIComponent(today)}`}>
-        {t('newSale')}
-      </Link>
+      <div className="week-home-actions">
+        <button className="btn btn-secondary" type="button">
+          {t('products')}
+        </button>
+        <Link className="btn" to={`/sales?deliveryDate=${encodeURIComponent(today)}`}>
+          {t('newSale')}
+        </Link>
+      </div>
       <div className="week-nav">
         <button className="week-shift" type="button" aria-label={t('previousWeek')} disabled={!earlier} onClick={() => earlier && select(earlier)}>
           ‹

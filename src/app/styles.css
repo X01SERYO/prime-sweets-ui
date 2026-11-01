@@ -184,6 +184,27 @@ select {
   margin-left: 0.5rem;
 }
 
+@media (max-width: 40rem) {
+  .topbar {
+    gap: 0.35rem;
+    padding-right: 0.65rem;
+    padding-left: 0.65rem;
+  }
+
+  .shell-logo {
+    width: min(9.25rem, 48vw);
+  }
+
+  .lang {
+    padding-right: 0.6rem;
+    padding-left: 0.6rem;
+  }
+
+  .topbar .lang + .lang {
+    margin-left: 0;
+  }
+}
+
 .lang {
   margin-left: auto;
   min-height: 2.25rem;
@@ -1157,6 +1178,17 @@ dialog.pending-modal {
 
 .day-summary strong {
   font-size: 0.95rem;
+}
+
+.week-home-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.week-home-actions .btn {
+  flex: 1;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 .week-shortcuts {
