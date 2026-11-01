@@ -46,5 +46,5 @@ Screen: `/?deliveryDate=`.
 
 | Area | Where it lives |
 |---|---|
-| Catalog Excel import and Alegra sync | API [PDR-002](../../../prime-sweets-api/docs/pdrs/PDR-002.md). Not a screen in this client. |
+| Product administration and Alegra sync | [PDR-003](../pdrs/PDR-003.md). The home button exists and does not open a screen yet. Alegra stays on the API. |
 | Choosing a printer or a printer protocol | Windows print dialog. The UI does not record that an invoice was printed. |

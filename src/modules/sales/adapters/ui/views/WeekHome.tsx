@@ -33,9 +33,9 @@ export function WeekHome({ listSales }: WeekHomeProps) {
   return (
     <section className="stack">
       <div className="week-home-actions">
-        <button className="btn btn-secondary" type="button">
+        <Link className="btn btn-secondary" to="/products">
           {t('products')}
-        </button>
+        </Link>
         <Link className="btn" to={`/sales?deliveryDate=${encodeURIComponent(today)}`}>
           {t('newSale')}
         </Link>

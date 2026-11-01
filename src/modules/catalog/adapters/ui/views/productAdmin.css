@@ -1,0 +1,80 @@
+.product-admin-search {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.product-admin-search input {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.product-admin-table th,
+.product-admin-table td {
+  padding: 0.35rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  white-space: normal;
+  font-size: 0.75rem;
+  overflow-wrap: normal;
+}
+
+.product-admin-table th {
+  font-weight: 700;
+}
+
+.product-admin-table th:last-child,
+.product-admin-table td:last-child {
+  width: 2.4rem;
+  text-align: center;
+}
+
+.product-admin-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-admin-size {
+  margin-left: auto;
+}
+
+.product-admin-size select {
+  min-height: 2.15rem;
+}
+
+.product-editor {
+  width: min(32rem, calc(100vw - 1.5rem));
+  border: 0;
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.product-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.75rem;
+}
+
+.product-editor-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 40rem) {
+  .product-admin-wide {
+    display: none;
+  }
+
+  .product-editor-grid {
+    grid-template-columns: 1fr;
+  }
+}

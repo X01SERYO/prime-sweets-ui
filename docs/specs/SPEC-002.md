@@ -6,7 +6,7 @@
 **Document role:** Implementation guide for the UI [PDR-002](../pdrs/PDR-002.md). Not a description of the running client.
 **API contract:** [SPEC-002](../../../prime-sweets-api/docs/specs/SPEC-002.md).
 
-Do not add catalog import or Alegra calls to this repository.
+Product administration is [SPEC-003](./SPEC-003.md). Do not add it, or any Alegra call, to this feature.
 
 ## 0. Impact on what is already built
 

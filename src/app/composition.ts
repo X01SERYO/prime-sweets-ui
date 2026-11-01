@@ -4,7 +4,10 @@ import { HttpCustomerQuery } from '@/modules/customers/adapters/infrastructure/h
 import { CreateCustomerUseCase } from '@/modules/customers/application/use-cases/createCustomer.useCase';
 import { GetCustomerUseCase } from '@/modules/customers/application/use-cases/getCustomer.useCase';
 import { SearchCustomersUseCase } from '@/modules/customers/application/use-cases/searchCustomers.useCase';
+import { HttpCatalogProduct } from '@/modules/catalog/adapters/infrastructure/httpCatalogProduct';
+import { SearchCatalogProductsUseCase } from '@/modules/catalog/application/use-cases/searchCatalogProducts.useCase';
 import { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
+import { UpdateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/updateCatalogProduct.useCase';
 import { BrowserSessionStore } from '@/modules/identity/adapters/infrastructure/browserSessionStore';
 import { HttpAuth } from '@/modules/identity/adapters/infrastructure/httpAuth';
 import { LoginUseCase } from '@/modules/identity/application/use-cases/login.useCase';
@@ -39,6 +42,8 @@ export interface AppContainer {
   login: LoginUseCase;
   logout: LogoutUseCase;
   searchProducts: SearchProductsUseCase;
+  searchCatalogProducts: SearchCatalogProductsUseCase;
+  updateCatalogProduct: UpdateCatalogProductUseCase;
   searchCustomers: SearchCustomersUseCase;
   getCustomer: GetCustomerUseCase;
   createCustomer: CreateCustomerUseCase;
@@ -70,6 +75,8 @@ export function createAppContainer(): AppContainer {
     login: new LoginUseCase(auth, sessionStore),
     logout: new LogoutUseCase(auth, sessionStore),
     searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
+    searchCatalogProducts: new SearchCatalogProductsUseCase(new HttpCatalogProduct(http)),
+    updateCatalogProduct: new UpdateCatalogProductUseCase(new HttpCatalogProduct(http)),
     searchCustomers: new SearchCustomersUseCase(new HttpCustomerQuery(http)),
     getCustomer: new GetCustomerUseCase(new HttpCustomerQuery(http)),
     createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http)),
