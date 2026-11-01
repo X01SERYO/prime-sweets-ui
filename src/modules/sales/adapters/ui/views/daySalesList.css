@@ -38,27 +38,89 @@
   text-align: right;
 }
 
+.day-sales-cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day-sale-card {
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+}
+
+.day-sale-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.day-sale-name {
+  overflow: hidden;
+  color: var(--deep);
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-sale-summary .day-sale-total {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.day-sale-summary svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: var(--deep);
+}
+
+.day-sale-summary.open svg {
+  transform: rotate(180deg);
+}
+
+.day-sale-detail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.day-sale-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.15rem;
+}
+
+.day-sale-action {
+  display: inline-flex;
+  width: 2.75rem;
+  justify-content: center;
+}
+
 @media (max-width: 40rem) {
   .row.day-sales-print,
-  .day-sales-pick {
+  .day-sales-table {
     display: none;
   }
 
-  .day-sales-table {
-    table-layout: fixed;
-    white-space: normal;
-  }
-
-  .day-sales-table td {
-    padding: 0.4rem 0.15rem;
-    white-space: normal;
-  }
-
-  .day-sales-table td.day-sales-action,
-  .day-sales-table .icon-btn {
-    width: 2.15rem;
-    min-width: 2.15rem;
-    min-height: 2.15rem;
+  .day-sales-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
   }
 }
 

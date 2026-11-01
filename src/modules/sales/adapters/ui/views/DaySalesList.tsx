@@ -49,6 +49,7 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
   const printing = usePrintInvoices(printInvoices);
   const [pendingVoidId, setPendingVoidId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
+  const [openId, setOpenId] = useState<string | null>(null);
   const printable = listed.sales.filter(sale => canPreviewInvoice(sale.status));
 
   function toggle(saleId: string) {
@@ -89,6 +90,40 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
           </button>
         </div>
       ) : null}
+      <ul className="day-sales-cards">
+        {listed.sales.map(sale => {
+          const open = openId === sale.id;
+          return (
+            <li key={sale.id} className="card day-sale-card">
+              <button
+                className={open ? 'day-sale-summary open' : 'day-sale-summary'}
+                type="button"
+                aria-expanded={open}
+                aria-label={`${sale.customerName}, ${t(statusKey[sale.status])}, ${formatCurrency(sale.total)}. ${open ? t('hideSaleDetail') : t('showSaleDetail')}`}
+                onClick={() => setOpenId(open ? null : sale.id)}
+              >
+                <span className="day-sale-name">{sale.customerName}</span>
+                <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
+                <span className="day-sale-total">{formatCurrency(sale.total)}</span>
+                <ChevronIcon />
+              </button>
+              {open ? (
+                <div className="day-sale-detail">
+                  <span>{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</span>
+                  <span className="day-sale-actions">
+                    <SaleAction
+                      sale={sale}
+                      voidingId={voiding.voidingId}
+                      pendingVoidId={pendingVoidId}
+                      onVoid={setPendingVoidId}
+                    />
+                  </span>
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
       <table className="day-sales-table">
         <tbody>
           {listed.sales.map(sale => (
@@ -116,33 +151,13 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
               </td>
               <td className="m">{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</td>
               <td className="m day-sales-total">{formatCurrency(sale.total)}</td>
-              <td className="day-sales-action">
-                {canPreviewInvoice(sale.status) || (sale.status === 'VOIDED' && sale.invoiceNumber) ? (
-                  <Link className="btn icon-btn icon-preview" to={`/invoices/${sale.id}`} aria-label={t('invoicePreview')}>
-                    <EyeIcon />
-                  </Link>
-                ) : null}
-              </td>
-              <td className="day-sales-action">
-                {canEditSaleLines(sale.status) ? (
-                  <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
-                    <EditIcon />
-                  </Link>
-                ) : null}
-              </td>
-              <td className="day-sales-action">
-                {canVoidSale(sale.status) ? (
-                  <button
-                    className="btn icon-btn icon-void"
-                    type="button"
-                    aria-label={t('voidSale')}
-                    disabled={voiding.voidingId !== null || pendingVoidId === sale.id}
-                    onClick={() => setPendingVoidId(sale.id)}
-                  >
-                    <VoidIcon />
-                  </button>
-                ) : null}
-              </td>
+              <SaleAction
+                sale={sale}
+                voidingId={voiding.voidingId}
+                pendingVoidId={pendingVoidId}
+                onVoid={setPendingVoidId}
+                asCells
+              />
             </tr>
           ))}
         </tbody>
@@ -167,6 +182,70 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
         />
       ) : null}
     </section>
+  );
+}
+
+function SaleAction({
+  sale,
+  voidingId,
+  pendingVoidId,
+  onVoid,
+  asCells = false
+}: {
+  sale: { id: string; status: 'DRAFT' | 'CONFIRMED' | 'VOIDED'; invoiceNumber: string | null };
+  voidingId: string | null;
+  pendingVoidId: string | null;
+  onVoid: (saleId: string) => void;
+  asCells?: boolean;
+}) {
+  const { t } = useLocale();
+  const preview =
+    canPreviewInvoice(sale.status) || (sale.status === 'VOIDED' && sale.invoiceNumber) ? (
+      <Link className="btn icon-btn icon-preview" to={`/invoices/${sale.id}`} aria-label={t('invoicePreview')}>
+        <EyeIcon />
+      </Link>
+    ) : null;
+  const edit = canEditSaleLines(sale.status) ? (
+    <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
+      <EditIcon />
+    </Link>
+  ) : null;
+  const voidAction = canVoidSale(sale.status) ? (
+    <button
+      className="btn icon-btn icon-void"
+      type="button"
+      aria-label={t('voidSale')}
+      disabled={voidingId !== null || pendingVoidId === sale.id}
+      onClick={() => onVoid(sale.id)}
+    >
+      <VoidIcon />
+    </button>
+  ) : null;
+
+  if (asCells) {
+    return (
+      <>
+        <td className="day-sales-action">{preview}</td>
+        <td className="day-sales-action">{edit}</td>
+        <td className="day-sales-action">{voidAction}</td>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span className="day-sale-action">{preview}</span>
+      <span className="day-sale-action">{edit}</span>
+      <span className="day-sale-action">{voidAction}</span>
+    </>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="m6 9 6 6 6-6" />
+    </svg>
   );
 }
 

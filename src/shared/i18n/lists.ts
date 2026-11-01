@@ -52,6 +52,8 @@ export const listMessages = catalog(
     printSelected: 'Imprimir selección',
     printAll: 'Imprimir confirmadas',
     selectAllInvoices: 'Seleccionar todas',
+    showSaleDetail: 'Ver detalle de la venta',
+    hideSaleDetail: 'Ocultar detalle de la venta',
     reprint: 'Volver a imprimir'
   },
   {
@@ -105,6 +107,8 @@ export const listMessages = catalog(
     printSelected: 'Print selection',
     printAll: 'Print confirmed',
     selectAllInvoices: 'Select all',
+    showSaleDetail: 'Show sale details',
+    hideSaleDetail: 'Hide sale details',
     reprint: 'Print again'
   }
 );
