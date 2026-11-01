@@ -7,6 +7,14 @@ import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
 
+function businessDay(value: string): string {
+  const [year, month, day] = value.slice(0, 10).split('-');
+  if (!year || !month || !day) {
+    return value;
+  }
+  return `${day}/${month}/${year}`;
+}
+
 function saleDay(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
@@ -50,6 +58,7 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
       {document ? (
         <>
           <article className="invoice-sheet">
+            {document.voided ? <p className="invoice-void-mark">ANULADA</p> : null}
             {document.logo ? <img className="invoice-logo" alt="" src={document.logo} /> : null}
             <p className="invoice-name">{document.companyName}</p>
             <p className="b">NIT {document.companyNit}</p>
@@ -77,7 +86,7 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
               <b>Método de pago:</b> Efectivo
             </p>
             <p className="small">
-              <b>Vencimiento:</b> {saleDay(document.saleDate)}
+              <b>Fecha de entrega:</b> {businessDay(document.deliveryDate)}
             </p>
             <table>
               <colgroup>
@@ -115,9 +124,11 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
               <span>{formatCurrency(document.total)}</span>
             </p>
           </article>
-          <button className="btn" type="button" disabled={printing.printing} onClick={() => void printing.print([saleId ?? ''])}>
-            {printing.printing ? t('invoicePrinting') : t('reprint')}
-          </button>
+          {document.voided ? null : (
+            <button className="btn" type="button" disabled={printing.printing} onClick={() => void printing.print([saleId ?? ''])}>
+              {printing.printing ? t('invoicePrinting') : t('reprint')}
+            </button>
+          )}
         </>
       ) : null}
     </section>

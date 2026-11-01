@@ -18,6 +18,29 @@ export function businessToday(now: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+export function addBusinessDays(date: string, days: number): string | null {
+  const cursor = parseBusinessDate(date);
+  if (!cursor) {
+    return null;
+  }
+  cursor.setUTCDate(cursor.getUTCDate() + days);
+  return cursor.toISOString().slice(0, 10);
+}
+
+export function previousWeek(date: string): string | null {
+  return addBusinessDays(date, -7);
+}
+
+export function nextWeek(date: string, today: string): string | null {
+  const candidate = addBusinessDays(date, 7);
+  const currentMonday = weekDeliveryDays(today)[0]?.date;
+  const candidateMonday = candidate ? weekDeliveryDays(candidate)[0]?.date : null;
+  if (!candidate || !currentMonday || !candidateMonday || candidateMonday > currentMonday) {
+    return null;
+  }
+  return candidate;
+}
+
 export function weekDeliveryDays(today: string): WeekDeliveryDay[] {
   const cursor = parseBusinessDate(today);
   if (!cursor) {

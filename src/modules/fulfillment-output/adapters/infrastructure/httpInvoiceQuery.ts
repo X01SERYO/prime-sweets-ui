@@ -35,8 +35,8 @@ export class HttpInvoiceQuery implements InvoiceQueryPort {
     this.http = http;
   }
 
-  async list(salesDayId: string): Promise<InvoiceSummaryModel[]> {
-    const body = await this.http.get<Envelope>(`/invoices?salesDayId=${encodeURIComponent(salesDayId)}`);
+  async list(deliveryDate: string): Promise<InvoiceSummaryModel[]> {
+    const body = await this.http.get<Envelope>(`/invoices?deliveryDate=${encodeURIComponent(deliveryDate)}`);
     if (!body || body.success !== true) {
       throw new InvoiceInvalidError();
     }

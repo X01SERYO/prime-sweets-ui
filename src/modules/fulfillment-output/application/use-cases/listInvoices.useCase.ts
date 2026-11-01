@@ -9,8 +9,8 @@ export class ListInvoicesUseCase {
     this.query = query;
   }
 
-  async execute(salesDayId: string): Promise<InvoiceSummaryModel[]> {
-    const id = salesDayId.trim();
+  async execute(deliveryDate: string): Promise<InvoiceSummaryModel[]> {
+    const id = deliveryDate.trim();
     if (!id) {
       throw new InvoiceInvalidError();
     }

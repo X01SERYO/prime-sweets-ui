@@ -2,7 +2,7 @@
 
 **Sources:** `src/`, `package.json`, `.env.example`.
 
-The UI is the seller SPA. Routes cover login, the current Sales Day, customers, day sales, a sale, the load sheet, and invoice preview. A closed day prints from the day-sales list. `/invoices/:salesDayId` redirects there. Signed-out visitors go to `/login`. Printing uses the browser print dialog.
+The UI is the seller SPA. Routes cover login, the week home, customers, a sale, Entregas for a delivery date, the load sheet, and invoice preview at `/invoices/:saleId`. Signed-out visitors go to `/login`. Printing uses the browser print dialog and is hidden on a phone.
 
 ## Diagram
 

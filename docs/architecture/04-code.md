@@ -1,6 +1,6 @@
 # C4 Level 4 — Code (current)
 
-**Verified flow:** boot the SPA, restore the session, and open the Sales Day when the seller is signed in.
+**Verified flow:** boot the SPA, restore the session, and open the week home when the seller is signed in.
 
 **Sources:** `src/main.tsx`, `src/app/composition.ts`, `src/app/App.tsx`, `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`.
 

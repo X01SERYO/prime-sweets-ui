@@ -26,13 +26,18 @@ export function ConfirmDialog({
   onCancel
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog || dialog.open) {
       return;
     }
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     dialog.showModal();
+    panelRef.current?.focus();
     return () => {
       if (dialog.open) {
         dialog.close();
@@ -56,6 +61,7 @@ export function ConfirmDialog({
         }
       }}
     >
+      <div ref={panelRef} className="modal-panel" tabIndex={-1}>
       <h2>{title}</h2>
       <p>{message}</p>
       {error ? <p role="alert">{error}</p> : null}
@@ -73,6 +79,7 @@ export function ConfirmDialog({
             {cancelLabel}
           </button>
         )}
+      </div>
       </div>
     </dialog>
   );

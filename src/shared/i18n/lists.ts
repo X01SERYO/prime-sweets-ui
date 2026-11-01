@@ -51,6 +51,7 @@ export const listMessages = catalog(
     invoicePreview: 'Vista previa',
     printSelected: 'Imprimir selección',
     printAll: 'Imprimir confirmadas',
+    selectAllInvoices: 'Seleccionar todas',
     reprint: 'Volver a imprimir'
   },
   {
@@ -103,6 +104,7 @@ export const listMessages = catalog(
     invoicePreview: 'Preview',
     printSelected: 'Print selection',
     printAll: 'Print confirmed',
+    selectAllInvoices: 'Select all',
     reprint: 'Print again'
   }
 );

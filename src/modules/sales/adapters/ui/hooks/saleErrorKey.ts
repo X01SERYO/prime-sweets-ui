@@ -1,4 +1,5 @@
 import { DeliveryDateBeforeSaleError } from '@/modules/sales/domain/errors/deliveryDateBeforeSale.error';
+import { DeliveryDateOutOfRangeError } from '@/modules/sales/domain/errors/deliveryDateOutOfRange.error';
 import { DeliveryDateRequiredError } from '@/modules/sales/domain/errors/deliveryDateRequired.error';
 import { SaleOutsideEditWindowError } from '@/modules/sales/domain/errors/saleOutsideEditWindow.error';
 import { SaleAlreadyVoidedError } from '@/modules/sales/domain/errors/saleAlreadyVoided.error';
@@ -20,6 +21,9 @@ export function saleErrorKey(caught: unknown, fallback: MessageKey): MessageKey 
   }
   if (caught instanceof DeliveryDateBeforeSaleError) {
     return 'deliveryDateBeforeSale';
+  }
+  if (caught instanceof DeliveryDateOutOfRangeError) {
+    return 'deliveryDateOutOfRange';
   }
   if (caught instanceof SaleMustContainItemsError) {
     return 'saleMustContainItems';

@@ -4,15 +4,12 @@ import type { GetSaleUseCase } from '@/modules/sales/application/use-cases/getSa
 import type { ListDraftSalesUseCase } from '@/modules/sales/application/use-cases/listDraftSales.useCase';
 import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import type { SaleModel } from '@/modules/sales/domain/models/sale';
-import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import type { MessageKey } from '@/shared/i18n/messages';
 
 export function useDraftSale(
-  sellerId: string,
   customerId: string | null,
   saleId: string | null,
   deliveryDate: string | null,
-  getCurrentSalesDay: GetCurrentSalesDayUseCase,
   listDrafts: ListDraftSalesUseCase,
   createDraft: CreateDraftSaleUseCase,
   getSale: GetSaleUseCase
@@ -30,35 +27,14 @@ export function useDraftSale(
     let cancelled = false;
     setLoading(true);
     setError(null);
-    getCurrentSalesDay
-      .execute(sellerId)
-      .then(async day => {
-        if (!day) {
-          if (!cancelled) {
-            setError('saleDayMissing');
-            setSale(null);
-          }
-          return null;
-        }
-        if (saleId) {
-          return getSale.execute(saleId);
-        }
-        if (day.status !== 'OPEN') {
-          if (!cancelled) {
-            setError('saleDayClosed');
-          }
-          return null;
-        }
-        if (!customerId || !deliveryDate) {
-          return null;
-        }
-        const drafts = await listDrafts.execute(day.id, customerId);
-        const existing = drafts.find(draft => draft.deliveryDate === deliveryDate) ?? null;
-        if (existing) {
-          return existing;
-        }
-        return createDraft.execute(day.id, customerId, deliveryDate);
-      })
+    const load = saleId
+      ? getSale.execute(saleId)
+      : customerId && deliveryDate
+        ? listDrafts.execute(deliveryDate, customerId).then(async drafts => {
+            return drafts[0] ?? createDraft.execute(customerId, deliveryDate);
+          })
+        : Promise.resolve(null);
+    load
       .then(draft => {
         if (!cancelled && draft) {
           setSale(draft);
@@ -78,7 +54,7 @@ export function useDraftSale(
     return () => {
       cancelled = true;
     };
-  }, [sellerId, customerId, saleId, deliveryDate, getCurrentSalesDay, listDrafts, createDraft, getSale]);
+  }, [customerId, saleId, deliveryDate, listDrafts, createDraft, getSale]);
 
   return { sale, setSale, loading, error };
 }

@@ -8,7 +8,7 @@ export class ListDraftSalesUseCase {
     this.query = query;
   }
 
-  async execute(salesDayId: string, customerId: string): Promise<SaleModel[]> {
-    return this.query.listDrafts(salesDayId.trim(), customerId.trim());
+  async execute(deliveryDate: string, customerId: string): Promise<SaleModel[]> {
+    return this.query.listDrafts(deliveryDate.trim(), customerId.trim());
   }
 }

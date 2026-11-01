@@ -10,7 +10,7 @@ function hrefOf(pathname: string, search: string): string {
 
 function canReturnTo(href: string): boolean {
   const path = href.split('?')[0];
-  return path !== '/' && path !== '/login';
+  return path !== '/login';
 }
 
 export function NavigationHistory({ children }: { children: ReactNode }) {
@@ -71,7 +71,7 @@ function BackLink() {
           navigate(-1);
           return;
         }
-        navigate('/sales-day');
+        navigate('/');
       }}
     >
       <BackIcon />

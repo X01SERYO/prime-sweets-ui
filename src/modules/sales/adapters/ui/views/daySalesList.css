@@ -38,14 +38,32 @@
   text-align: right;
 }
 
-.day-sales-icons {
-  width: 1%;
-  padding-left: 0.35rem;
-  padding-right: 0;
-  text-align: right;
-  white-space: nowrap;
+@media (max-width: 40rem) {
+  .row.day-sales-print,
+  .day-sales-pick {
+    display: none;
+  }
+
+  .day-sales-table {
+    table-layout: fixed;
+    white-space: normal;
+  }
+
+  .day-sales-table td {
+    padding: 0.4rem 0.15rem;
+    white-space: normal;
+  }
+
+  .day-sales-table td.day-sales-action,
+  .day-sales-table .icon-btn {
+    width: 2.15rem;
+    min-width: 2.15rem;
+    min-height: 2.15rem;
+  }
 }
 
-.day-sales-icons .icon-btn + .icon-btn {
-  margin-left: 0.2rem;
+.day-sales-table td.day-sales-action {
+  width: 2.15rem;
+  padding: 0.35rem 0.05rem;
+  text-align: center;
 }

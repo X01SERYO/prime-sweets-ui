@@ -12,7 +12,17 @@ export const shellMessages = catalog(
     invoices: 'Facturas',
     signOut: 'Salir',
     home: 'Menú principal',
-    back: 'Volver'
+    back: 'Volver',
+    previousWeek: 'Semana anterior',
+    nextWeek: 'Semana siguiente',
+    weekDays: 'Días de la semana',
+    salesOfDay: 'Entregas',
+    daySummaryLoading: 'Cargando el día…',
+    daySummaryFailed: 'No se pudo cargar el resumen del día.',
+    draftCount: 'Borradores',
+    confirmedCount: 'Confirmadas',
+    voidedCount: 'Anuladas',
+    confirmedTotal: 'Total'
   },
   {
     languageLabel: 'Switch language to Spanish',
@@ -25,6 +35,16 @@ export const shellMessages = catalog(
     invoices: 'Invoices',
     signOut: 'Sign out',
     home: 'Main menu',
-    back: 'Back'
+    back: 'Back',
+    previousWeek: 'Previous week',
+    nextWeek: 'Next week',
+    weekDays: 'Days of the week',
+    salesOfDay: 'Deliveries',
+    daySummaryLoading: 'Loading the day…',
+    daySummaryFailed: 'The day summary could not be loaded.',
+    draftCount: 'Drafts',
+    confirmedCount: 'Confirmed',
+    voidedCount: 'Voided',
+    confirmedTotal: 'Total'
   }
 );

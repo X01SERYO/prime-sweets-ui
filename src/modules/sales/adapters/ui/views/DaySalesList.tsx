@@ -2,13 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
 import type { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
-import { useDaySales } from '@/modules/sales/adapters/ui/hooks/useDaySales';
 import { useDeliverySales } from '@/modules/sales/adapters/ui/hooks/useDeliverySales';
 import { useVoidListedSale } from '@/modules/sales/adapters/ui/hooks/useVoidListedSale';
-import type { ListDaySalesUseCase } from '@/modules/sales/application/use-cases/listDaySales.useCase';
 import type { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application/use-cases/listSalesByDeliveryDate.useCase';
 import type { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
-import type { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
 import { canEditSaleLines, canPreviewInvoice, canVoidSale } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -39,73 +36,78 @@ const statusKey = {
 } as const;
 
 interface DaySalesListProps {
-  sellerId: string;
-  salesDayId?: string;
-  getCurrentSalesDay: GetCurrentSalesDayUseCase;
-  listDaySales: ListDaySalesUseCase;
   deliveryDate?: string;
-  listDeliverySales?: ListSalesByDeliveryDateUseCase;
+  listDeliverySales: ListSalesByDeliveryDateUseCase;
   voidSale: VoidSaleUseCase;
   printInvoices: PrintInvoicesUseCase;
 }
 
-export function DaySalesList({
-  sellerId,
-  salesDayId,
-  getCurrentSalesDay,
-  listDaySales,
-  deliveryDate,
-  listDeliverySales,
-  voidSale,
-  printInvoices
-}: DaySalesListProps) {
+export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printInvoices }: DaySalesListProps) {
   const { t, locale } = useLocale();
-  const byDay = useDaySales(sellerId, salesDayId, getCurrentSalesDay, listDaySales, !deliveryDate);
-  const byDelivery = useDeliverySales(deliveryDate, listDeliverySales);
-  const listed = deliveryDate
-    ? { sales: byDelivery.sales, dayOpen: true, dayId: null, loading: byDelivery.loading, error: byDelivery.error, reload: byDelivery.reload }
-    : byDay;
+  const listed = useDeliverySales(deliveryDate, listDeliverySales);
   const voiding = useVoidListedSale(voidSale, listed.reload);
   const printing = usePrintInvoices(printInvoices);
   const [pendingVoidId, setPendingVoidId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
-  const readOnly = !listed.dayOpen && Boolean(listed.dayId);
   const printable = listed.sales.filter(sale => canPreviewInvoice(sale.status));
 
   function toggle(saleId: string) {
     setSelected(current => (current.includes(saleId) ? current.filter(id => id !== saleId) : [...current, saleId]));
   }
 
+  function selectAll() {
+    const ids = printable.map(sale => sale.id);
+    setSelected(current => (ids.every(id => current.includes(id)) ? [] : ids));
+  }
+
   return (
     <section className="stack">
       <div>
-        <ScreenTitle>{deliveryDate ? t('deliverySales') : t('daySales')}</ScreenTitle>
+        <ScreenTitle>{t('deliverySales')}</ScreenTitle>
         {deliveryDate ? <p className="load-sheet-date">{formatDeliveryHeading(deliveryDate, locale)}</p> : null}
       </div>
       {listed.loading ? <p>{t('daySalesLoading')}</p> : null}
       {listed.error ? <p className="alert">{t(listed.error)}</p> : null}
       {voiding.error && !pendingVoidId ? <p role="alert">{t(voiding.error)}</p> : null}
-      {readOnly && printing.error ? <p className="alert">{t(printing.error)}</p> : null}
-      {!listed.loading && !listed.error && listed.sales.length === 0 ? (
-        <p>{deliveryDate ? t('deliverySalesEmpty') : t('daySalesEmpty')}</p>
+      {printing.error ? <p className="alert">{t(printing.error)}</p> : null}
+      {!listed.loading && !listed.error && listed.sales.length === 0 ? <p>{t('deliverySalesEmpty')}</p> : null}
+      {printable.length > 0 ? (
+        <div className="row day-sales-print">
+          <button className="btn btn-secondary" type="button" disabled={printing.printing} onClick={selectAll}>
+            {t('selectAllInvoices')}
+          </button>
+          <button className="btn btn-secondary" type="button" disabled={printing.printing || selected.length === 0} onClick={() => void printing.print(selected)}>
+            {printing.printing ? t('invoicePrinting') : t('printSelected')}
+          </button>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            disabled={printing.printing || printable.length === 0}
+            onClick={() => void printing.print(printable.map(sale => sale.id))}
+          >
+            {t('printAll')}
+          </button>
+        </div>
       ) : null}
       <table className="day-sales-table">
         <tbody>
           {listed.sales.map(sale => (
             <tr key={sale.id}>
-              {readOnly ? (
+              {canPreviewInvoice(sale.status) ? (
                 <td className="day-sales-pick">
                   <label className="day-sales-check">
                     <input
                       type="checkbox"
                       aria-label={sale.invoiceNumber ?? sale.customerName}
                       checked={selected.includes(sale.id)}
-                      disabled={!canPreviewInvoice(sale.status) || printing.printing}
+                      disabled={printing.printing}
                       onChange={() => toggle(sale.id)}
                     />
                   </label>
                 </td>
-              ) : null}
+              ) : (
+                <td className="day-sales-pick" />
+              )}
               <td>
                 <b>{sale.customerName}</b>
               </td>
@@ -114,22 +116,22 @@ export function DaySalesList({
               </td>
               <td className="m">{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</td>
               <td className="m day-sales-total">{formatCurrency(sale.total)}</td>
-              <td className="day-sales-icons">
-                {readOnly && canPreviewInvoice(sale.status) && listed.dayId ? (
-                  <Link
-                    className="btn icon-btn icon-edit"
-                    to={`/invoices/${listed.dayId}/${sale.id}`}
-                    aria-label={t('invoicePreview')}
-                  >
+              <td className="day-sales-action">
+                {canPreviewInvoice(sale.status) || (sale.status === 'VOIDED' && sale.invoiceNumber) ? (
+                  <Link className="btn icon-btn icon-preview" to={`/invoices/${sale.id}`} aria-label={t('invoicePreview')}>
                     <EyeIcon />
                   </Link>
                 ) : null}
-                {listed.dayOpen && canEditSaleLines(sale.status) ? (
+              </td>
+              <td className="day-sales-action">
+                {canEditSaleLines(sale.status) ? (
                   <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
                     <EditIcon />
                   </Link>
                 ) : null}
-                {listed.dayOpen && canVoidSale(sale.status) ? (
+              </td>
+              <td className="day-sales-action">
+                {canVoidSale(sale.status) ? (
                   <button
                     className="btn icon-btn icon-void"
                     type="button"
@@ -145,21 +147,6 @@ export function DaySalesList({
           ))}
         </tbody>
       </table>
-      {readOnly ? (
-        <div className="row">
-          <button className="btn" type="button" disabled={printing.printing || selected.length === 0} onClick={() => void printing.print(selected)}>
-            {printing.printing ? t('invoicePrinting') : t('printSelected')}
-          </button>
-          <button
-            className="btn btn-secondary"
-            type="button"
-            disabled={printing.printing || printable.length === 0}
-            onClick={() => void printing.print(printable.map(sale => sale.id))}
-          >
-            {t('printAll')}
-          </button>
-        </div>
-      ) : null}
       {pendingVoidId ? (
         <ConfirmDialog
           title={t('voidSale')}

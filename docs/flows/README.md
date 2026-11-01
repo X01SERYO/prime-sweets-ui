@@ -1,58 +1,50 @@
 # UI flows (current)
 
-**Sources:** `src/main.tsx`, `src/app/App.tsx`, `src/app/composition.ts`.
-
-Only the flow that exists in code is described as current. Gaps that are still outside this repository are listed at the end.
+**Sources:** `src/main.tsx`, `src/app/App.tsx`, `src/app/composition.ts`, `src/modules/sales/adapters/ui/views/WeekHome.tsx`, `DaySalesList.tsx`.
 
 ## 1. Open the application
 
 1. The browser loads `index.html` and `src/main.tsx`.
-2. If `#root` is missing, startup throws `No se encontró el elemento #root`.
-3. `createAppContainer()` reads `VITE_API_BASE_URL`.
-4. `App` renders a top bar and opens `/sales-day`. That screen links to customers, the sale search, the load sheet, and invoices. There is no side menu.
-5. `ES | EN` switches the chrome between Spanish and English and stores the choice in `localStorage`. The default is Spanish.
-6. Login, logout, the current Sales Day, opening it, product search, customer search/create, day sales, the load sheet, and invoices call the API. Printing invoices opens one browser print dialog.
+2. `createAppContainer()` reads `VITE_API_BASE_URL`.
+3. A signed-in seller lands on `/`, the week home. There is no Sales Day screen. `/sales-day` and `/day-sales` redirect to `/`.
+4. `ES | EN` switches the chrome and stores the choice in `localStorage`. The default is Spanish.
+5. Login, logout, sales, the load sheet, and invoices call the API. Printing confirmed invoices opens one browser print dialog.
 
-## 2. Search products
+## 2. Week home
 
-Screen: `/sales`.
+Screen: `/?deliveryDate=`.
 
-1. An empty query does not call the API. The screen asks for a name, brand, or code.
-2. Submit calls `SearchProductsUseCase`, which trims the query and calls `GET /products/search?q=`.
-3. The mapper keeps `id`, `name`, `alegraId` as `code`, and `wholesalePrice`. The API payload has no brand name, so the hit does not invent one.
-4. Each hit shows the name and the wholesale price. The product code is not shown. The price is display-only. The hint "name, brand, or code" sits on an information icon beside the search label.
-5. Choosing a hit opens the pending line for that product when today's Sales Day is open and the customer is loaded. A non-2xx response shows `error` from the body, or `HTTP {status}`. Network failure shows the client message. The list is cleared.
+1. With no date, the selected day is today in `America/Bogota`.
+2. The week is Monday through Sunday. Previous week moves back seven days. Next week is disabled when the candidate week is after the current week.
+3. **Nueva venta** always opens `/sales?deliveryDate=` for today, not for the selected day.
+4. The selected day shows counts of drafts, confirmed sales, voided sales, and the confirmed total.
+5. **Entregas** opens `/delivery-sales?deliveryDate=`. **Cargue** opens `/load-sheets?deliveryDate=`.
+6. Back from those screens returns to the same selected day.
 
-## 3. Search or create a customer
+## 3. Search products and customers
 
-Screen: `/customers`.
+1. Product search on the sale screen calls `GET /products/search?q=` after at least 3 characters. Choosing a hit opens the pending line. The dialog focuses its title so the mobile keyboard does not open by itself.
+2. Customer search and create are unchanged. A created or chosen customer opens the sale for the delivery date already on the screen.
 
-1. An empty query does not call the API. The screen asks for a name or a document number.
-2. Submit calls `SearchCustomersUseCase`, which trims the query and calls `GET /customers/search?q=`.
-3. Each hit shows name, document type, and document number. Choosing one opens `/sales?customerId=`.
-4. Create requires document type, document number, and name. Phone, email, and address stay behind a control that starts off. Empty required fields do not call the API.
-5. Create calls `POST /customers`. `CUSTOMER_ALREADY_EXISTS` stays on the form. A created customer opens `/sales?customerId=` with the id from the response.
-6. The sale screen loads that id with `GET /customers/:id` and shows the name, document type, and document number.
+## 4. Sale
 
-## 4. Sales Day, day sales, and the sale
+1. `POST /sales` sends `{ customerId, deliveryDate }` only. The API stores the seller from the session.
+2. A draft for the same customer and delivery date is reused.
+3. Changing the delivery date of a draft updates that sale. Changing it on a confirmed sale asks for confirmation, then follows the new sale id when the API returns one.
+4. A draft cannot be voided. A confirmed sale can be edited or voided, including a sale from a previous week.
+5. The sale screen does not link to the invoice preview. That link lives on Entregas.
 
-1. `/login` stores the session in `sessionStorage` and sends it as a bearer token. Logout clears it.
-2. `/sales-day` loads the current day and lists the Sales Days of the current week, Monday through today. With no day, the only action is open. An open day can be closed after confirmation. A closed current day can be reopened after confirmation. Load sheet and invoices are linked only when the day is closed. Confirmations stay in their card, on one row.
-3. `/day-sales` lists the day's sales newest first. Each row is one line: customer, status, `Factura {number}` when a number exists, amount, and the edit or void icon while the day is open. A closed day shows the list without those actions until it is reopened.
-4. `/sales?customerId=` opens a modal with the remaining days of the week, from today through Sunday, only while today's Sales Day is open. Today is labeled "Hoy". Later days show the weekday and the day number, such as "domingo 1". Choosing a day creates or reuses the draft for that date. With no confirmed lines the table still shows its headers and one centered row, "Vacío".
-5. A pending line has the product name and a quantity control on one row. Quantity starts at 1, steps by 1, and accepts up to 3 decimal places. The screen shows the unit price and the line total before the seller confirms the line.
-6. Confirm sale calls `POST /sales/:id/confirm` only when the draft has at least one line and the day is open. Void calls `POST /sales/:id/void` only while the day is open. The invoice number stays on the screen.
+## 5. Entregas and Cargue
 
-## 5. Load Sheet and invoices
-
-1. `/load-sheets/:salesDayId` calls `GET /load-sheets/:salesDayId` for a closed day. The screen is one table. Beside the title it shows the sold total and the profit total. There is no print action.
-2. `/invoices/:salesDayId` redirects to the day-sales list for that day. When the day is closed, each confirmed row can be selected and previewed. Voided rows stay on the list and cannot be printed.
-3. Preview calls `GET /invoices/:saleId` and shows the ticket without the legal text. Print loads each selected document, orders them by ascending invoice number, and opens one browser dialog. Each page is 70 mm wide with no margin and a page break between invoices. The printed ticket includes the legal text. Reprint requests the same documents again. The black logo comes from the API. The color logo in the header is `public/logo.webp` in this application.
+1. Entregas lists drafts, confirmed sales, and voided sales for the delivery date.
+2. A confirmed row has the preview icon, edit, and void. A draft has edit only. A voided sale that has an invoice number has only the same preview icon.
+3. On a wide screen, Entregas shows **Seleccionar todas**, **Imprimir selección**, and **Imprimir confirmadas** above the list. On a phone those controls and the checkboxes are hidden.
+4. Cargue calls `GET /load-sheets?deliveryDate=` and does not print.
+5. Preview calls `GET /invoices/:saleId`. The label is **Fecha de entrega**. A voided document shows **ANULADA** on a diagonal and has no print action. Confirmed documents print at 70 mm with a page break between them.
 
 ## Still outside this UI
 
 | Area | Where it lives |
 |---|---|
 | Catalog Excel import and Alegra sync | API [PDR-002](../../../prime-sweets-api/docs/pdrs/PDR-002.md). Not a screen in this client. |
-| Load sheet by delivery date | UI [SPEC-002](../specs/SPEC-002.md) section 3. Not built. |
 | Choosing a printer or a printer protocol | Windows print dialog. The UI does not record that an invoice was printed. |

@@ -13,8 +13,9 @@ export interface SaleItemModel {
 
 export interface SaleModel {
   id: string;
-  salesDayId: string;
+  sellerId: string;
   customerId: string;
+  captureDate: string;
   deliveryDate: string;
   status: SaleStatus;
   invoiceNumber: string | null;

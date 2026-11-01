@@ -7,6 +7,7 @@ const SHEET_CSS = `
   html, body { margin: 0; padding: 0; background: #fff; color: #000; }
   body { font: 400 13px "Courier New", Courier, monospace; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .invoice-sheet {
+    position: relative;
     width: 70mm;
     max-width: 70mm;
     margin: 0;
@@ -42,6 +43,7 @@ const SHEET_CSS = `
   th .qty { text-align: left; }
   .total { display: flex; justify-content: flex-end; gap: 4mm; margin: 4mm 0 0; font-size: 13px; }
   .invoice-sheet .legal { margin: 16mm 0 0; font-size: 8px; font-weight: 400; line-height: 1.3; }
+  .invoice-sheet .void-mark { position: absolute; top: 42%; left: 0; right: 0; margin: 0; text-align: center; font-size: 22px; font-weight: 700; letter-spacing: 1px; color: rgba(180, 40, 20, 0.35); transform: rotate(-18deg); }
 `;
 
 function escapeHtml(value: string): string {
@@ -52,6 +54,14 @@ function escapeHtml(value: string): string {
     if (char === '"') return '&quot;';
     return '&#39;';
   });
+}
+
+function businessDay(value: string): string {
+  const [year, month, day] = value.slice(0, 10).split('-');
+  if (!year || !month || !day) {
+    return value;
+  }
+  return `${day}/${month}/${year}`;
 }
 
 function saleDay(value: string): string {
@@ -75,7 +85,9 @@ function sheet(document: InvoiceDocumentModel): string {
     )
     .join('');
   const logo = document.logo ? `<img class="logo" alt="" src="${escapeHtml(document.logo)}" />` : '';
+  const voided = document.voided ? '<p class="void-mark">ANULADA</p>' : '';
   return `<article class="invoice-sheet">
+    ${voided}
     ${logo}
     <p class="name center b">${escapeHtml(document.companyName)}</p>
     <p class="line center b">NIT ${escapeHtml(document.companyNit)}</p>
@@ -90,7 +102,7 @@ function sheet(document: InvoiceDocumentModel): string {
     <p class="line small center b">No ${escapeHtml(document.invoiceNumber)}</p>
     <p class="line small center"><span class="b">Fecha:</span> ${escapeHtml(saleDay(document.saleDate))}</p>
     <p class="line small center"><span class="b">Método de pago:</span> Efectivo</p>
-    <p class="line small center"><span class="b">Vencimiento:</span> ${escapeHtml(saleDay(document.saleDate))}</p>
+    <p class="line small center"><span class="b">Fecha de entrega:</span> ${escapeHtml(businessDay(document.deliveryDate))}</p>
     <table>
       <colgroup><col class="col-qty" /><col class="col-product" /><col class="col-money" /><col class="col-money" /></colgroup>
       <thead><tr><th><span class="qty">CANT</span></th><th>PRODUCTO</th><th>V/UND</th><th>V/TOTAL</th></tr></thead>

@@ -9,13 +9,12 @@ export class CreateDraftSaleUseCase {
     this.command = command;
   }
 
-  async execute(salesDayId: string, customerId: string, deliveryDate: string): Promise<SaleModel> {
-    const dayId = salesDayId.trim();
+  async execute(customerId: string, deliveryDate: string): Promise<SaleModel> {
     const customer = customerId.trim();
     const date = deliveryDate.trim();
-    if (!dayId || !customer || !date) {
+    if (!customer || !date) {
       throw new SaleInvalidError();
     }
-    return this.command.create(dayId, customer, date);
+    return this.command.create(customer, date);
   }
 }

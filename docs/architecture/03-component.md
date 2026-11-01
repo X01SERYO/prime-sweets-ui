@@ -2,7 +2,7 @@
 
 **Sources:** `src/app/`, `src/shared/`, `src/modules/`.
 
-The SPA has a composition root, a shared HTTP client, and one hexagonal module per seller area: identity, catalog, customers, sales day, sales, and fulfillment output.
+The SPA has a composition root, a shared HTTP client, and one hexagonal module per seller area: identity, catalog, customers, sales, and fulfillment output. The sales-day module is removed.
 
 ## Diagram
 

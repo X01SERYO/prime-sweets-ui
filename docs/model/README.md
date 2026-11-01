@@ -2,7 +2,7 @@
 
 **Sources:** `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`, `src/app/composition.ts`.
 
-The client models the session, the current Sales Day, the product hit, the customer, the sale and its lines, the day-sale row, the load sheet, and the invoice summary and document.
+The client models the session, the product hit, the customer, the sale and its lines, the delivery-day row, the load sheet, and the invoice summary and document. There is no Sales Day model.
 
 ## Product hit
 
@@ -36,7 +36,21 @@ A non-2xx response throws `HttpRequestError` with `status`, `message`, and `code
 
 ## Composition
 
-`AppContainer` wires the HTTP client and the use cases for identity, catalog, customers, the Sales Day, sales, the load sheet, and invoices. `App` uses those use cases. It does not call the API itself.
+`AppContainer` wires the HTTP client and the use cases for identity, catalog, customers, sales, the load sheet, and invoices. `App` uses those use cases. It does not call the API itself.
+
+## Sale
+
+`src/modules/sales/domain/models/sale.ts`.
+
+| Field | Meaning |
+|---|---|
+| `sellerId` | User id stored by the API from the session |
+| `captureDate` | Business day the sale was taken |
+| `deliveryDate` | Delivery day. The home, Entregas, and Cargue filter by this date |
+| `status` | `DRAFT`, `CONFIRMED`, or `VOIDED` |
+| `invoiceNumber` | Present after confirmation. Kept when the sale is voided |
+
+A voided invoice document adds `voided: true`. The preview uses it for the diagonal mark and hides print.
 
 ## Browser storage
 

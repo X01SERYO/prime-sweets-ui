@@ -2,6 +2,7 @@ import { toSale, toSaleEnvelope } from '@/modules/sales/adapters/infrastructure/
 import type { SaleCommandPort } from '@/modules/sales/application/ports/saleCommand.port';
 import type { SaleQueryPort } from '@/modules/sales/application/ports/saleQuery.port';
 import { DeliveryDateBeforeSaleError } from '@/modules/sales/domain/errors/deliveryDateBeforeSale.error';
+import { DeliveryDateOutOfRangeError } from '@/modules/sales/domain/errors/deliveryDateOutOfRange.error';
 import { DeliveryDateRequiredError } from '@/modules/sales/domain/errors/deliveryDateRequired.error';
 import { SaleOutsideEditWindowError } from '@/modules/sales/domain/errors/saleOutsideEditWindow.error';
 import { SaleAlreadyVoidedError } from '@/modules/sales/domain/errors/saleAlreadyVoided.error';
@@ -26,7 +27,8 @@ function mapSaleError(error: unknown): never {
     error instanceof SaleCannotBeModifiedError ||
     error instanceof SaleOutsideEditWindowError ||
     error instanceof DeliveryDateRequiredError ||
-    error instanceof DeliveryDateBeforeSaleError
+    error instanceof DeliveryDateBeforeSaleError ||
+    error instanceof DeliveryDateOutOfRangeError
   ) {
     throw error;
   }
@@ -51,6 +53,9 @@ function mapSaleError(error: unknown): never {
   if (error instanceof HttpRequestError && error.code === 'DELIVERY_DATE_BEFORE_SALE') {
     throw new DeliveryDateBeforeSaleError();
   }
+  if (error instanceof HttpRequestError && error.code === 'DELIVERY_DATE_OUT_OF_RANGE') {
+    throw new DeliveryDateOutOfRangeError();
+  }
   throw error;
 }
 
@@ -61,26 +66,24 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     this.http = http;
   }
 
-  async create(salesDayId: string, customerId: string, deliveryDate: string): Promise<SaleModel> {
+  async create(customerId: string, deliveryDate: string): Promise<SaleModel> {
     try {
-      const body = await this.http.post<Envelope>('/sales', { salesDayId, customerId, deliveryDate });
+      const body = await this.http.post<Envelope>('/sales', { customerId, deliveryDate });
       return toSaleEnvelope(body);
     } catch (error) {
       mapSaleError(error);
     }
   }
 
-  async listDrafts(salesDayId: string, customerId: string): Promise<SaleModel[]> {
-    return this.list(`/sales?salesDayId=${encodeURIComponent(salesDayId)}&customerId=${encodeURIComponent(customerId)}&status=DRAFT`);
+  async listDrafts(deliveryDate: string, customerId: string): Promise<SaleModel[]> {
+    return this.list(
+      `/sales?deliveryDate=${encodeURIComponent(deliveryDate)}&customerId=${encodeURIComponent(customerId)}&status=DRAFT`
+    );
   }
 
   async get(saleId: string): Promise<SaleModel> {
     const body = await this.http.get<Envelope>(`/sales/${encodeURIComponent(saleId)}`);
     return toSaleEnvelope(body);
-  }
-
-  async listBySalesDay(salesDayId: string): Promise<SaleModel[]> {
-    return this.list(`/sales?salesDayId=${encodeURIComponent(salesDayId)}`);
   }
 
   async listByDeliveryDate(deliveryDate: string): Promise<SaleModel[]> {

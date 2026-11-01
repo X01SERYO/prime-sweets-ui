@@ -589,6 +589,7 @@ function PendingCard({
 }) {
   const { t } = useLocale();
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const [name, setName] = useState(pending.name);
   const [quantity, setQuantity] = useState('1');
   const lineQuantity = parseQuantity(quantity);
@@ -615,6 +616,10 @@ function PendingCard({
       return;
     }
     dialog.showModal();
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    titleRef.current?.focus();
     return () => {
       if (dialog.open) {
         dialog.close();
@@ -645,7 +650,9 @@ function PendingCard({
           save();
         }}
       >
-        <h2 className="pending-catalog">{pending.name}</h2>
+        <h2 ref={titleRef} className="pending-catalog" tabIndex={-1}>
+          {pending.name}
+        </h2>
         <label htmlFor="pending-name">{t('itemName')}</label>
         <input id="pending-name" value={name} disabled={busy} onChange={event => setName(event.target.value)} />
         <QuantityField value={quantity} disabled={busy} onChange={setQuantity} />

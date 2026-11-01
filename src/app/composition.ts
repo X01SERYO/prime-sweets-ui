@@ -10,20 +10,12 @@ import { HttpAuth } from '@/modules/identity/adapters/infrastructure/httpAuth';
 import { LoginUseCase } from '@/modules/identity/application/use-cases/login.useCase';
 import { LogoutUseCase } from '@/modules/identity/application/use-cases/logout.useCase';
 import type { SessionStorePort } from '@/modules/identity/application/ports/sessionStore.port';
-import { HttpSalesDayCommand } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayCommand';
-import { HttpSalesDayQuery } from '@/modules/sales-day/adapters/infrastructure/httpSalesDayQuery';
-import { GetCurrentSalesDayUseCase } from '@/modules/sales-day/application/use-cases/getCurrentSalesDay.useCase';
-import { ListCurrentWeekSalesDaysUseCase } from '@/modules/sales-day/application/use-cases/listRecentSalesDays.useCase';
-import { OpenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/openSalesDay.useCase';
-import { CloseSalesDayUseCase } from '@/modules/sales-day/application/use-cases/closeSalesDay.useCase';
-import { ReopenSalesDayUseCase } from '@/modules/sales-day/application/use-cases/reopenSalesDay.useCase';
 import { HttpSale } from '@/modules/sales/adapters/infrastructure/httpSale';
 import { AddSaleItemUseCase } from '@/modules/sales/application/use-cases/addSaleItem.useCase';
 import { ConfirmSaleUseCase } from '@/modules/sales/application/use-cases/confirmSale.useCase';
 import { CreateDraftSaleUseCase } from '@/modules/sales/application/use-cases/createDraftSale.useCase';
 import { SetSaleDeliveryDateUseCase } from '@/modules/sales/application/use-cases/setSaleDeliveryDate.useCase';
 import { GetSaleUseCase } from '@/modules/sales/application/use-cases/getSale.useCase';
-import { ListDaySalesUseCase } from '@/modules/sales/application/use-cases/listDaySales.useCase';
 import { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application/use-cases/listSalesByDeliveryDate.useCase';
 import { ListDraftSalesUseCase } from '@/modules/sales/application/use-cases/listDraftSales.useCase';
 import { RemoveSaleItemUseCase } from '@/modules/sales/application/use-cases/removeSaleItem.useCase';
@@ -47,17 +39,11 @@ export interface AppContainer {
   login: LoginUseCase;
   logout: LogoutUseCase;
   searchProducts: SearchProductsUseCase;
-  getCurrentSalesDay: GetCurrentSalesDayUseCase;
-  listRecentSalesDays: ListCurrentWeekSalesDaysUseCase;
-  openSalesDay: OpenSalesDayUseCase;
-  closeSalesDay: CloseSalesDayUseCase;
-  reopenSalesDay: ReopenSalesDayUseCase;
   searchCustomers: SearchCustomersUseCase;
   getCustomer: GetCustomerUseCase;
   createCustomer: CreateCustomerUseCase;
   listDraftSales: ListDraftSalesUseCase;
   getSale: GetSaleUseCase;
-  listDaySales: ListDaySalesUseCase;
   listDeliverySales: ListSalesByDeliveryDateUseCase;
   createDraftSale: CreateDraftSaleUseCase;
   setSaleDeliveryDate: SetSaleDeliveryDateUseCase;
@@ -77,7 +63,6 @@ export function createAppContainer(): AppContainer {
   const sessionStore = new BrowserSessionStore();
   const http = createHttpClient(env.apiBaseUrl, () => sessionStore.read()?.token ?? null);
   const auth = new HttpAuth(http);
-  const salesDayQuery = new HttpSalesDayQuery(http);
   return {
     apiBaseUrl: env.apiBaseUrl,
     http,
@@ -85,17 +70,11 @@ export function createAppContainer(): AppContainer {
     login: new LoginUseCase(auth, sessionStore),
     logout: new LogoutUseCase(auth, sessionStore),
     searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
-    getCurrentSalesDay: new GetCurrentSalesDayUseCase(salesDayQuery),
-    listRecentSalesDays: new ListCurrentWeekSalesDaysUseCase(salesDayQuery),
-    openSalesDay: new OpenSalesDayUseCase(new HttpSalesDayCommand(http)),
-    closeSalesDay: new CloseSalesDayUseCase(new HttpSalesDayCommand(http)),
-    reopenSalesDay: new ReopenSalesDayUseCase(new HttpSalesDayCommand(http)),
     searchCustomers: new SearchCustomersUseCase(new HttpCustomerQuery(http)),
     getCustomer: new GetCustomerUseCase(new HttpCustomerQuery(http)),
     createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http)),
     listDraftSales: new ListDraftSalesUseCase(new HttpSale(http)),
     getSale: new GetSaleUseCase(new HttpSale(http)),
-    listDaySales: new ListDaySalesUseCase(new HttpSale(http), new HttpCustomerQuery(http)),
     listDeliverySales: new ListSalesByDeliveryDateUseCase(new HttpSale(http), new HttpCustomerQuery(http)),
     createDraftSale: new CreateDraftSaleUseCase(new HttpSale(http)),
     setSaleDeliveryDate: new SetSaleDeliveryDateUseCase(new HttpSale(http)),

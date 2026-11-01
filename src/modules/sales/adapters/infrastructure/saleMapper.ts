@@ -41,7 +41,6 @@ export function toSale(raw: unknown): SaleModel {
   const data = raw as Record<string, unknown>;
   if (
     typeof data.id !== 'string' ||
-    typeof data.salesDayId !== 'string' ||
     typeof data.customerId !== 'string' ||
     (data.status !== 'DRAFT' && data.status !== 'CONFIRMED' && data.status !== 'VOIDED') ||
     !Array.isArray(data.items)
@@ -51,8 +50,9 @@ export function toSale(raw: unknown): SaleModel {
   const status: SaleStatus = data.status;
   return {
     id: data.id,
-    salesDayId: data.salesDayId,
+    sellerId: typeof data.sellerId === 'string' ? data.sellerId : '',
     customerId: data.customerId,
+    captureDate: typeof data.captureDate === 'string' ? data.captureDate.slice(0, 10) : '',
     deliveryDate: typeof data.deliveryDate === 'string' ? data.deliveryDate.slice(0, 10) : '',
     status,
     invoiceNumber: typeof data.invoiceNumber === 'string' ? data.invoiceNumber : null,

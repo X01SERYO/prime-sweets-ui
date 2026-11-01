@@ -17,7 +17,7 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | [adrs/ADR-001.md](./adrs/ADR-001.md) | Architecture decision: one SPA, feature modules, hexagon per module | Proposed. Binding for Version 1. Current runtime shape is in `architecture/`. |
 | [adrs/ADR-002.md](./adrs/ADR-002.md) | Extend `sales-day`, `sales`, and `fulfillment-output` | Proposed. Binding for PDR-002. |
 | [architecture/](./architecture/README.md) | C4 model of **the current UI** | Implemented. One C4 set only. |
-| [model/](./model/README.md) | Client structures verified in code | Session, catalog hit, sales day, sale, load sheet, and invoice models. |
+| [model/](./model/README.md) | Client structures verified in code | Session, catalog hit, sale, delivery-day row, load sheet, and invoice models. |
 | [flows/](./flows/README.md) | User and application flows verified in code | Login through invoice print. Remaining gaps are listed, not invented. |
 | [technical-debt.md](./technical-debt.md) | Register of UI technical debt | Active. |
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useSearchParams } from 'react-router';
 import { DeliveryDayCard } from '@/app/DeliveryDayCard';
 import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
@@ -17,29 +17,22 @@ import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
-import { SalesDayHome } from '@/modules/sales-day/adapters/ui/views/SalesDayHome';
+import { WeekHome } from '@/modules/sales/adapters/ui/views/WeekHome';
 import type { Session } from '@/modules/identity/domain/models/session';
 import { useLocale } from '@/shared/i18n/useLocale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { NavigationHistory, ScreenTitle } from '@/shared/ui/BackButton';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 
 interface AppProps {
   container: AppContainer;
 }
 
-function InvoiceListRedirect() {
-  const { salesDayId } = useParams();
-  return <Navigate to={salesDayId ? `/day-sales/${salesDayId}` : '/sales-day'} replace />;
-}
-
-function DeliverySalesPage({ container, sellerId }: { container: AppContainer; sellerId: string }) {
+function DeliverySalesPage({ container }: { container: AppContainer }) {
   const [params] = useSearchParams();
   return (
     <DaySalesList
-      sellerId={sellerId}
       deliveryDate={params.get('deliveryDate') ?? undefined}
-      getCurrentSalesDay={container.getCurrentSalesDay}
-      listDaySales={container.listDaySales}
       listDeliverySales={container.listDeliverySales}
       voidSale={container.voidSale}
       printInvoices={container.printInvoices}
@@ -47,28 +40,15 @@ function DeliverySalesPage({ container, sellerId }: { container: AppContainer; s
   );
 }
 
-function DaySalesPage({ container, sellerId }: { container: AppContainer; sellerId: string }) {
-  const { salesDayId } = useParams();
-  return (
-    <DaySalesList
-      sellerId={sellerId}
-      salesDayId={salesDayId}
-      getCurrentSalesDay={container.getCurrentSalesDay}
-      listDaySales={container.listDaySales}
-      voidSale={container.voidSale}
-      printInvoices={container.printInvoices}
-    />
-  );
-}
-
-function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId: string }) {
+function SaleSearch({ container }: { container: AppContainer }) {
   const { t } = useLocale();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
-  const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
+  const [deliveryDate, setDeliveryDate] = useState<string | null>(params.get('deliveryDate'));
   const [changingDelivery, setChangingDelivery] = useState(false);
+  const [pendingMove, setPendingMove] = useState<string | null>(null);
   const [deliveryError, setDeliveryError] = useState<MessageKey | null>(null);
   const [pending, setPending] = useState<PendingLine | null>(null);
   const [searchOutcome, setSearchOutcome] = useState<{ id: number; added: boolean } | null>(null);
@@ -78,11 +58,9 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
   const allowLeave = useRef(false);
   const blocker = useBlocker(() => editingLine && !allowLeave.current);
   const draft = useDraftSale(
-    sellerId,
     customerId,
     saleId,
     deliveryDate,
-    container.getCurrentSalesDay,
     container.listDraftSales,
     container.createDraftSale,
     container.getSale
@@ -102,6 +80,29 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
       blocker.reset();
     }
   }, [blocker]);
+
+  function moveDelivery(date: string) {
+    const current = draft.sale;
+    if (!current) {
+      return;
+    }
+    void container.setSaleDeliveryDate
+      .execute(current.id, date)
+      .then(saved => {
+        setDeliveryError(null);
+        setChangingDelivery(false);
+        if (saved.id !== current.id) {
+          allowLeave.current = true;
+          navigate(`/sales?saleId=${encodeURIComponent(saved.id)}`);
+          return;
+        }
+        draft.setSale(saved);
+      })
+      .catch((caught: unknown) => {
+        setDeliveryError(saleErrorKey(caught, 'saleLineFailed'));
+        setChangingDelivery(false);
+      });
+  }
 
   const lines = useSaleMutations(
     draft.sale,
@@ -132,18 +133,34 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
           days={deliveryDaysThroughSunday(businessToday())}
           onClose={() => setChangingDelivery(false)}
           onSelect={date => {
-            void container.setSaleDeliveryDate
-              .execute(draft.sale!.id, date)
-              .then(saved => {
-                draft.setSale(saved);
-                setDeliveryError(null);
-                setChangingDelivery(false);
-              })
-              .catch((caught: unknown) => {
-                setDeliveryError(saleErrorKey(caught, 'saleLineFailed'));
-                setChangingDelivery(false);
-              });
+            const current = draft.sale;
+            if (!current) {
+              return;
+            }
+            if (current.status === 'CONFIRMED' && date !== current.deliveryDate) {
+              setPendingMove(date);
+              setChangingDelivery(false);
+              return;
+            }
+            moveDelivery(date);
           }}
+        />
+      ) : null}
+      {pendingMove && draft.sale ? (
+        <ConfirmDialog
+          title={t('changeDeliveryDay')}
+          message={t('confirmMoveInvoice')
+            .replace('{number}', draft.sale.invoiceNumber ?? '')
+            .replace('{from}', shortDate(draft.sale.deliveryDate))
+            .replace('{to}', shortDate(pendingMove))}
+          confirmLabel={t('confirmAction')}
+          cancelLabel={t('cancelAction')}
+          onConfirm={() => {
+            const date = pendingMove;
+            setPendingMove(null);
+            moveDelivery(date);
+          }}
+          onCancel={() => setPendingMove(null)}
         />
       ) : null}
       {shownCustomerId && !saleId && !draft.sale && !draft.loading ? (
@@ -178,12 +195,12 @@ function SaleSearch({ container, sellerId }: { container: AppContainer; sellerId
           const current = updated ?? draft.sale;
           if (current?.status === 'CONFIRMED') {
             allowLeave.current = true;
-            navigate('/day-sales');
+            navigate(current.deliveryDate ? `/delivery-sales?deliveryDate=${encodeURIComponent(current.deliveryDate)}` : '/');
             return;
           }
           void confirmation.confirm(current).then(saved => {
             if (saved) {
-              navigate('/sales-day');
+              navigate('/');
             }
           });
         }}
@@ -235,7 +252,7 @@ export function App({ container }: AppProps) {
     <div className="shell">
       <div className="shell-head">
       <header className="topbar">
-        <Link to={session ? '/sales-day' : '/login'} aria-label={t('home')}>
+        <Link to={session ? '/' : '/login'} aria-label={t('home')}>
           <img className="shell-logo" src="/logo.webp" alt="Dulcería La Principal" />
         </Link>
         {session ? (
@@ -256,30 +273,17 @@ export function App({ container }: AppProps) {
             path="/login"
             element={
               session ? (
-                <Navigate to="/sales-day" replace />
+                <Navigate to="/" replace />
               ) : (
                 <LoginView login={container.login} onLoggedIn={setSession} />
               )
             }
           />
-          <Route path="/" element={<Navigate to={session ? '/sales-day' : '/login'} replace />} />
           <Route
-            path="/sales-day"
-            element={
-              session ? (
-                <SalesDayHome
-                  sellerId={session.user.id}
-                  getCurrentSalesDay={container.getCurrentSalesDay}
-                  listRecentSalesDays={container.listRecentSalesDays}
-                  openSalesDay={container.openSalesDay}
-                  closeSalesDay={container.closeSalesDay}
-                  reopenSalesDay={container.reopenSalesDay}
-                />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
+            path="/"
+            element={session ? <WeekHome listSales={container.listDeliverySales} /> : <Navigate to="/login" replace />}
           />
+          <Route path="/sales-day" element={<Navigate to="/" replace />} />
           <Route
             path="/customers"
             element={
@@ -292,25 +296,21 @@ export function App({ container }: AppProps) {
           />
           <Route
             path="/delivery-sales"
-            element={session ? <DeliverySalesPage container={container} sellerId={session.user.id} /> : <Navigate to="/login" replace />}
+            element={session ? <DeliverySalesPage container={container} /> : <Navigate to="/login" replace />}
           />
-          <Route
-            path="/day-sales/:salesDayId?"
-            element={session ? <DaySalesPage container={container} sellerId={session.user.id} /> : <Navigate to="/login" replace />}
-          />
+          <Route path="/day-sales/:salesDayId?" element={<Navigate to="/" replace />} />
           <Route
             path="/sales"
             element={
-              session ? <SaleSearch container={container} sellerId={session.user.id} /> : <Navigate to="/login" replace />
+              session ? <SaleSearch container={container} /> : <Navigate to="/login" replace />
             }
           />
           <Route
             path="/load-sheets"
             element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
           />
-          <Route path="/invoices/:salesDayId" element={<InvoiceListRedirect />} />
           <Route
-            path="/invoices/:salesDayId/:saleId"
+            path="/invoices/:saleId"
             element={
               session ? (
                 <InvoicePreview generateInvoice={container.generateInvoice} printInvoices={container.printInvoices} />
@@ -319,11 +319,19 @@ export function App({ container }: AppProps) {
               )
             }
           />
-          <Route path="*" element={<Navigate to={session ? '/sales-day' : '/login'} replace />} />
+          <Route path="*" element={<Navigate to={session ? '/' : '/login'} replace />} />
         </Routes>
       </main>
     </div>
     </NavigationHistory>
   );
+}
+
+function shortDate(value: string): string {
+  const [year, month, day] = value.slice(0, 10).split('-');
+  if (!year || !month || !day) {
+    return value;
+  }
+  return `${day}/${month}/${year}`;
 }
 

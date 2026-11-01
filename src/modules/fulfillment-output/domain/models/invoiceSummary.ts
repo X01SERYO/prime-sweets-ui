@@ -2,7 +2,7 @@ export type InvoiceStatus = 'CONFIRMED' | 'VOIDED';
 
 export interface InvoiceSummaryModel {
   saleId: string;
-  salesDayId: string;
+  deliveryDate: string;
   customerId: string;
   invoiceNumber: string;
   status: InvoiceStatus;
@@ -31,6 +31,8 @@ export interface InvoiceDocumentModel {
   customerName: string;
   invoiceNumber: string;
   saleDate: string;
+  deliveryDate: string;
+  voided: boolean;
   lines: InvoiceLineModel[];
   subtotal: number;
   total: number;

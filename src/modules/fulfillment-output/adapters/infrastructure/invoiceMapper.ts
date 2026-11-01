@@ -31,7 +31,7 @@ export function toInvoiceSummaries(raw: unknown): InvoiceSummaryModel[] {
     const status: InvoiceStatus = row.status;
     return {
       saleId: text(row.saleId),
-      salesDayId: text(row.salesDayId),
+      deliveryDate: text(row.deliveryDate),
       customerId: text(row.customerId),
       invoiceNumber: text(row.invoiceNumber),
       status,
@@ -79,6 +79,8 @@ export function toInvoiceDocument(raw: unknown): InvoiceDocumentModel {
     customerName: text(data.customerName),
     invoiceNumber: text(data.invoiceNumber),
     saleDate: text(data.saleDate),
+    deliveryDate: text(data.deliveryDate),
+    voided: data.voided === true,
     lines: data.lines.map(toLine),
     subtotal: money(data.subtotal),
     total: money(data.total)
