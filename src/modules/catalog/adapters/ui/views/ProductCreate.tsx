@@ -137,7 +137,11 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
               <input value={brandName} onChange={event => setBrandName(event.target.value.toLocaleUpperCase('es-CO'))} />
             </Field>
             <Field label={t('code')}>
-              <input value={brandCode} onChange={event => setBrandCode(event.target.value.toLocaleUpperCase('es-CO'))} />
+              <input
+                value={brandCode}
+                maxLength={3}
+                onChange={event => setBrandCode(event.target.value.toLocaleUpperCase('es-CO').slice(0, 3))}
+              />
             </Field>
             <button className="btn product-brand-save" type="button" onClick={() => void saveBrand()}>
               {t('saveProduct')}

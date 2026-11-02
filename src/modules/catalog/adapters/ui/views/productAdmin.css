@@ -189,7 +189,12 @@ button.btn.product-brand-save {
   min-height: 2.15rem;
 }
 
-.product-editor {
+section.product-editor {
+  width: 100%;
+  padding: 0;
+}
+
+dialog.product-editor {
   width: min(44rem, calc(100vw - 1.5rem));
   border: 0;
   border-radius: var(--radius);
@@ -209,6 +214,11 @@ button.btn.product-brand-save {
   gap: 0.15rem;
   margin-bottom: 0;
   font-size: 0.75rem;
+}
+
+.product-editor select,
+.product-editor option {
+  font-size: inherit;
 }
 
 .product-editor select {
@@ -279,11 +289,15 @@ button.btn.product-brand-save {
     display: none;
   }
 
-  .product-editor {
+  dialog.product-editor {
     max-height: 78vh;
     display: flex;
     flex-direction: column;
     padding: 0.65rem 0.35rem 0.65rem 0.65rem;
+    font-size: 0.7rem;
+  }
+
+  section.product-editor {
     font-size: 0.7rem;
   }
 
@@ -305,13 +319,23 @@ button.btn.product-brand-save {
     font-size: 0.7rem;
   }
 
-  .product-editor input,
-  .product-editor select {
+  .product-editor input {
     height: 1.9rem;
     min-height: 1.9rem;
     max-height: 1.9rem;
     padding: 0 0.4rem;
     line-height: 1.9rem;
+    font-size: 0.7rem;
+  }
+
+  .product-editor select,
+  .product-editor option {
+    height: 30px;
+    min-height: 30px;
+    max-height: 30px;
+    padding: 0 0.4rem;
+    line-height: 30px;
+    font-size: 0.7rem;
   }
 
   .product-editor .btn {
@@ -320,14 +344,14 @@ button.btn.product-brand-save {
   }
 
   button.btn.product-brand-add {
-    flex-basis: 1.9rem;
-    width: 1.9rem;
-    height: 1.9rem;
-    min-width: 1.9rem;
-    max-width: 1.9rem;
-    min-height: 1.9rem;
-    max-height: 1.9rem;
-    font-size: 1.1rem;
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    max-width: 30px;
+    min-height: 30px;
+    max-height: 30px;
+    font-size: 1rem;
   }
 
   button.btn.product-brand-save {
