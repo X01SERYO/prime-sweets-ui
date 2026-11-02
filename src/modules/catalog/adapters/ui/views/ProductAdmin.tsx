@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import type { SearchCatalogProductsUseCase } from '@/modules/catalog/application/use-cases/searchCatalogProducts.useCase';
 import type { UpdateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/updateCatalogProduct.useCase';
 import type { CatalogProduct, CatalogProductPatch } from '@/modules/catalog/domain/models/catalogProduct';
@@ -17,6 +18,7 @@ interface ProductAdminProps {
 }
 
 type Draft = {
+  name: string;
   margin: string;
   wholesaleCost: string;
   wholesalePrice: string;
@@ -26,11 +28,12 @@ type Draft = {
   pack: string;
 };
 
-const fields = ['wholesaleCost', 'wholesalePrice', 'retailCost', 'retailPrice', 'units', 'pack'] as const;
+const fields = ['wholesaleCost', 'wholesalePrice', 'retailPrice', 'units', 'pack'] as const;
 const PAGE_SIZES = [10, 20, 30, 40, 50];
 
 function draftFrom(product: CatalogProduct): Draft {
   return {
+    name: product.name ?? '',
     margin: '15',
     wholesaleCost: text(product.wholesaleCost),
     wholesalePrice: text(product.wholesalePrice),
@@ -78,11 +81,17 @@ function changedCount(draft: string, current: number): number | undefined | 'inv
   return amount === current ? undefined : amount;
 }
 
+function retailUnitCost(wholesaleCost: number | null, units: number): number {
+  if (wholesaleCost === null || !Number.isFinite(wholesaleCost) || !Number.isFinite(units) || units <= 0) {
+    return 0;
+  }
+  return Math.round(wholesaleCost / units);
+}
+
 function patchFor(product: CatalogProduct, draft: Draft): CatalogProductPatch | 'invalid' | null {
   const next = {
     wholesaleCost: changedMoney(draft.wholesaleCost, product.wholesaleCost),
     wholesalePrice: changedMoney(draft.wholesalePrice, product.wholesalePrice),
-    retailCost: changedMoney(draft.retailCost, product.retailCost),
     retailPrice: changedMoney(draft.retailPrice, product.retailPrice),
     units: changedCount(draft.units, product.units),
     pack: changedCount(draft.pack, product.pack)
@@ -90,18 +99,37 @@ function patchFor(product: CatalogProduct, draft: Draft): CatalogProductPatch | 
   if (Object.values(next).some(value => value === 'invalid')) {
     return 'invalid';
   }
+  const name = draft.name.trim();
+  if (name === '') {
+    return 'invalid';
+  }
+  const wholesaleCost = next.wholesaleCost === undefined ? product.wholesaleCost : next.wholesaleCost;
+  const units = next.units === undefined ? product.units : next.units;
+  const retailCost = retailUnitCost(wholesaleCost, units);
+  if (retailCost <= 0) {
+    return 'invalid';
+  }
   const patch: CatalogProductPatch = {};
+  if (name !== (product.name ?? '')) {
+    patch.name = name;
+  }
   for (const field of fields) {
     const value = next[field];
     if (typeof value === 'number') {
       patch[field] = value;
     }
   }
+  if (retailCost !== product.retailCost) {
+    patch.retailCost = retailCost;
+  }
   return Object.keys(patch).length === 0 ? null : patch;
 }
 
 export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: ProductAdminProps) {
   const { t } = useLocale();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const createdName = (location.state as { createdName?: string } | null)?.createdName ?? '';
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -112,6 +140,10 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const dismissToast = useCallback(() => {
+    setError(null);
+    setNotice(null);
+  }, []);
 
   async function load(nextPage: number, term: string, size = pageSize) {
     const trimmed = term.trim();
@@ -134,7 +166,13 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
   }
 
   useEffect(() => {
-    void load(1, '');
+    void load(1, '').then(() => {
+      if (!createdName) {
+        return;
+      }
+      setNotice(t('productCreated').replace('{name}', createdName));
+      navigate('/products', { replace: true, state: null });
+    });
     // The first page loads once when the screen opens.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -168,9 +206,13 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
       setProducts(current => current.map(item => (item.id === saved.id ? saved : item)));
       setEditing(null);
       setDraft(null);
-      setNotice(t('productSaved'));
+      setNotice(t('productSaved').replace('{name}', saved.name ?? saved.code));
     } catch (caught) {
-      setError(caught instanceof CatalogInvalidError || caught instanceof HttpRequestError ? t('productInvalid') : t('productUpdateFailed'));
+      if (caught instanceof HttpRequestError && caught.code === 'ALEGRA_SYNC_FAILED') {
+        setError(`${t('alegraSyncFailed')} ${caught.message}`);
+      } else {
+        setError(caught instanceof CatalogInvalidError || caught instanceof HttpRequestError ? t('productInvalid') : t('productUpdateFailed'));
+      }
     } finally {
       setSavingId(null);
     }
@@ -178,21 +220,45 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
 
   return (
     <section className="stack">
-      <ScreenTitle>{t('products')}</ScreenTitle>
+      <div className="product-admin-heading">
+        <ScreenTitle>{t('products')}</ScreenTitle>
+        <Link className="btn" to="/products/new">
+          {t('createProduct')}
+        </Link>
+      </div>
       <form
-        className="product-admin-search"
         onSubmit={event => {
           event.preventDefault();
           void load(1, query);
         }}
       >
-        <input value={query} aria-label={t('searchProduct')} onChange={event => setQuery(event.target.value)} />
-        <button className="btn" type="submit">
-          {t('search')}
-        </button>
+        <div className="search-label">
+          <label htmlFor="product-admin-query">{t('searchProduct')}</label>
+          <button type="button" className="info-tip" aria-label={t('searchHint')}>
+            <InfoIcon />
+            <span className="info-tip-text" role="tooltip">
+              {t('searchHint')}
+            </span>
+          </button>
+        </div>
+        <div className="search-row">
+          <input
+            className="search-field"
+            id="product-admin-query"
+            value={query}
+            autoComplete="off"
+            onChange={event => setQuery(event.target.value)}
+          />
+          <button
+            className="btn search-submit"
+            type="submit"
+            aria-label={t('search')}
+            disabled={query.trim().length > 0 && !isProductSearchTerm(query)}
+          >
+            <SearchIcon />
+          </button>
+        </div>
       </form>
-      {error ? <p role="alert">{error}</p> : null}
-      {notice ? <p>{notice}</p> : null}
       <table className="product-admin-table">
         <thead>
           <tr>
@@ -203,7 +269,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
             <th className="product-admin-wide">{t('retailCost')}</th>
             <th className="product-admin-wide">{t('retailSale')}</th>
             <th className="product-admin-wide">{t('productUnits')}</th>
-            <th className="product-admin-wide">{t('pack')}</th>
+            <th className="product-admin-wide">{t('productPack')}</th>
             <th className="product-admin-wide">{t('brand')}</th>
             <th />
           </tr>
@@ -235,6 +301,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
           draft={draft}
           saving={savingId === editing.id}
           error={error}
+          onDismiss={dismissToast}
           onChange={changeDraft}
           onClose={() => {
             setEditing(null);
@@ -270,6 +337,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
           </select>
         </label>
       </div>
+      {!editing && (error || notice) ? <Toast error={error} notice={notice} onDone={dismissToast} /> : null}
     </section>
   );
 }
@@ -282,11 +350,53 @@ function percent(value: number | null, empty: string): string {
   return value === null ? empty : `${value}%`;
 }
 
+function Toast({
+  error,
+  notice,
+  onDone
+}: {
+  error: string | null;
+  notice: string | null;
+  onDone: () => void;
+}) {
+  const message = error ?? notice;
+  const [leaving, setLeaving] = useState(false);
+
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+    setLeaving(false);
+    const visibleFor = Math.min(12000, 4000 + message.length * 45);
+    const hide = window.setTimeout(() => setLeaving(true), visibleFor);
+    const done = window.setTimeout(onDone, visibleFor + 380);
+    return () => {
+      window.clearTimeout(hide);
+      window.clearTimeout(done);
+    };
+  }, [message, onDone]);
+
+  const { t } = useLocale();
+  if (!message) {
+    return null;
+  }
+  return (
+    <p
+      className={`product-admin-toast ${error ? 'is-error' : 'is-ok'}${leaving ? ' is-leaving' : ''}`}
+      role={error ? 'alert' : 'status'}
+    >
+      <strong className="product-admin-toast-title">{error ? t('toastError') : t('toastOk')}: </strong>
+      {message}
+    </p>
+  );
+}
+
 function ProductEditor({
   product,
   draft,
   saving,
   error,
+  onDismiss,
   onChange,
   onClose,
   onSave
@@ -295,6 +405,7 @@ function ProductEditor({
   draft: Draft;
   saving: boolean;
   error: string | null;
+  onDismiss: () => void;
   onChange: (field: keyof Draft, value: string) => void;
   onClose: () => void;
   onSave: () => void;
@@ -313,55 +424,83 @@ function ProductEditor({
   }, []);
 
   const suggested = suggestedSalePrice(parseMoney(draft.wholesaleCost), Number(draft.margin));
+  const retailCost = retailUnitCost(parseMoney(draft.wholesaleCost), Number(draft.units));
 
   return (
     <dialog ref={dialogRef} className="product-editor" onCancel={onClose}>
       <h2 ref={titleRef} tabIndex={-1}>
-        {product.code} · {product.name ?? t('noName')}
+        {t('editProduct')}
       </h2>
-      <p className="m">{product.brandName ?? '—'}</p>
-      {error ? <p role="alert">{error}</p> : null}
       <div className="product-editor-grid">
+        <Field label={t('code')} value={product.code} locked />
+        <Field label={t('brand')} value={product.brandName ?? '—'} locked />
+        <Field label={t('productName')} wide>
+          <input value={draft.name} onChange={event => onChange('name', event.target.value.toLocaleUpperCase('es-CO'))} />
+        </Field>
         <Field label={t('marginPercent')}>
           <input value={draft.margin} inputMode="decimal" onChange={event => onChange('margin', event.target.value)} />
         </Field>
-        <Field label={t('suggestedPrice')} value={money(suggested, t('notAvailable'))} />
-        <Field label={t('productWholesaleCost')}>
-          <input value={draft.wholesaleCost} inputMode="decimal" onChange={event => onChange('wholesaleCost', event.target.value)} />
-        </Field>
-        <Field label={t('wholesaleSale')}>
-          <input value={draft.wholesalePrice} inputMode="decimal" onChange={event => onChange('wholesalePrice', event.target.value)} />
-        </Field>
-        <Field
-          label={t('wholesaleMargin')}
-          value={percent(realMarginPercent(parseMoney(draft.wholesalePrice), parseMoney(draft.wholesaleCost)), t('notAvailable'))}
-        />
-        <Field label={t('retailCost')}>
-          <input value={draft.retailCost} inputMode="decimal" onChange={event => onChange('retailCost', event.target.value)} />
-        </Field>
-        <Field label={t('retailSale')}>
-          <input value={draft.retailPrice} inputMode="decimal" onChange={event => onChange('retailPrice', event.target.value)} />
-        </Field>
-        <Field
-          label={t('retailMargin')}
-          value={percent(realMarginPercent(parseMoney(draft.retailPrice), parseMoney(draft.retailCost)), t('notAvailable'))}
-        />
+        <Field label={t('suggestedPrice')} value={money(suggested, t('notAvailable'))} locked />
+        <div className="product-editor-line">
+          <Field label={t('productWholesaleCost')}>
+            <MoneyInput value={draft.wholesaleCost} onChange={value => onChange('wholesaleCost', value)} />
+          </Field>
+          <Field label={t('wholesaleSale')}>
+            <MoneyInput value={draft.wholesalePrice} onChange={value => onChange('wholesalePrice', value)} />
+          </Field>
+          <Field
+            label={t('wholesaleMargin')}
+            value={percent(realMarginPercent(parseMoney(draft.wholesalePrice), parseMoney(draft.wholesaleCost)), t('notAvailable'))}
+            locked
+          />
+        </div>
+        <div className="product-editor-line">
+          <Field label={t('retailCost')} value={money(retailCost, t('notAvailable'))} locked />
+          <Field label={t('retailSale')}>
+            <MoneyInput value={draft.retailPrice} onChange={value => onChange('retailPrice', value)} />
+          </Field>
+          <Field
+            label={t('retailMargin')}
+            value={percent(realMarginPercent(parseMoney(draft.retailPrice), retailCost) ?? 0, t('notAvailable'))}
+            locked
+          />
+        </div>
         <Field label={t('productUnits')}>
           <input value={draft.units} inputMode="numeric" onChange={event => onChange('units', event.target.value)} />
         </Field>
-        <Field label={t('pack')}>
+        <Field label={t('productPack')}>
           <input value={draft.pack} inputMode="numeric" onChange={event => onChange('pack', event.target.value)} />
         </Field>
       </div>
-      <div className="row">
+      <div className="product-editor-actions">
         <button className="btn btn-secondary" type="button" onClick={onClose}>
           {t('cancelAction')}
         </button>
-        <button className="btn" type="button" disabled={saving} onClick={onSave}>
+        <button className="btn" type="button" disabled={saving || retailCost <= 0} onClick={onSave}>
           {saving ? t('savingProduct') : t('saveProduct')}
         </button>
       </div>
+      <Toast error={error} notice={null} onDone={onDismiss} />
     </dialog>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.25" />
+      <path d="M8 7.25v4" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      <circle cx="8" cy="5" r="0.75" fill="currentColor" />
+    </svg>
   );
 }
 
@@ -376,11 +515,39 @@ function EditIcon() {
   );
 }
 
-function Field({ label, value, children }: { label: string; value?: string; children?: ReactNode }) {
+function MoneyInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const amount = value.trim() === '' ? null : Number(value);
+  const shown = amount === null || Number.isNaN(amount) ? '' : formatCurrency(amount);
   return (
-    <label>
+    <input
+      value={shown}
+      inputMode="numeric"
+      onChange={event => onChange(event.target.value.replace(/\D/g, ''))}
+    />
+  );
+}
+
+function Field({
+  label,
+  value,
+  locked,
+  wide,
+  children
+}: {
+  label: string;
+  value?: string;
+  locked?: boolean;
+  wide?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <label className={wide ? 'product-editor-wide' : undefined}>
       {label}
-      {children ?? <strong>{value}</strong>}
+      {locked ? (
+        <input className="is-locked" value={value ?? ''} disabled readOnly tabIndex={-1} />
+      ) : (
+        children
+      )}
     </label>
   );
 }

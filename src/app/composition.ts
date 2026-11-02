@@ -7,6 +7,10 @@ import { SearchCustomersUseCase } from '@/modules/customers/application/use-case
 import { HttpCatalogProduct } from '@/modules/catalog/adapters/infrastructure/httpCatalogProduct';
 import { SearchCatalogProductsUseCase } from '@/modules/catalog/application/use-cases/searchCatalogProducts.useCase';
 import { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
+import { HttpBrand } from '@/modules/catalog/adapters/infrastructure/httpBrand';
+import { CreateBrandUseCase } from '@/modules/catalog/application/use-cases/createBrand.useCase';
+import { CreateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/createCatalogProduct.useCase';
+import { ListBrandsUseCase } from '@/modules/catalog/application/use-cases/listBrands.useCase';
 import { UpdateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/updateCatalogProduct.useCase';
 import { BrowserSessionStore } from '@/modules/identity/adapters/infrastructure/browserSessionStore';
 import { HttpAuth } from '@/modules/identity/adapters/infrastructure/httpAuth';
@@ -44,6 +48,9 @@ export interface AppContainer {
   searchProducts: SearchProductsUseCase;
   searchCatalogProducts: SearchCatalogProductsUseCase;
   updateCatalogProduct: UpdateCatalogProductUseCase;
+  createCatalogProduct: CreateCatalogProductUseCase;
+  listBrands: ListBrandsUseCase;
+  createBrand: CreateBrandUseCase;
   searchCustomers: SearchCustomersUseCase;
   getCustomer: GetCustomerUseCase;
   createCustomer: CreateCustomerUseCase;
@@ -77,6 +84,9 @@ export function createAppContainer(): AppContainer {
     searchProducts: new SearchProductsUseCase(new HttpProductSearch(http)),
     searchCatalogProducts: new SearchCatalogProductsUseCase(new HttpCatalogProduct(http)),
     updateCatalogProduct: new UpdateCatalogProductUseCase(new HttpCatalogProduct(http)),
+    createCatalogProduct: new CreateCatalogProductUseCase(new HttpCatalogProduct(http)),
+    listBrands: new ListBrandsUseCase(new HttpBrand(http)),
+    createBrand: new CreateBrandUseCase(new HttpBrand(http)),
     searchCustomers: new SearchCustomersUseCase(new HttpCustomerQuery(http)),
     getCustomer: new GetCustomerUseCase(new HttpCustomerQuery(http)),
     createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http)),

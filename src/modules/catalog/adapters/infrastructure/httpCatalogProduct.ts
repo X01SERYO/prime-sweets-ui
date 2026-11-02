@@ -1,5 +1,5 @@
 import type { CatalogProductPage, CatalogProductPort } from '@/modules/catalog/application/ports/catalogProduct.port';
-import type { CatalogProduct, CatalogProductPatch } from '@/modules/catalog/domain/models/catalogProduct';
+import type { CatalogProduct, CatalogProductCreate, CatalogProductPatch } from '@/modules/catalog/domain/models/catalogProduct';
 import { toCatalogProduct } from '@/modules/catalog/adapters/infrastructure/catalogProductMapper';
 import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
 import { HttpRequestError, type HttpClient } from '@/shared/infrastructure/http/httpClient';
@@ -34,6 +34,21 @@ export class HttpCatalogProduct implements CatalogProductPort {
   async update(id: string, patch: CatalogProductPatch): Promise<CatalogProduct> {
     try {
       const body = await this.http.put<Envelope>(`/products/${encodeURIComponent(id)}`, patch);
+      if (!body || body.success !== true) {
+        throw new CatalogInvalidError();
+      }
+      return toCatalogProduct(body.data);
+    } catch (error) {
+      if (error instanceof HttpRequestError && error.code === 'PRODUCT_INVALID') {
+        throw new CatalogInvalidError();
+      }
+      throw error;
+    }
+  }
+
+  async create(input: CatalogProductCreate): Promise<CatalogProduct> {
+    try {
+      const body = await this.http.post<Envelope>('/products', input);
       if (!body || body.success !== true) {
         throw new CatalogInvalidError();
       }

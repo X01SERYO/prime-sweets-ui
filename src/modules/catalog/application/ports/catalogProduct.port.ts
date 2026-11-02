@@ -1,4 +1,4 @@
-import type { CatalogProduct, CatalogProductPatch } from '@/modules/catalog/domain/models/catalogProduct';
+import type { CatalogProduct, CatalogProductCreate, CatalogProductPatch } from '@/modules/catalog/domain/models/catalogProduct';
 
 export interface CatalogProductPage {
   items: CatalogProduct[];
@@ -10,4 +10,5 @@ export interface CatalogProductPage {
 export interface CatalogProductPort {
   list(page: number, pageSize: number, query?: string): Promise<CatalogProductPage>;
   update(id: string, patch: CatalogProductPatch): Promise<CatalogProduct>;
+  create(input: CatalogProductCreate): Promise<CatalogProduct>;
 }

@@ -12,7 +12,6 @@ interface SaleCustomerChoiceProps {
 export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerChoiceProps) {
   const { t } = useLocale();
   const search = useCustomerSearch(searchCustomers);
-  const [mode, setMode] = useState<'search' | null>(null);
 
   function onSearch(event: FormEvent) {
     event.preventDefault();
@@ -22,15 +21,11 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
   return (
     <section className="stack customer-choice">
       <div className="row customer-choice-actions">
-        <button className="btn" type="button" onClick={() => setMode('search')}>
-          {t('findCustomer')}
-        </button>
-        <Link className="btn btn-secondary" to="/customers">
+        <Link className="btn" to="/customers">
           {t('customerCreate')}
         </Link>
       </div>
-      {mode === 'search' ? (
-        <form className="card" onSubmit={onSearch}>
+      <form className="card" onSubmit={onSearch}>
           <div className="search-label">
             <label htmlFor="customer-query">{t('findCustomer')}</label>
             <button type="button" className="info-tip" aria-label={t('customerSearchHint')}>
@@ -55,8 +50,7 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
               <SearchIcon />
             </button>
           </div>
-        </form>
-      ) : null}
+      </form>
       {search.error && !search.searched ? <p role="alert">{t(search.error)}</p> : null}
       {search.searched ? (
         <CustomerResults title={t('searchResults')} closeLabel={t('closeSearch')} onClose={search.closeResults}>

@@ -11,7 +11,19 @@ export interface CatalogProduct {
   retailPrice: number | null;
 }
 
+export interface CatalogProductCreate {
+  name: string;
+  brandId?: string;
+  wholesaleCost: number;
+  wholesalePrice: number;
+  retailCost: number;
+  retailPrice: number;
+  units: number;
+  pack: number;
+}
+
 export interface CatalogProductPatch {
+  name?: string;
   wholesaleCost?: number;
   wholesalePrice?: number;
   retailCost?: number;

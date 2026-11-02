@@ -16,6 +16,7 @@ import { businessToday, deliveryDaysThroughSunday } from '@/modules/sales/domain
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { ProductAdmin } from '@/modules/catalog/adapters/ui/views/ProductAdmin';
+import { ProductCreate } from '@/modules/catalog/adapters/ui/views/ProductCreate';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
 import { WeekHome } from '@/modules/sales/adapters/ui/views/WeekHome';
@@ -285,6 +286,20 @@ export function App({ container }: AppProps) {
             element={session ? <WeekHome listSales={container.listDeliverySales} /> : <Navigate to="/login" replace />}
           />
           <Route path="/sales-day" element={<Navigate to="/" replace />} />
+          <Route
+            path="/products/new"
+            element={
+              session ? (
+                <ProductCreate
+                  createCatalogProduct={container.createCatalogProduct}
+                  listBrands={container.listBrands}
+                  createBrand={container.createBrand}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
           <Route
             path="/products"
             element={
