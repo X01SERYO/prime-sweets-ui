@@ -23,6 +23,8 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
   const navigate = useNavigate();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [brandId, setBrandId] = useState('');
+  const [brandQuery, setBrandQuery] = useState('');
+  const [brandListOpen, setBrandListOpen] = useState(false);
   const [addingBrand, setAddingBrand] = useState(false);
   const [brandName, setBrandName] = useState('');
   const [brandCode, setBrandCode] = useState('');
@@ -57,6 +59,7 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
       const created = await createBrand.execute({ name: nextName, code: nextCode });
       setBrands(current => [...current, created].sort((left, right) => left.name.localeCompare(right.name, 'es')));
       setBrandId(created.id);
+      setBrandQuery(created.name);
       setBrandName('');
       setBrandCode('');
       setAddingBrand(false);
@@ -118,14 +121,42 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
       <div className="product-editor-grid">
         <Field label={t('brand')} wide>
           <span className="product-brand-row">
-            <select value={brandId} onChange={event => setBrandId(event.target.value)}>
-              <option value="">—</option>
-              {brands.map(brand => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
-            </select>
+            <span className="product-brand-combo">
+              <input
+                value={brandQuery}
+                autoComplete="off"
+                onFocus={() => setBrandListOpen(true)}
+                onBlur={() => window.setTimeout(() => setBrandListOpen(false), 120)}
+                onChange={event => {
+                  const next = event.target.value.toLocaleUpperCase('es-CO');
+                  setBrandQuery(next);
+                  setBrandListOpen(true);
+                  const found = brands.find(brand => brand.name === next);
+                  setBrandId(found?.id ?? '');
+                }}
+              />
+              {brandListOpen ? (
+                <ul className="product-brand-options">
+                  {brands
+                    .filter(brand => brand.name.includes(brandQuery.trim()))
+                    .map(brand => (
+                      <li key={brand.id}>
+                        <button
+                          type="button"
+                          onMouseDown={event => event.preventDefault()}
+                          onClick={() => {
+                            setBrandId(brand.id);
+                            setBrandQuery(brand.name);
+                            setBrandListOpen(false);
+                          }}
+                        >
+                          {brand.name}
+                        </button>
+                      </li>
+                    ))}
+                </ul>
+              ) : null}
+            </span>
             <button className="btn product-brand-add" type="button" aria-label={t('addBrand')} onClick={() => setAddingBrand(current => !current)}>
               +
             </button>

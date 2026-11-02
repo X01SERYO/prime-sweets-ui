@@ -78,9 +78,40 @@
   gap: 0.45rem;
 }
 
-.product-brand-row select {
+.product-brand-combo {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+
+.product-brand-options {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 0.2rem);
+  left: 0;
+  right: 0;
+  max-height: 9rem;
+  margin: 0;
+  padding: 0.2rem;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.product-brand-options button {
+  width: 100%;
+  height: auto;
+  min-height: 1.7rem;
+  padding: 0.2rem 0.45rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: left;
 }
 
 button.btn.product-brand-add {
@@ -335,6 +366,11 @@ dialog.product-editor {
     max-height: 30px;
     padding: 0 0.4rem;
     line-height: 30px;
+    font-size: 0.7rem;
+  }
+
+  .product-brand-options button {
+    min-height: 1.5rem;
     font-size: 0.7rem;
   }
 
