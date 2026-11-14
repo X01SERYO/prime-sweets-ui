@@ -13,7 +13,7 @@ title Prime Sweets UI — Containers (current)
 Person(seller, "Seller", "Browser user")
 
 Container_Boundary(client, "Prime Sweets UI") {
-  Container(spa, "Web application", "Vite 7, React 19, TypeScript, React Router", "Seller screens for the day, customers, sales, the load sheet, and invoices")
+  Container(spa, "Web application", "Vite 7, React 19, TypeScript 6, React Router", "Seller screens for the day, customers, sales, the load sheet, and invoices")
 }
 
 System_Ext(api, "Prime Sweets Core API", "Express process. Default base URL http://localhost:4000")
@@ -28,7 +28,7 @@ Rel(spa, api, "Bearer JSON for the signed-in seller", "fetch")
 
 `src/main.tsx` mounts React on `#root`, builds the composition container, and renders `App`.
 
-Stack: TypeScript ESM, React 19, Vite 7, ESLint 9 flat config, Prettier 3.
+Stack: Node.js 26, TypeScript 6, ESM, React 19, Vite 7, ESLint 10 flat config, Prettier 3.
 
 ## Core API
 

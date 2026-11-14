@@ -30,4 +30,4 @@ Authentication, sale capture, the Load Sheet, and invoice print are implemented.
 | ID | Item |
 |---|---|
 | — | `baseUrl` removed from `tsconfig.app.json` so the TypeScript 6 deprecation is not an error. Path alias `@/*` remains. |
-| — | Prettier and `.cursorignore` match the API project. `.eslintignore` is intentionally absent because ESLint 9 reads `ignores` from `eslint.config.js`. |
+| — | Prettier and `.cursorignore` match the API project. `.eslintignore` is intentionally absent because ESLint 10 reads `ignores` from `eslint.config.js`. |
