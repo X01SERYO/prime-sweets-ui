@@ -11,7 +11,7 @@ Authentication, sale capture, the Load Sheet, and invoice print are implemented.
 |---|---|---|---|
 | TD-01 | ~~Sample lists are not API-backed~~ | `src/app/composition.ts` | **[RESOLVED]** Customers, day sales, the load sheet, invoices, and sales call HTTP adapters. There is no `Sample*` class. |
 | TD-02 | ~~HTTP client drops the API error body~~ | `src/shared/infrastructure/http/httpClient.ts` | **[RESOLVED]** `HttpRequestError` keeps `status`, `message`, and `code` when the body sends them. |
-| TD-03 | Thin automated tests | `src/test/architecture.test.ts` | `npm test` covers currency format and domain error codes. Screen flows are not covered. |
+| TD-03 | Coverage far below 85% of the whole UI | `package.json` `test:coverage` | **[IN PROGRESS]** Vitest with v8 coverage and `all: true` measures every file under `src`, not only the files a test imports. Measured **4.52% lines** (84/1856 executable) with 7 passing tests. The screens (`views`, about 2,700 source lines) are not rendered yet, so they stay uncovered. | Render each screen with Testing Library and exercise its actions until line coverage is at least 85%. |
 | TD-13 | ~~Dummy list files~~ | `src/shared/dev/dummyLists.ts`, `src/app/lists/DummyLists.tsx` | **[RESOLVED]** Those files are gone. The screens read the API. |
 | TD-04 | ESLint 9 is outside the current support window | `package.json` | `npm install` warns that ESLint 9 is deprecated. Lint still passes. Moving to ESLint 10 is a tooling change, not a feature. |
 

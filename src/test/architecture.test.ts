@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { test } from 'vitest';
 import { CatalogInvalidError } from '../modules/catalog/domain/errors/catalogInvalid.error.ts';
 import { LoginResponseInvalidError } from '../modules/identity/domain/errors/loginResponseInvalid.error.ts';
 import { DeliveryDateOutOfRangeError } from '../modules/sales/domain/errors/deliveryDateOutOfRange.error.ts';

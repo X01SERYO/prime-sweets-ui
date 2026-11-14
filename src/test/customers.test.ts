@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { test } from 'vitest';
 import { CustomerAlreadyExistsError } from '../modules/customers/domain/errors/customerAlreadyExists.error.ts';
 import { CustomerInvalidError } from '../modules/customers/domain/errors/customerInvalid.error.ts';
 import { CustomerNotFoundError } from '../modules/customers/domain/errors/customerNotFound.error.ts';
