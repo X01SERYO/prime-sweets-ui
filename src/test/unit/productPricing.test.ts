@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import { realMarginPercent, suggestedSalePrice } from '../modules/catalog/domain/productPricing.ts';
+import { realMarginPercent, suggestedSalePrice } from '../../modules/catalog/domain/productPricing.ts';
 
 test('suggested price is the wholesale cost plus 15 percent', () => {
   assert.equal(suggestedSalePrice(1000, 15), 1150);

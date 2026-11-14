@@ -7,10 +7,10 @@ import {
   nextWeek,
   previousWeek,
   weekDeliveryDays
-} from '../modules/sales/domain/deliveryDays.ts';
-import { isSellableQuantity } from '../modules/sales/domain/quantity.ts';
-import { addedSaleLineName, previewLineTotal } from '../modules/sales/domain/saleLineName.ts';
-import { canConfirmSale, canEditSaleLines, canRenameSaleLine, canVoidSale } from '../modules/sales/domain/saleStatus.ts';
+} from '../../modules/sales/domain/deliveryDays.ts';
+import { isSellableQuantity } from '../../modules/sales/domain/quantity.ts';
+import { addedSaleLineName, previewLineTotal } from '../../modules/sales/domain/saleLineName.ts';
+import { canConfirmSale, canEditSaleLines, canRenameSaleLine, canVoidSale } from '../../modules/sales/domain/saleStatus.ts';
 
 test('business dates stay inside the current week and reject a bad day', () => {
   assert.match(businessToday(new Date('2026-11-14T15:00:00Z')), /^\d{4}-\d{2}-\d{2}$/);
