@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, test } from 'vitest';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { App } from '../../app/App.tsx';
@@ -54,7 +54,19 @@ const sale = {
   ]
 };
 
-function bodyFor(url: string): unknown {
+function bodyFor(url: string, method: string): unknown {
+  if (method !== 'GET' && url.includes('/products')) {
+    return { success: true, data: product };
+  }
+  if (method !== 'GET' && url.includes('/customers')) {
+    return { success: true, data: customer };
+  }
+  if (method !== 'GET' && url.includes('/brands')) {
+    return { success: true, data: { id: 'b1', name: 'ACME', code: 'ACM' } };
+  }
+  if (url.includes('/products/search')) {
+    return { success: true, data: [{ id: 'p1', alegraId: 'a1', code: 'ACM001', name: 'SODA', wholesalePrice: 1000 }] };
+  }
   if (url.includes('/products')) {
     return { success: true, data: { items: [product], total: 1, page: 1, pageSize: 10 } };
   }
@@ -131,12 +143,18 @@ function bodyFor(url: string): unknown {
     return { success: true, data: sale };
   }
   if (url.includes('/sales')) {
-    return { success: true, data: [sale] };
+    return { success: true, data: [{ ...sale, status: url.includes('customerId') ? 'DRAFT' : 'CONFIRMED' }] };
   }
   return { success: true, data: [] };
 }
 
 function installBrowser() {
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    this.open = true;
+  };
+  HTMLDialogElement.prototype.close = function close() {
+    this.open = false;
+  };
   window.matchMedia = (query: string) => ({
     matches: false,
     media: query,
@@ -152,9 +170,12 @@ function installBrowser() {
 }
 
 function installFetch() {
-  const fetchMock: typeof fetch = async (input) => {
+  const fetchMock: typeof fetch = async (input, init) => {
     const url = String(input);
-    return new Response(JSON.stringify(bodyFor(url)), { status: 200, headers: { 'content-type': 'application/json' } });
+    return new Response(JSON.stringify(bodyFor(url, init?.method ?? 'GET')), {
+      status: 200,
+      headers: { 'content-type': 'application/json' }
+    });
   };
   globalThis.fetch = fetchMock;
 }
@@ -198,6 +219,16 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
 
   open('/products');
   await waitFor(() => screen.getByText('ACM001'));
+  fireEvent.click(screen.getByRole('button', { name: 'Editar producto' }));
+  fireEvent.change(screen.getByDisplayValue('SODA'), { target: { value: 'SODA EXTRA' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+  await waitFor(() => screen.getByText(/se actualizó/));
+  fireEvent.click(screen.getByRole('button', { name: 'Editar producto' }));
+  fireEvent.change(screen.getByDisplayValue('SODA'), { target: { value: '' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+  fireEvent.change(screen.getByLabelText(/buscar producto/i), { target: { value: 'SOD' } });
+  fireEvent.click(screen.getByRole('button', { name: /^buscar$/i }));
+  fireEvent.change(screen.getByLabelText(/tamaño|page size|por página/i), { target: { value: '20' } });
   cleanup();
 
   open('/products/new');
@@ -205,16 +236,22 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   cleanup();
 
   open('/customers');
-  await waitFor(() => {
-    const text = document.body.textContent ?? '';
-    if (!/cliente|customer|documento/i.test(text)) {
-      throw new Error(text.slice(0, 500));
-    }
-  });
+  await waitFor(() => screen.getByLabelText('Número de documento'));
+  fireEvent.change(screen.getByLabelText(/número|number/i), { target: { value: '1' } });
+  fireEvent.change(screen.getByLabelText(/nombre|name/i), { target: { value: 'ANA' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Crear cliente' }));
   cleanup();
 
   open('/delivery-sales?deliveryDate=2026-11-14');
   await waitFor(() => screen.getByText(/001/));
+  const selectAll = screen.queryByRole('button', { name: /seleccionar|select all/i });
+  if (selectAll) {
+    fireEvent.click(selectAll);
+  }
+  const printAll = screen.queryByRole('button', { name: /imprimir confirmadas|print confirmed/i });
+  if (printAll) {
+    fireEvent.click(printAll);
+  }
   cleanup();
 
   open('/load-sheets?deliveryDate=2026-11-14');
@@ -225,6 +262,41 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   await waitFor(() => screen.getByText(/Dulceria|factura|invoice/i));
   cleanup();
 
+  open('/sales?customerId=c1');
+  const today = await screen.findByRole('button', { name: /hoy|today/i });
+  fireEvent.click(today);
+  cleanup();
+
   open('/sales?deliveryDate=2026-11-14&customerId=c1&saleId=s1');
   await waitFor(() => screen.getByText('SODA'));
+  const productQuery = screen.queryByLabelText(/buscar producto/i);
+  if (productQuery) {
+    fireEvent.change(productQuery, { target: { value: 'SODA' } });
+    fireEvent.click(screen.getAllByRole('button', { name: /^buscar$/i })[0]);
+    const add = await screen.findByRole('button', { name: 'Agregar' });
+    fireEvent.click(add);
+    const confirmLine = await screen.findByRole('button', { name: 'Guardar cambio' });
+    fireEvent.click(confirmLine);
+  }
+  const confirm = screen.queryByRole('button', { name: 'Confirmar venta' });
+  if (confirm) {
+    fireEvent.click(confirm);
+  }
+  const changeDay = screen.queryByRole('button', { name: /cambiar día/i });
+  if (changeDay) {
+    fireEvent.click(changeDay);
+    const day = screen.queryAllByRole('button').find(button => /\d/.test(button.textContent ?? '') && button.textContent !== 'Salir');
+    if (day) {
+      fireEvent.click(day);
+    }
+  }
+  const quantity = screen.queryAllByRole('spinbutton')[0] ?? screen.queryAllByRole('textbox').at(-1);
+  if (quantity) {
+    fireEvent.change(quantity, { target: { value: '3' } });
+  }
+  const saveLine = screen.queryByRole('button', { name: 'Guardar cambio' });
+  if (saveLine) {
+    fireEvent.click(saveLine);
+  }
+  fireEvent.click(screen.getByRole('button', { name: 'Salir' }));
 });
