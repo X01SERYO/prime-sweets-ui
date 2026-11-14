@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface ConfirmDialogProps {
   title: string;
@@ -64,7 +65,7 @@ export function ConfirmDialog({
       <div ref={panelRef} className="modal-panel" tabIndex={-1}>
       <h2>{title}</h2>
       <p>{message}</p>
-      {error ? <p role="alert">{error}</p> : null}
+      {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       <div className={alignEnd ? 'modal-actions modal-actions-end' : 'modal-actions'}>
         {alignEnd ? (
           <button className="btn btn-secondary" type="button" disabled={busy} onClick={onCancel}>

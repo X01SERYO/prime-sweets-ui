@@ -6,6 +6,7 @@ import type { PrintInvoicesUseCase } from '@/modules/fulfillment-output/applicat
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 function businessDay(value: string): string {
   const [year, month, day] = value.slice(0, 10).split('-');
@@ -43,18 +44,18 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
   return (
     <section className="stack">
       <ScreenTitle>{t('invoicePreview')}</ScreenTitle>
-      {loaded.loading ? <p>{t('invoiceLoadLoading')}</p> : null}
+      {loaded.loading ? <StatusMessage tone="info">{t('invoiceLoadLoading')}</StatusMessage> : null}
       {loaded.error ? (
-        <div className={loaded.errorKind === 'business' ? 'notice notice-business' : 'notice notice-error'} role="alert">
+        <StatusMessage tone={loaded.errorKind === 'business' ? 'warning' : 'error'}>
           <p>{t(loaded.error)}</p>
           <div className="row">
             <button className="btn" type="button" onClick={loaded.retry}>
               {t('retryInvoice')}
             </button>
           </div>
-        </div>
+        </StatusMessage>
       ) : null}
-      {printing.error ? <p className="alert">{t(printing.error)}</p> : null}
+      {printing.error ? <StatusMessage tone="error">{t(printing.error)}</StatusMessage> : null}
       {document ? (
         <>
           <article className="invoice-sheet">

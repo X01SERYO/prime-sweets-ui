@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSaleCustomer } from '@/modules/customers/adapters/ui/hooks/useSaleCustomer';
 import type { GetCustomerUseCase } from '@/modules/customers/application/use-cases/getCustomer.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface SelectedCustomerProps {
   customerId: string | null;
@@ -19,7 +20,7 @@ export function SelectedCustomer({ customerId, getCustomer }: SelectedCustomerPr
 
   return (
     <section className="card customer-card">
-      {error ? <p role="alert">{t(error)}</p> : null}
+      {error ? <StatusMessage tone="error">{t(error)}</StatusMessage> : null}
       {customer ? (
         <>
           <button

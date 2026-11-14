@@ -1239,6 +1239,131 @@ dialog.pending-modal {
   }
 }
 
+.status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(10 79 90 / 6%);
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.status-mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+}
+
+.status-mark svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.status-body {
+  min-width: 0;
+  padding-top: 0.12rem;
+}
+
+.status-body p {
+  margin: 0;
+}
+
+.status a {
+  color: var(--deep);
+  font-weight: 650;
+}
+
+.status-error {
+  background: linear-gradient(180deg, #fff 0%, #fff8f8 100%);
+  border-color: #f3d4d8;
+}
+
+.status-error .status-mark {
+  background: #fde8ea;
+  color: #be123c;
+}
+
+.status-warning {
+  background: linear-gradient(180deg, #fff 0%, #fff8f2 100%);
+  border-color: #ffd7c2;
+}
+
+.status-warning .status-mark {
+  background: #fff1ea;
+  color: var(--orange);
+}
+
+.status-info {
+  background: linear-gradient(180deg, #fff 0%, #f4fbfc 100%);
+  border-color: #d5eef1;
+}
+
+.status-info .status-mark {
+  background: #e7f6f8;
+  color: var(--teal);
+}
+
+.status-success {
+  background: linear-gradient(180deg, #fff 0%, #f4fbf6 100%);
+  border-color: #cfeedd;
+}
+
+.status-success .status-mark {
+  background: #e7f6ec;
+  color: #15803d;
+}
+
+.app-toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.25rem;
+  z-index: 30;
+  max-width: min(22rem, calc(100vw - 2rem));
+  box-shadow: 0 16px 40px rgb(10 79 90 / 16%);
+  animation: app-toast-in 0.28s ease;
+}
+
+.app-toast.is-leaving {
+  animation: app-toast-out 0.38s ease forwards;
+}
+
+@media (min-width: 48rem) {
+  .app-toast {
+    bottom: 1rem;
+  }
+}
+
+@keyframes app-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
 .notice {
   display: flex;
   flex-direction: column;
@@ -1597,11 +1722,6 @@ code {
   font-family: ui-monospace, monospace;
 }
 
-[role='alert'] {
-  color: var(--deep);
-  font-weight: 700;
-}
-
 @media (max-width: 40rem) {
   .sale-close {
     display: grid;
@@ -1723,6 +1843,103 @@ code {
   .shell main {
     width: min(52rem, 100%);
     padding: 2rem 1.25rem;
+  }
+}
+
+.app-frame {
+  min-height: calc(100vh - 4rem);
+}
+
+.app-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #fff;
+  border-top: 1px solid var(--line);
+}
+
+.app-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.45rem 0.2rem 0.55rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.app-nav a svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.app-nav a[data-section='wholesale'][aria-current='page'] {
+  color: #1d4e89;
+}
+
+.app-nav a[data-section='retail'][aria-current='page'] {
+  color: #1b7a45;
+}
+
+.app-nav a[data-section='load'][aria-current='page'] {
+  color: #9a6700;
+}
+
+.app-nav a[data-section='products'][aria-current='page'] {
+  color: var(--deep);
+}
+
+.shell main {
+  padding-bottom: 4.75rem;
+}
+
+.retail-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.retail-tabs a {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.retail-tabs a[aria-current='page'] {
+  background: #e7f6ec;
+  border-color: #1b7a45;
+}
+
+@media (min-width: 48rem) {
+  .app-frame {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+  }
+
+  .app-nav {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+  }
+
+  .app-nav a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.55rem;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .shell main,
+  .app-frame main {
+    padding-bottom: 1.5rem;
   }
 }
 

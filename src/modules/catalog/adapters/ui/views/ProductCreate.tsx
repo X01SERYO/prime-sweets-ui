@@ -9,6 +9,7 @@ import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInva
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 import { HttpRequestError } from '@/shared/infrastructure/http/httpClient';
 import './productAdmin.css';
 
@@ -117,7 +118,7 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
   return (
     <section className="stack product-editor">
       <ScreenTitle>{t('createProduct')}</ScreenTitle>
-      {error ? <p className="product-editor-error" role="alert">{error}</p> : null}
+      {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       <div className="product-editor-grid">
         <Field label={t('brand')} wide>
           <span className="product-brand-row">

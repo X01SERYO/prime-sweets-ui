@@ -9,6 +9,7 @@ import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInva
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
+import { AppToast } from '@/shared/ui/AppToast';
 import { HttpRequestError } from '@/shared/infrastructure/http/httpClient';
 import './productAdmin.css';
 
@@ -360,34 +361,15 @@ function Toast({
   onDone: () => void;
 }) {
   const message = error ?? notice;
-  const [leaving, setLeaving] = useState(false);
-
-  useEffect(() => {
-    if (!message) {
-      return;
-    }
-    setLeaving(false);
-    const visibleFor = Math.min(12000, 4000 + message.length * 45);
-    const hide = window.setTimeout(() => setLeaving(true), visibleFor);
-    const done = window.setTimeout(onDone, visibleFor + 380);
-    return () => {
-      window.clearTimeout(hide);
-      window.clearTimeout(done);
-    };
-  }, [message, onDone]);
-
   const { t } = useLocale();
   if (!message) {
     return null;
   }
   return (
-    <p
-      className={`product-admin-toast ${error ? 'is-error' : 'is-ok'}${leaving ? ' is-leaving' : ''}`}
-      role={error ? 'alert' : 'status'}
-    >
+    <AppToast tone={error ? 'error' : 'success'} message={message} onDone={onDone}>
       <strong className="product-admin-toast-title">{error ? t('toastError') : t('toastOk')}: </strong>
       {message}
-    </p>
+    </AppToast>
   );
 }
 

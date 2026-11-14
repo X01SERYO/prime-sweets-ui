@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useCustomerSearch } from '@/modules/customers/adapters/ui/hooks/useCustomerSearch';
 import type { SearchCustomersUseCase } from '@/modules/customers/application/use-cases/searchCustomers.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface SaleCustomerChoiceProps {
   searchCustomers: SearchCustomersUseCase;
@@ -51,14 +52,14 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
             </button>
           </div>
       </form>
-      {search.error && !search.searched ? <p role="alert">{t(search.error)}</p> : null}
+      {search.error && !search.searched ? <StatusMessage tone="error">{t(search.error)}</StatusMessage> : null}
       {search.searched ? (
         <CustomerResults title={t('searchResults')} closeLabel={t('closeSearch')} onClose={search.closeResults}>
-          {search.error ? <p role="alert">{t(search.error)}</p> : null}
+          {search.error ? <StatusMessage tone="error">{t(search.error)}</StatusMessage> : null}
           {!search.loading && !search.error && search.customers.length === 0 ? (
-            <p className="m">
+            <StatusMessage tone="info">
               {t('customerNoResults')} <Link to="/customers">{t('customerCreate')}</Link>
-            </p>
+            </StatusMessage>
           ) : null}
           {search.customers.length > 0 ? (
             <ul className="list">

@@ -10,6 +10,12 @@ export const shellMessages = catalog(
     newSale: 'Nueva venta',
     daySales: 'Ventas del día',
     loadSheet: 'Cargue',
+    viewLoadSheet: 'Ver cargue de este día',
+    wholesaleSection: 'Por mayor',
+    retailSection: 'Detal',
+    retailToday: 'Hoy',
+    retailHistory: 'Días anteriores',
+    retailPending: 'La venta detal de hoy se registra en el siguiente paso.',
     invoices: 'Facturas',
     signOut: 'Salir',
     home: 'Menú principal',
@@ -23,7 +29,7 @@ export const shellMessages = catalog(
     draftCount: 'Borradores',
     confirmedCount: 'Confirmadas',
     voidedCount: 'Anuladas',
-    confirmedTotal: 'Total'
+    confirmedTotal: 'Total por mayor'
   },
   {
     languageLabel: 'Switch language to Spanish',
@@ -34,6 +40,12 @@ export const shellMessages = catalog(
     newSale: 'New sale',
     daySales: 'Day sales',
     loadSheet: 'Load sheet',
+    viewLoadSheet: 'View this day’s load sheet',
+    wholesaleSection: 'Wholesale',
+    retailSection: 'Retail',
+    retailToday: 'Today',
+    retailHistory: 'Earlier days',
+    retailPending: 'Today’s retail sale is recorded in the next step.',
     invoices: 'Invoices',
     signOut: 'Sign out',
     home: 'Main menu',
@@ -47,6 +59,6 @@ export const shellMessages = catalog(
     draftCount: 'Drafts',
     confirmedCount: 'Confirmed',
     voidedCount: 'Voided',
-    confirmedTotal: 'Total'
+    confirmedTotal: 'Wholesale total'
   }
 );

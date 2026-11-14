@@ -1,58 +1,5 @@
-.product-admin-toast {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 30;
-  max-width: min(24rem, calc(100vw - 2rem));
-  margin: 0;
-  padding: 0.7rem 0.9rem;
-  border-radius: 12px;
-  color: #fff;
-  box-shadow: 0 10px 28px rgb(0 0 0 / 22%);
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.35;
-  animation: product-toast-in 0.28s ease;
-}
-
 .product-admin-toast-title {
   font-weight: 700;
-}
-
-.product-admin-toast.is-ok {
-  background: var(--deep);
-  color: #fff;
-}
-
-.product-admin-toast.is-error {
-  background: #9a4a24;
-  color: #fff;
-}
-
-.product-admin-toast.is-leaving {
-  animation: product-toast-out 0.38s ease forwards;
-}
-
-@keyframes product-toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.75rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes product-toast-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
 }
 
 .product-admin-heading {
@@ -138,13 +85,6 @@ button.btn.product-brand-save {
   font-size: 0.75rem;
 }
 
-.product-editor-error {
-  margin: 0;
-  color: #9a4a24;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
 .product-admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -227,6 +167,8 @@ section.product-editor {
 
 dialog.product-editor {
   width: min(44rem, calc(100vw - 1.5rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
   border: 0;
   border-radius: var(--radius);
   padding: 1rem;
@@ -236,6 +178,12 @@ dialog.product-editor {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.55rem 0.75rem;
+  min-width: 0;
+}
+
+.product-editor-grid > *,
+.product-editor-line > * {
+  min-width: 0;
 }
 
 .product-editor-grid label,
@@ -270,6 +218,7 @@ dialog.product-editor {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.55rem 0.75rem;
+  min-width: 0;
 }
 
 .product-editor-actions {
@@ -309,7 +258,7 @@ dialog.product-editor {
     overflow: visible;
   }
 
-  .product-admin-toast {
+  .app-toast {
     right: 1rem;
     left: 1rem;
     max-width: none;
@@ -320,11 +269,20 @@ dialog.product-editor {
     display: none;
   }
 
+  dialog.product-editor,
+  section.product-editor {
+    width: 100%;
+    max-width: 100%;
+  }
+
   dialog.product-editor {
-    max-height: 78vh;
+    width: calc(100% - 1rem);
+    max-height: calc(100dvh - 1rem);
+    margin: auto;
     display: flex;
     flex-direction: column;
-    padding: 0.65rem 0.35rem 0.65rem 0.65rem;
+    overflow: hidden;
+    padding: 0.75rem;
     font-size: 0.7rem;
   }
 
@@ -338,10 +296,11 @@ dialog.product-editor {
   }
 
   .product-editor-grid {
+    flex: 1 1 auto;
+    min-height: 0;
     gap: 0.4rem 0.45rem;
     overflow: auto;
-    padding-right: 0.45rem;
-    padding-bottom: 0.45rem;
+    padding: 4px 4px 0.45rem;
   }
 
   .product-editor-grid label,
@@ -350,7 +309,8 @@ dialog.product-editor {
     font-size: 0.7rem;
   }
 
-  .product-editor input {
+  .product-editor input,
+  .product-editor select {
     height: 1.9rem;
     min-height: 1.9rem;
     max-height: 1.9rem;
@@ -359,14 +319,9 @@ dialog.product-editor {
     font-size: 0.7rem;
   }
 
-  .product-editor select,
-  .product-editor option {
-    height: 30px;
-    min-height: 30px;
-    max-height: 30px;
-    padding: 0 0.4rem;
-    line-height: 30px;
-    font-size: 0.7rem;
+  .product-editor input:focus,
+  .product-editor select:focus {
+    outline-offset: 0;
   }
 
   .product-brand-options button {

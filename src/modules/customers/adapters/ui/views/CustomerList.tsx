@@ -4,6 +4,7 @@ import { useCreateCustomer } from '@/modules/customers/adapters/ui/hooks/useCrea
 import type { CreateCustomerUseCase } from '@/modules/customers/application/use-cases/createCustomer.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 const documentTypes = ['CC', 'NIT', 'CE', 'TI', 'PA'] as const;
 
@@ -65,7 +66,7 @@ export function CustomerList({ createCustomer }: CustomerListProps) {
             <input id="customer-address" value={form.address} onChange={event => form.setAddress(event.target.value)} />
           </>
         ) : null}
-        {form.error ? <p role="alert">{t(form.error)}</p> : null}
+        {form.error ? <StatusMessage tone="error">{t(form.error)}</StatusMessage> : null}
         <button className="btn" type="submit" disabled={form.saving}>
           {t('customerCreate')}
         </button>

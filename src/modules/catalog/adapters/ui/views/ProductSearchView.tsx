@@ -4,6 +4,7 @@ import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
 import { formatCurrency } from '@/shared/domain/money';
 import { useProductSearch } from '@/modules/catalog/adapters/ui/hooks/useProductSearch';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 import '@/modules/catalog/adapters/ui/views/productSearch.css';
 
 interface ProductSearchViewProps {
@@ -69,8 +70,10 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
           closeLabel={t('closeSearch')}
           onClose={closeResults}
         >
-          {error ? <p role="alert">{t(error)}</p> : null}
-          {!loading && !error && products.length === 0 ? <p className="m">{t('noResults')}</p> : null}
+          {error ? <StatusMessage tone="error">{t(error)}</StatusMessage> : null}
+          {!loading && !error && products.length === 0 ? (
+            <StatusMessage tone="info">{t('noResults')}</StatusMessage>
+          ) : null}
           {products.length > 0 ? (
             <ul className="product-hits">
               {products.map(product => (

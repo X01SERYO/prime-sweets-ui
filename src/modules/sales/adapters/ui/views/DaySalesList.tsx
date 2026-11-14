@@ -11,6 +11,7 @@ import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 import './daySalesList.css';
 
 function formatDeliveryHeading(value: string, locale: string): string {
@@ -67,11 +68,13 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
         <ScreenTitle>{t('deliverySales')}</ScreenTitle>
         {deliveryDate ? <p className="load-sheet-date">{formatDeliveryHeading(deliveryDate, locale)}</p> : null}
       </div>
-      {listed.loading ? <p>{t('daySalesLoading')}</p> : null}
-      {listed.error ? <p className="alert">{t(listed.error)}</p> : null}
-      {voiding.error && !pendingVoidId ? <p role="alert">{t(voiding.error)}</p> : null}
-      {printing.error ? <p className="alert">{t(printing.error)}</p> : null}
-      {!listed.loading && !listed.error && listed.sales.length === 0 ? <p>{t('deliverySalesEmpty')}</p> : null}
+      {listed.loading ? <StatusMessage tone="info">{t('daySalesLoading')}</StatusMessage> : null}
+      {listed.error ? <StatusMessage tone="error">{t(listed.error)}</StatusMessage> : null}
+      {voiding.error && !pendingVoidId ? <StatusMessage tone="error">{t(voiding.error)}</StatusMessage> : null}
+      {printing.error ? <StatusMessage tone="error">{t(printing.error)}</StatusMessage> : null}
+      {!listed.loading && !listed.error && listed.sales.length === 0 ? (
+        <StatusMessage tone="info">{t('deliverySalesEmpty')}</StatusMessage>
+      ) : null}
       {printable.length > 0 ? (
         <div className="row day-sales-print">
           <button className="btn btn-secondary" type="button" disabled={printing.printing} onClick={selectAll}>

@@ -4,6 +4,7 @@ import type { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application
 import { businessToday, nextWeek, previousWeek, weekDeliveryDays } from '@/modules/sales/domain/deliveryDays';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 interface WeekHomeProps {
   listSales: ListSalesByDeliveryDateUseCase;
 }
@@ -33,9 +34,6 @@ export function WeekHome({ listSales }: WeekHomeProps) {
   return (
     <section className="stack">
       <div className="week-home-actions">
-        <Link className="btn btn-secondary" to="/products">
-          {t('products')}
-        </Link>
         <Link className="btn" to={`/sales?deliveryDate=${encodeURIComponent(today)}`}>
           {t('newSale')}
         </Link>
@@ -63,8 +61,8 @@ export function WeekHome({ listSales }: WeekHomeProps) {
           </button>
         ))}
       </div>
-      {summary.loading ? <p className="m">{t('daySummaryLoading')}</p> : null}
-      {summary.failed ? <p role="alert">{t('daySummaryFailed')}</p> : null}
+      {summary.loading ? <StatusMessage tone="info">{t('daySummaryLoading')}</StatusMessage> : null}
+      {summary.failed ? <StatusMessage tone="error">{t('daySummaryFailed')}</StatusMessage> : null}
       {summary.summary ? (
         <ul className="day-summary">
           <li>
@@ -90,7 +88,7 @@ export function WeekHome({ listSales }: WeekHomeProps) {
           {t('salesOfDay')}
         </Link>
         <Link className="btn btn-secondary" to={`/load-sheets?deliveryDate=${encodeURIComponent(selected)}`}>
-          {t('loadSheet')}
+          {t('viewLoadSheet')}
         </Link>
       </div>
     </section>

@@ -11,7 +11,7 @@ export const identityMessages = catalog(
     signingIn: 'Entrando…',
     loginRequired: 'Escribe correo y contraseña',
     invalidCredentials: 'Correo o contraseña incorrectos',
-    loginFailed: 'No se pudo iniciar sesión. Revisa que la API esté en marcha.',
+    loginFailed: 'No pudimos iniciar sesión. Inténtalo de nuevo en un momento.',
     signedInAs: 'Sesión'
   },
   {
@@ -24,7 +24,7 @@ export const identityMessages = catalog(
     signingIn: 'Signing in…',
     loginRequired: 'Enter email and password',
     invalidCredentials: 'Incorrect email or password',
-    loginFailed: 'Could not sign in. Check that the API is running.',
+    loginFailed: 'We could not sign you in. Try again in a moment.',
     signedInAs: 'Session'
   }
 );

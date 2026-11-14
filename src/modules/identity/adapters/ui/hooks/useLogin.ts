@@ -33,5 +33,5 @@ export function useLogin(login: LoginUseCase, onLoggedIn: (session: Session) => 
     }
   }
 
-  return { email, setEmail, password, setPassword, loading, error, submit };
+  return { email, setEmail, password, setPassword, loading, error, submit, dismissError: () => setError(null) };
 }

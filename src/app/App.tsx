@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useSearchParams } from 'react-router';
+import { AppShellNav } from '@/app/AppShell';
 import { DeliveryDayCard } from '@/app/DeliveryDayCard';
+import { RetailSection } from '@/modules/retail-sales/adapters/ui/views/RetailSection';
 import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
@@ -25,6 +27,7 @@ import { useLocale } from '@/shared/i18n/useLocale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { NavigationHistory, ScreenTitle } from '@/shared/ui/BackButton';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface AppProps {
   container: AppContainer;
@@ -128,7 +131,7 @@ function SaleSearch({ container }: { container: AppContainer }) {
           onChange={canEditLines ? () => setChangingDelivery(true) : undefined}
         />
       ) : null}
-      {deliveryError ? <p role="alert">{t(deliveryError)}</p> : null}
+      {deliveryError ? <StatusMessage tone="error">{t(deliveryError)}</StatusMessage> : null}
       {changingDelivery && draft.sale ? (
         <DeliveryDateModal
           title={t('changeDeliveryDay')}
@@ -269,6 +272,8 @@ export function App({ container }: AppProps) {
         </button>
       </header>
       </div>
+      <div className={session ? 'app-frame' : undefined}>
+      {session ? <AppShellNav /> : null}
       <main>
         <Routes>
           <Route
@@ -339,6 +344,14 @@ export function App({ container }: AppProps) {
             element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
           />
           <Route
+            path="/retail-sales/history"
+            element={session ? <RetailSection /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/retail-sales"
+            element={session ? <RetailSection /> : <Navigate to="/login" replace />}
+          />
+          <Route
             path="/invoices/:saleId"
             element={
               session ? (
@@ -351,6 +364,7 @@ export function App({ container }: AppProps) {
           <Route path="*" element={<Navigate to={session ? '/' : '/login'} replace />} />
         </Routes>
       </main>
+      </div>
     </div>
     </NavigationHistory>
   );

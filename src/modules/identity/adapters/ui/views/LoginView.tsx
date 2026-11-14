@@ -4,6 +4,7 @@ import type { Session } from '@/modules/identity/domain/models/session';
 import { useLogin } from '@/modules/identity/adapters/ui/hooks/useLogin';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
+import { AppToast } from '@/shared/ui/AppToast';
 
 interface LoginViewProps {
   login: LoginUseCase;
@@ -56,9 +57,7 @@ export function LoginView({ login, onLoggedIn }: LoginViewProps) {
         </button>
       </form>
       {form.error ? (
-        <p role="alert">
-          {t(form.error)}
-        </p>
+        <AppToast tone="error" message={t(form.error)} onDone={form.dismissError} />
       ) : null}
     </section>
   );

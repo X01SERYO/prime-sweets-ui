@@ -6,6 +6,7 @@ import type { LoadSheetLineModel } from '@/modules/fulfillment-output/domain/mod
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 import '@/modules/fulfillment-output/adapters/ui/views/loadSheet.css';
 
 interface LoadSheetListProps {
@@ -144,9 +145,11 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
           </p>
         ) : null}
       </header>
-      {sheet.loading ? <p className="m">{t('loadSheetLoading')}</p> : null}
-      {sheet.error ? <p role="alert">{t(sheet.error)}</p> : null}
-      {!sheet.loading && !sheet.error && sheet.lines.length === 0 ? <p className="m">{t('loadSheetEmpty')}</p> : null}
+      {sheet.loading ? <StatusMessage tone="info">{t('loadSheetLoading')}</StatusMessage> : null}
+      {sheet.error ? <StatusMessage tone="error">{t(sheet.error)}</StatusMessage> : null}
+      {!sheet.loading && !sheet.error && sheet.lines.length === 0 ? (
+        <StatusMessage tone="info">{t('loadSheetEmpty')}</StatusMessage>
+      ) : null}
       {sheet.lines.length > 0 ? (
       <div className="load-sheet-scroll">
       <table className="load-sheet-table">

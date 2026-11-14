@@ -6,6 +6,7 @@ import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
+import { StatusMessage } from '@/shared/ui/StatusMessage';
 import { QuantityField } from '@/modules/sales/adapters/ui/views/QuantityField';
 import { parseQuantity } from '@/modules/sales/domain/quantity';
 
@@ -102,9 +103,9 @@ export function SaleLines({
 
   return (
     <section className="stack">
-      {loading ? <p className="m">{t('saleLoading')}</p> : null}
-      {error ? <p role="alert">{t(error)}</p> : null}
-      {lineError && !pending ? <p role="alert">{t(lineError)}</p> : null}
+      {loading ? <StatusMessage tone="info">{t('saleLoading')}</StatusMessage> : null}
+      {error ? <StatusMessage tone="error">{t(error)}</StatusMessage> : null}
+      {lineError && !pending ? <StatusMessage tone="error">{t(lineError)}</StatusMessage> : null}
       {pending ? (
         <PendingCard
           pending={pending}
@@ -153,7 +154,7 @@ export function SaleLines({
             {!sale || sale.items.length === 0 ? (
               <tr>
                 <td className="lines-empty" colSpan={editable ? 7 : 5}>
-                  {t('saleEmpty')}
+                  <StatusMessage tone="info">{t('saleEmpty')}</StatusMessage>
                 </td>
               </tr>
             ) : null}
@@ -219,7 +220,7 @@ export function SaleLines({
       ) : null}
       {sale ? (
         <div className="card">
-          {confirmError ? <p role="alert">{t(confirmError)}</p> : null}
+          {confirmError ? <StatusMessage tone="error">{t(confirmError)}</StatusMessage> : null}
           {editNotice ? (
             <ConfirmDialog
               title={t('saleLineInProgressTitle')}
@@ -240,7 +241,7 @@ export function SaleLines({
               }}
             />
           ) : null}
-          {sale.status === 'VOIDED' ? <p className="m">{t('saleVoided')}</p> : null}
+          {sale.status === 'VOIDED' ? <StatusMessage tone="warning">{t('saleVoided')}</StatusMessage> : null}
           <div className="sale-close">
             {sale.invoiceNumber ? (
               <p>
@@ -310,7 +311,7 @@ function SaleLineCards({
       <span>{t('lineTotal')}</span>
       <span />
     </div>
-    {!sale || sale.items.length === 0 ? <p className="line-cards-empty">{t('saleEmpty')}</p> : null}
+    {!sale || sale.items.length === 0 ? <StatusMessage tone="info">{t('saleEmpty')}</StatusMessage> : null}
     {sale && sale.items.length > 0 ? (
     <ul className="line-cards">
       {sale.items.map(item => {
@@ -677,7 +678,7 @@ function PendingCard({
             </button>
           </div>
         </div>
-        {error ? <p className="pending-error" role="alert">{t(error)}</p> : null}
+        {error ? <StatusMessage tone="error">{t(error)}</StatusMessage> : null}
       </form>
     </dialog>
   );
