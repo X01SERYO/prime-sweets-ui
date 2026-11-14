@@ -12,7 +12,7 @@ title Prime Sweets UI — System Context (current)
 
 Person(seller, "Seller", "Opens the web application in a browser")
 System(ui, "Prime Sweets UI", "Vite/React SPA for the seller day, sales, load sheet, and invoices")
-System_Ext(api, "Prime Sweets Core API", "Identity, catalog, customers, Sales Day, sales, Load Sheet, and invoice documents")
+System_Ext(api, "Prime Sweets Core API", "Identity, catalog, customers, sales, Load Sheet, and invoice documents")
 
 Rel(seller, ui, "Signs in and works the day")
 Rel(ui, api, "Bearer JSON", "HTTP")
@@ -22,7 +22,7 @@ Rel(ui, api, "Bearer JSON", "HTTP")
 
 | Person | Relationship in code |
 |---|---|
-| Seller | Signs in, works today's Sales Day, and prints invoices from the browser. |
+| Seller | Signs in, works the delivery week, and prints invoices from the browser. |
 
 ## External systems
 

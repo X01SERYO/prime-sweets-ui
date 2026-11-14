@@ -2,7 +2,7 @@
 
 **Sources:** `src/app/`, `src/shared/`, `src/modules/`.
 
-The SPA has a composition root, a shared HTTP client, and one hexagonal module per seller area: identity, catalog, customers, sales, and fulfillment output. The sales-day module is removed.
+The SPA has a composition root, a shared HTTP client, and one hexagonal module per seller area: identity, catalog, customers, sales, and fulfillment output. There is no sales-day module. `/sales-day` and `/day-sales` redirect to `/`.
 
 ## Diagram
 
@@ -40,7 +40,12 @@ src/
   shared/
     config/env.ts
     infrastructure/http/httpClient.ts
-  modules/                    empty
+  modules/
+    identity/                  login and session
+    catalog/                   product search, product admin, product create
+    customers/                 customer create and sale customer search
+    sales/                     week home, sale lines, delivery-day list
+    fulfillment-output/        load sheet and invoice preview
 ```
 
-Routes: `/sales-day`, `/customers`, `/sales`, `/load-sheets`, `/invoices`. `/` redirects to `/sales-day`. There is still no module for catalog, customers, sales day, sales, or fulfillment output.
+Routes: `/login`, `/`, `/products`, `/products/new`, `/customers`, `/sales`, `/delivery-sales`, `/load-sheets`, `/invoices/:saleId`. `/` is the week home.

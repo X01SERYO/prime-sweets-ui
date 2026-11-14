@@ -15,6 +15,16 @@ Authentication, sale capture, the Load Sheet, and invoice print are implemented.
 | TD-13 | ~~Dummy list files~~ | `src/shared/dev/dummyLists.ts`, `src/app/lists/DummyLists.tsx` | **[RESOLVED]** Those files are gone. The screens read the API. |
 | TD-04 | ESLint 9 is outside the current support window | `package.json` | `npm install` warns that ESLint 9 is deprecated. Lint still passes. Moving to ESLint 10 is a tooling change, not a feature. |
 
+## Review on 2026-11-14
+
+| Check | Result |
+|---|---|
+| Coverage | **[RESOLVED]** TD-03 is 85.07% lines (1579/1856) with Vitest `all: true`. |
+| Architecture docs | **[RESOLVED]** `docs/architecture/03-component.md` listed an empty `modules/` tree and a Sales Day home. It now lists identity, catalog, customers, sales, and fulfillment output, and the routes that `App.tsx` actually registers. |
+| Flows | **[RESOLVED]** Product admin is `/products` and `/products/new`. The retail section in PDR-004 is not built. |
+| Unused screens | No unused view was deleted. The old dummy lists were already removed (TD-13). |
+| Tooling | TD-04 stays open. ESLint 9 still warns on install. |
+
 ## Resolved with the shell
 
 | ID | Item |

@@ -46,5 +46,5 @@ Screen: `/?deliveryDate=`.
 
 | Area | Where it lives |
 |---|---|
-| Product administration and Alegra sync | [PDR-003](../pdrs/PDR-003.md). The home button exists and does not open a screen yet. Alegra stays on the API. |
+| Product administration and Alegra sync | Product list and create are at `/products` and `/products/new`. Alegra stays on the API. The approved retail section is [PDR-004](../pdrs/PDR-004.md) and is not built. |
 | Choosing a printer or a printer protocol | Windows print dialog. The UI does not record that an invoice was printed. |
