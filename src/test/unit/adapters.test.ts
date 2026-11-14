@@ -183,7 +183,21 @@ test('invoice and load sheet mappers reject a broken payload and print a ticket'
   });
   assert.equal(toInvoiceSummaries([{ saleId: 's1', deliveryDate: '2026-11-14', customerId: 'c1', invoiceNumber: '001', status: 'VOIDED', totalAmount: 1 }])[0].status, 'VOIDED');
   assert.throws(() => toInvoiceSummaries({}), InvoiceInvalidError);
-  assert.equal(toLoadSheetLines({ lines: [{ productId: 'p1', name: 'SODA', quantity: 1, brand: 'ACME', wholesaleCost: 1, wholesaleSalePrice: 2, totalPrice: 2, profit: 1, priceGroups: [] }] }).length, 1);
+  const grouped = toLoadSheetLines({
+    lines: [{
+      productId: 'p1',
+      name: 'SODA',
+      quantity: 1,
+      wholesaleCost: null,
+      wholesaleSalePrice: '2',
+      totalPrice: 2,
+      profit: 1,
+      priceGroups: [{ wholesaleCost: 1, wholesaleSalePrice: 2, quantity: 1, totalPrice: 2, profit: 1 }]
+    }]
+  });
+  assert.equal(grouped[0].priceGroups.length, 1);
+  assert.throws(() => toLoadSheetLines({ lines: [null] }), LoadSheetInvalidError);
+  assert.throws(() => toLoadSheetLines({ lines: [{ productId: 'p1', name: 'SODA', quantity: 1, priceGroups: [{}] }] }), LoadSheetInvalidError);
   assert.throws(() => toLoadSheetLines(null), LoadSheetInvalidError);
   const printed: string[] = [];
   const frame = document.createElement('iframe');

@@ -139,6 +139,9 @@ function bodyFor(url: string, method: string): unknown {
   if (url.includes('/customers')) {
     return { success: true, data: [customer] };
   }
+  if (url.includes('/sales/s2')) {
+    return { success: true, data: { ...sale, id: 's2', status: 'CONFIRMED' } };
+  }
   if (/\/sales\/[^/?]/.test(url)) {
     return { success: true, data: sale };
   }
@@ -170,9 +173,17 @@ function installBrowser() {
 }
 
 function installFetch() {
+  let productWrites = 0;
   const fetchMock: typeof fetch = async (input, init) => {
     const url = String(input);
-    return new Response(JSON.stringify(bodyFor(url, init?.method ?? 'GET')), {
+    const method = init?.method ?? 'GET';
+    if (method === 'PUT' && url.includes('/products')) {
+      productWrites += 1;
+      if (productWrites > 1) {
+        return new Response(JSON.stringify({ error: 'sync', code: 'ALEGRA_SYNC_FAILED' }), { status: 502 });
+      }
+    }
+    return new Response(JSON.stringify(bodyFor(url, method)), {
       status: 200,
       headers: { 'content-type': 'application/json' }
     });
@@ -224,11 +235,18 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
   await waitFor(() => screen.getByText(/se actualizó/));
   fireEvent.click(screen.getByRole('button', { name: 'Editar producto' }));
-  fireEvent.change(screen.getByDisplayValue('SODA'), { target: { value: '' } });
+  fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: '' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+  fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: 'SODA EXTRA' } });
+  fireEvent.change(screen.getByLabelText('% de ganancia'), { target: { value: '20' } });
+  fireEvent.change(screen.getByLabelText('Unidades'), { target: { value: '2' } });
+  fireEvent.change(screen.getByLabelText('Caja'), { target: { value: '4' } });
+  fireEvent.change(screen.getByLabelText('Venta por mayor'), { target: { value: '1500' } });
   fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
   fireEvent.change(screen.getByLabelText(/buscar producto/i), { target: { value: 'SOD' } });
   fireEvent.click(screen.getByRole('button', { name: /^buscar$/i }));
   fireEvent.change(screen.getByLabelText(/tamaño|page size|por página/i), { target: { value: '20' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Volver' }));
   cleanup();
 
   open('/products/new');
@@ -252,6 +270,14 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   if (printAll) {
     fireEvent.click(printAll);
   }
+  const voidSale = screen.queryByRole('button', { name: 'Anular venta' });
+  if (voidSale) {
+    fireEvent.click(voidSale);
+    const confirmVoid = screen.queryByRole('button', { name: 'Confirmar' });
+    if (confirmVoid) {
+      fireEvent.click(confirmVoid);
+    }
+  }
   cleanup();
 
   open('/load-sheets?deliveryDate=2026-11-14');
@@ -262,9 +288,21 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   await waitFor(() => screen.getByText(/Dulceria|factura|invoice/i));
   cleanup();
 
+  open('/sales');
+  await waitFor(() => screen.getByLabelText(/buscar cliente/i));
+  cleanup();
+
   open('/sales?customerId=c1');
   const today = await screen.findByRole('button', { name: /hoy|today/i });
   fireEvent.click(today);
+  cleanup();
+
+  open('/sales?customerId=c1&saleId=s2');
+  await waitFor(() => screen.getByText('SODA'));
+  fireEvent.click(screen.getByRole('button', { name: 'Cambiar día' }));
+  const moveDays = document.querySelectorAll('.delivery-days button');
+  fireEvent.click(moveDays[moveDays.length - 1]);
+  fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
   cleanup();
 
   open('/sales?deliveryDate=2026-11-14&customerId=c1&saleId=s1');
@@ -278,18 +316,16 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
     const confirmLine = await screen.findByRole('button', { name: 'Guardar cambio' });
     fireEvent.click(confirmLine);
   }
-  const confirm = screen.queryByRole('button', { name: 'Confirmar venta' });
-  if (confirm) {
-    fireEvent.click(confirm);
-  }
-  const changeDay = screen.queryByRole('button', { name: /cambiar día/i });
-  if (changeDay) {
-    fireEvent.click(changeDay);
-    const day = screen.queryAllByRole('button').find(button => /\d/.test(button.textContent ?? '') && button.textContent !== 'Salir');
-    if (day) {
-      fireEvent.click(day);
+  fireEvent.click(screen.getByRole('button', { name: 'Cambiar día' }));
+  const days = document.querySelectorAll('.delivery-days button');
+  fireEvent.click(days[days.length - 1]);
+  await waitFor(() => {
+    const confirmSale = screen.getByRole('button', { name: 'Confirmar venta' });
+    if ((confirmSale as HTMLButtonElement).disabled) {
+      throw new Error('wait');
     }
-  }
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Confirmar venta' }));
   const quantity = screen.queryAllByRole('spinbutton')[0] ?? screen.queryAllByRole('textbox').at(-1);
   if (quantity) {
     fireEvent.change(quantity, { target: { value: '3' } });

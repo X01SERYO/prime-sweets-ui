@@ -64,13 +64,58 @@ function Hooks() {
   const listed = useVoidListedSale({ execute: async () => undefined }, () => undefined);
   return (
     <div>
-      <button type="button" onClick={() => void printing.print(['s1'])}>print</button>
-      <button type="button" onClick={() => void printing.print([])}>print-empty</button>
-      <button type="button" onClick={() => { customer.setDocumentNumber('1'); customer.setName('ANA'); void customer.submit(); }}>customer</button>
-      <button type="button" onClick={() => void confirmation.confirm(sale)}>confirm-hook</button>
-      <button type="button" onClick={() => void voiding.voidConfirmed({ ...sale, status: 'CONFIRMED' })}>void-hook</button>
-      <button type="button" onClick={() => void listed.voidConfirmed('s1')}>void-listed</button>
+      <button type="button" onClick={() => void printing.print(['s1'])}>
+        print
+      </button>
+      <button type="button" onClick={() => void printing.print([])}>
+        print-empty
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          customer.setDocumentNumber('1');
+          customer.setName('ANA');
+          void customer.submit();
+        }}
+      >
+        customer
+      </button>
+      <button type="button" onClick={() => void confirmation.confirm(sale)}>
+        confirm-hook
+      </button>
+      <button type="button" onClick={() => void voiding.voidConfirmed({ ...sale, status: 'CONFIRMED' })}>
+        void-hook
+      </button>
+      <button type="button" onClick={() => void listed.voidConfirmed('s1')}>
+        void-listed
+      </button>
       <span>{invoices.loading ? 'loading' : 'ready'}</span>
+    </div>
+  );
+}
+
+function FailingMutations() {
+  const failing = {
+    execute: async () => {
+      throw new Error('no');
+    }
+  };
+  const actions = useSaleMutations(sale, () => undefined, failing, failing, failing, failing);
+  const closed = useSaleMutations({ ...sale, status: 'VOIDED' }, () => undefined, failing, failing, failing, failing);
+  return (
+    <div>
+      <button type="button" onClick={() => void actions.accept('p1', 1, ' ')}>
+        blank
+      </button>
+      <button type="button" onClick={() => void actions.accept('p1', 1, 'SODA')}>
+        add-fail
+      </button>
+      <button type="button" onClick={() => void actions.changeName('i1', ' ')}>
+        name-blank
+      </button>
+      <button type="button" onClick={() => void closed.changeQuantity('i1', 1)}>
+        closed
+      </button>
     </div>
   );
 }
@@ -87,11 +132,21 @@ function Mutations() {
   );
   return (
     <div>
-      <button type="button" onClick={() => void actions.accept('p1', 1, 'SODA')}>add</button>
-      <button type="button" onClick={() => void actions.changeQuantity('i1', 3)}>qty</button>
-      <button type="button" onClick={() => void actions.changeName('i1', 'SODA extra')}>name</button>
-      <button type="button" onClick={() => void actions.remove('i1')}>drop</button>
-      <button type="button" onClick={() => void actions.changeQuantity('i1', 0)}>bad</button>
+      <button type="button" onClick={() => void actions.accept('p1', 1, 'SODA')}>
+        add
+      </button>
+      <button type="button" onClick={() => void actions.changeQuantity('i1', 3)}>
+        qty
+      </button>
+      <button type="button" onClick={() => void actions.changeName('i1', 'SODA extra')}>
+        name
+      </button>
+      <button type="button" onClick={() => void actions.remove('i1')}>
+        drop
+      </button>
+      <button type="button" onClick={() => void actions.changeQuantity('i1', 0)}>
+        bad
+      </button>
     </div>
   );
 }
@@ -169,8 +224,13 @@ function Page() {
         }}
         onLoggedIn={() => undefined}
       />
-      <DeliveryDateModal onSelect={() => undefined} onClose={() => undefined} days={[{ date: '2026-11-14', weekday: 6 }]} />
+      <DeliveryDateModal
+        onSelect={() => undefined}
+        onClose={() => undefined}
+        days={[{ date: '2026-11-14', weekday: 6 }]}
+      />
       <Mutations />
+      <FailingMutations />
       <Hooks />
     </LocaleProvider>
   );
@@ -200,26 +260,32 @@ test('editing a product, a sale line, and a search runs the screen actions', asy
   const router = createMemoryRouter([{ path: '*', element: <Page /> }], { initialEntries: ['/'] });
   render(<RouterProvider router={router} />);
 
+  fireEvent.focus(screen.getAllByRole('textbox')[0]);
+  fireEvent.click(await screen.findByRole('button', { name: 'ACME' }));
   fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: 'GALLETA' } });
   fireEvent.change(screen.getByLabelText('Costo por mayor'), { target: { value: '800' } });
   fireEvent.change(screen.getByLabelText('Venta por mayor'), { target: { value: '1000' } });
   fireEvent.change(screen.getByLabelText('Venta por menor'), { target: { value: '1200' } });
   fireEvent.change(screen.getByLabelText('Unidades'), { target: { value: '1' } });
   const saveProduct = document.querySelector('.product-editor-actions .btn:last-child') as HTMLButtonElement;
-  const values = [...document.querySelectorAll('.product-editor input')].map(node => (node as HTMLInputElement).value).join('|');
+  const values = [...document.querySelectorAll('.product-editor input')]
+    .map(node => (node as HTMLInputElement).value)
+    .join('|');
   if (saveProduct.disabled) {
     throw new Error(values);
   }
   fireEvent.click(saveProduct);
   fireEvent.click(screen.getByRole('button', { name: 'Agregar marca' }));
-  const brandName = screen.getAllByRole('textbox')[1];
-  fireEvent.change(brandName, { target: { value: 'NUEVA' } });
+  fireEvent.change(screen.getAllByLabelText('Nombre')[1], { target: { value: 'NUEVA' } });
+  fireEvent.change(screen.getByLabelText('Código'), { target: { value: 'NUE' } });
   fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' })[0]);
 
   fireEvent.click(screen.getByRole('button', { name: 'Quitar' }));
   fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' }).at(-1)!);
   fireEvent.click(screen.getByRole('button', { name: 'Confirmar venta' }));
   fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+  fireEvent.change(screen.getAllByLabelText('Producto').at(-1)!, { target: { value: 'SODA extra roja' } });
+  fireEvent.change(screen.getAllByLabelText('Cantidad').at(-1)!, { target: { value: '4' } });
   fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' }).at(-1)!);
 
   fireEvent.change(screen.getByLabelText(/buscar producto|search product/i), { target: { value: 'SODA' } });
@@ -239,6 +305,10 @@ test('editing a product, a sale line, and a search runs the screen actions', asy
   fireEvent.click(screen.getByRole('button', { name: 'name' }));
   fireEvent.click(screen.getByRole('button', { name: 'drop' }));
   fireEvent.click(screen.getByRole('button', { name: 'bad' }));
+  fireEvent.click(screen.getByRole('button', { name: 'blank' }));
+  fireEvent.click(screen.getByRole('button', { name: 'add-fail' }));
+  fireEvent.click(screen.getByRole('button', { name: 'name-blank' }));
+  fireEvent.click(screen.getByRole('button', { name: 'closed' }));
   fireEvent.click(screen.getByRole('button', { name: 'print' }));
   fireEvent.click(screen.getByRole('button', { name: 'print-empty' }));
   fireEvent.click(screen.getByRole('button', { name: 'customer' }));
@@ -307,8 +377,16 @@ test('creating a product reports a duplicate and an invalid brand', async () => 
           <LocaleProvider>
             <ProductCreate
               listBrands={{ execute: async () => [] }}
-              createBrand={{ execute: async () => { throw new HttpRequestError(409, 'ya existe', 'BRAND_EXISTS'); } }}
-              createCatalogProduct={{ execute: async () => { throw new HttpRequestError(409, 'ya existe', 'PRODUCT_ALREADY_EXISTS'); } }}
+              createBrand={{
+                execute: async () => {
+                  throw new HttpRequestError(409, 'ya existe', 'BRAND_EXISTS');
+                }
+              }}
+              createCatalogProduct={{
+                execute: async () => {
+                  throw new HttpRequestError(409, 'ya existe', 'PRODUCT_ALREADY_EXISTS');
+                }
+              }}
             />
           </LocaleProvider>
         )
@@ -319,11 +397,14 @@ test('creating a product reports a duplicate and an invalid brand', async () => 
   render(<RouterProvider router={router} />);
   fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: 'GALLETA' } });
   fireEvent.change(screen.getByLabelText('Costo por mayor'), { target: { value: '800' } });
+  fireEvent.change(screen.getByLabelText('Unidades'), { target: { value: '1' } });
+  fireEvent.click(document.querySelector('.product-editor-actions .btn:last-child')!);
   fireEvent.change(screen.getByLabelText('Venta por mayor'), { target: { value: '1000' } });
   fireEvent.change(screen.getByLabelText('Venta por menor'), { target: { value: '1200' } });
-  fireEvent.change(screen.getByLabelText('Unidades'), { target: { value: '1' } });
   fireEvent.click(document.querySelector('.product-editor-actions .btn:last-child')!);
   await waitFor(() => screen.getByRole('alert'));
   fireEvent.click(screen.getByRole('button', { name: 'Agregar marca' }));
-  fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' })[0]);
+  fireEvent.change(screen.getAllByLabelText('Nombre')[1], { target: { value: 'NUEVA' } });
+  fireEvent.change(screen.getByLabelText('Código'), { target: { value: 'NUE' } });
+  fireEvent.click(document.querySelector('.product-brand-save')!);
 });
