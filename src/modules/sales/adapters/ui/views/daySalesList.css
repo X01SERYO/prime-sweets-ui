@@ -4,13 +4,21 @@
   white-space: nowrap;
 }
 
+.day-sales-table th,
 .day-sales-table td {
   padding: 0.55rem 1.15rem;
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
   text-align: left;
+  font-size: 0.85rem;
 }
 
+.day-sales-table th {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.day-sales-table th:first-child,
 .day-sales-table td:first-child {
   padding-left: 0;
 }

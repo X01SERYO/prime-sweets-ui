@@ -36,6 +36,15 @@ import { GenerateInvoiceUseCase } from '@/modules/fulfillment-output/application
 import { ListInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/listInvoices.useCase';
 import { ListLoadSheetUseCase } from '@/modules/fulfillment-output/application/use-cases/listLoadSheet.useCase';
 import { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
+import { HttpRetailDay } from '@/modules/retail-sales/adapters/infrastructure/httpRetailDay';
+import { HttpRetailProductSearch } from '@/modules/retail-sales/adapters/infrastructure/httpRetailProductSearch';
+import { AddRetailItemUseCase } from '@/modules/retail-sales/application/use-cases/addRetailItem.useCase';
+import { GetTodayRetailDayUseCase } from '@/modules/retail-sales/application/use-cases/getTodayRetailDay.useCase';
+import { ListRetailDaysUseCase } from '@/modules/retail-sales/application/use-cases/listRetailDays.useCase';
+import { RemoveRetailItemUseCase } from '@/modules/retail-sales/application/use-cases/removeRetailItem.useCase';
+import { ReviewRetailDaysUseCase } from '@/modules/retail-sales/application/use-cases/reviewRetailDays.useCase';
+import { SearchRetailProductsUseCase } from '@/modules/retail-sales/application/use-cases/searchRetailProducts.useCase';
+import { SetRetailItemQuantityUseCase } from '@/modules/retail-sales/application/use-cases/setRetailItemQuantity.useCase';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -69,6 +78,13 @@ export interface AppContainer {
   listInvoices: ListInvoicesUseCase;
   generateInvoice: GenerateInvoiceUseCase;
   printInvoices: PrintInvoicesUseCase;
+  getTodayRetailDay: GetTodayRetailDayUseCase;
+  searchRetailProducts: SearchRetailProductsUseCase;
+  addRetailItem: AddRetailItemUseCase;
+  setRetailItemQuantity: SetRetailItemQuantityUseCase;
+  removeRetailItem: RemoveRetailItemUseCase;
+  listRetailDays: ListRetailDaysUseCase;
+  reviewRetailDays: ReviewRetailDaysUseCase;
 }
 
 export function createAppContainer(): AppContainer {
@@ -104,6 +120,13 @@ export function createAppContainer(): AppContainer {
     listLoadSheet: new ListLoadSheetUseCase(new HttpLoadSheetQuery(http)),
     listInvoices: new ListInvoicesUseCase(new HttpInvoiceQuery(http)),
     generateInvoice: new GenerateInvoiceUseCase(new HttpInvoiceQuery(http)),
-    printInvoices: new PrintInvoicesUseCase(new GenerateInvoiceUseCase(new HttpInvoiceQuery(http)), new BrowserInvoicePrint())
+    printInvoices: new PrintInvoicesUseCase(new GenerateInvoiceUseCase(new HttpInvoiceQuery(http)), new BrowserInvoicePrint()),
+    getTodayRetailDay: new GetTodayRetailDayUseCase(new HttpRetailDay(http)),
+    searchRetailProducts: new SearchRetailProductsUseCase(new HttpRetailProductSearch(http)),
+    addRetailItem: new AddRetailItemUseCase(new HttpRetailDay(http)),
+    setRetailItemQuantity: new SetRetailItemQuantityUseCase(new HttpRetailDay(http)),
+    removeRetailItem: new RemoveRetailItemUseCase(new HttpRetailDay(http)),
+    listRetailDays: new ListRetailDaysUseCase(new HttpRetailDay(http)),
+    reviewRetailDays: new ReviewRetailDaysUseCase(new HttpRetailDay(http))
   };
 }

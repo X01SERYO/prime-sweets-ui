@@ -3,6 +3,8 @@ import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useSearchParams
 import { AppShellNav } from '@/app/AppShell';
 import { DeliveryDayCard } from '@/app/DeliveryDayCard';
 import { RetailSection } from '@/modules/retail-sales/adapters/ui/views/RetailSection';
+import { RetailHistoryView } from '@/modules/retail-sales/adapters/ui/views/RetailHistoryView';
+import { RetailTodayView } from '@/modules/retail-sales/adapters/ui/views/RetailTodayView';
 import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
@@ -345,11 +347,33 @@ export function App({ container }: AppProps) {
           />
           <Route
             path="/retail-sales/history"
-            element={session ? <RetailSection /> : <Navigate to="/login" replace />}
+            element={
+              session ? (
+                <RetailSection>
+                  <RetailHistoryView listDays={container.listRetailDays} reviewDays={container.reviewRetailDays} />
+                </RetailSection>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           <Route
             path="/retail-sales"
-            element={session ? <RetailSection /> : <Navigate to="/login" replace />}
+            element={
+              session ? (
+                <RetailSection>
+                  <RetailTodayView
+                    getToday={container.getTodayRetailDay}
+                    searchProducts={container.searchRetailProducts}
+                    addItem={container.addRetailItem}
+                    setQuantity={container.setRetailItemQuantity}
+                    removeItem={container.removeRetailItem}
+                  />
+                </RetailSection>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           <Route
             path="/invoices/:saleId"

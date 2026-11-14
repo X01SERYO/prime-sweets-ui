@@ -57,11 +57,6 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
     setSelected(current => (current.includes(saleId) ? current.filter(id => id !== saleId) : [...current, saleId]));
   }
 
-  function selectAll() {
-    const ids = printable.map(sale => sale.id);
-    setSelected(current => (ids.every(id => current.includes(id)) ? [] : ids));
-  }
-
   return (
     <section className="stack">
       <div>
@@ -77,9 +72,6 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
       ) : null}
       {printable.length > 0 ? (
         <div className="row day-sales-print">
-          <button className="btn btn-secondary" type="button" disabled={printing.printing} onClick={selectAll}>
-            {t('selectAllInvoices')}
-          </button>
           <button className="btn btn-secondary" type="button" disabled={printing.printing || selected.length === 0} onClick={() => void printing.print(selected)}>
             {printing.printing ? t('invoicePrinting') : t('printSelected')}
           </button>
@@ -128,6 +120,18 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
         })}
       </ul>
       <table className="day-sales-table">
+        <thead>
+          <tr>
+            <th className="day-sales-pick" />
+            <th>{t('customerName')}</th>
+            <th>{t('status')}</th>
+            <th>{t('invoice')}</th>
+            <th className="day-sales-total">{t('saleTotal')}</th>
+            <th className="day-sales-action" />
+            <th className="day-sales-action" />
+            <th className="day-sales-action" />
+          </tr>
+        </thead>
         <tbody>
           {listed.sales.map(sale => (
             <tr key={sale.id}>

@@ -134,16 +134,6 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
           <ScreenTitle>{t('loadSheet')}</ScreenTitle>
           {deliveryDate ? <p className="load-sheet-date">{formatDeliveryHeading(deliveryDate, locale)}</p> : null}
         </div>
-        {!sheet.loading && !sheet.error ? (
-          <p className="load-sheet-totals">
-            <span>
-              {t('soldTotal')} {formatCurrency(soldTotal)}
-            </span>
-            <span>
-              {t('profitTotal')} {formatCurrency(profitTotal)}
-            </span>
-          </p>
-        ) : null}
       </header>
       {sheet.loading ? <StatusMessage tone="info">{t('loadSheetLoading')}</StatusMessage> : null}
       {sheet.error ? <StatusMessage tone="error">{t(sheet.error)}</StatusMessage> : null}
@@ -178,6 +168,18 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
         </tbody>
       </table>
       </div>
+      ) : null}
+      {!sheet.loading && !sheet.error ? (
+        <p className="load-sheet-totals">
+          <span className="load-sheet-total">
+            <small>{t('profitTotal')}</small>
+            <strong>{formatCurrency(profitTotal)}</strong>
+          </span>
+          <span className="load-sheet-total">
+            <small>{t('soldTotal')}</small>
+            <strong>{formatCurrency(soldTotal)}</strong>
+          </span>
+        </p>
       ) : null}
     </section>
   );

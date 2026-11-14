@@ -1,0 +1,356 @@
+.retail-day-head {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.retail-badge {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #fff4df;
+  color: #8a5a00;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.retail-badge.is-reviewed {
+  background: #e5f6ef;
+  color: #0d6b45;
+}
+
+.retail-today {
+  padding-bottom: 4.75rem;
+}
+
+.retail-totals-bar {
+  position: fixed;
+  z-index: 5;
+  right: 0;
+  bottom: 4.75rem;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0.7rem 1rem;
+  text-align: right;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 18px rgb(10 79 90 / 8%);
+}
+
+.retail-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.retail-total small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.retail-total strong {
+  color: var(--deep);
+  font-size: 1.05rem;
+}
+
+.retail-search,
+.retail-selected {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.retail-search input,
+.retail-selected label {
+  flex: 1 1 12rem;
+}
+
+.retail-results {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.retail-results button {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.retail-results [aria-selected='true'] button,
+.retail-results button:hover {
+  background: #f3f7f8;
+}
+
+.retail-lines {
+  overflow: visible;
+}
+
+.retail-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.retail-table th,
+.retail-table td {
+  padding: 0.4rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.75rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.retail-table th {
+  font-weight: 700;
+}
+
+.retail-table th:nth-child(1),
+.retail-table td:nth-child(1),
+.retail-table th:nth-child(2),
+.retail-table td:nth-child(2) {
+  width: 18%;
+}
+
+.retail-table th:nth-child(4),
+.retail-table td:nth-child(4) {
+  width: 18%;
+}
+
+.retail-table th:nth-child(5),
+.retail-table td:nth-child(5) {
+  width: 7.4rem;
+}
+
+.retail-table th:nth-child(6),
+.retail-table td:nth-child(6),
+.retail-table th:last-child,
+.retail-table td:last-child {
+  width: 2.1rem;
+  padding-right: 0;
+  padding-left: 0;
+  text-align: center;
+  overflow: visible;
+}
+
+.retail-table .qty {
+  gap: 0.15rem;
+}
+
+.retail-table .qty input,
+.retail-table .qty .btn,
+.retail-table .retail-delete {
+  width: 1.7rem;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  min-height: 1.7rem;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.retail-table .qty input {
+  width: 2.1rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.retail-lines tr.is-highlighted td {
+  background: #e7f7f8;
+}
+
+.retail-warn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  color: #c2410c;
+  cursor: help;
+}
+
+.retail-warn svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.retail-warn-text {
+  display: none;
+  position: absolute;
+  right: calc(100% + 0.35rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: max-content;
+  max-width: 14rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--radius);
+  background: var(--deep);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.retail-warn:hover .retail-warn-text,
+.retail-warn:focus-visible .retail-warn-text {
+  display: block;
+}
+
+.product-admin-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-admin-size {
+  margin-left: auto;
+}
+
+.retail-status-switch {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.retail-status-switch button {
+  margin: 0;
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.retail-status-switch button.is-active {
+  color: var(--deep);
+  border-bottom-color: var(--teal);
+  background: transparent;
+}
+
+.retail-select-page {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  margin: 0.65rem 0 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.retail-select-page input,
+.retail-history-list input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+.retail-history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.retail-history-list label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 0.35rem 1.25rem;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.retail-history-list label > .retail-history-metric strong {
+  font-size: 0.95rem;
+}
+
+.retail-history-list small {
+  display: block;
+  color: var(--muted);
+}
+
+.retail-history-bar {
+  position: fixed;
+  z-index: 5;
+  right: 0;
+  bottom: 4.75rem;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.7rem 1rem;
+  text-align: right;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 18px rgb(10 79 90 / 8%);
+}
+
+.retail-history-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.retail-history-metric small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.retail-history-metric strong {
+  color: var(--deep);
+  font-size: 1.05rem;
+}
+
+.retail-history {
+  padding-bottom: 4.5rem;
+}
+
+@media (min-width: 48rem) {
+  .retail-history-bar {
+    bottom: 0;
+    left: 13rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .retail-search,
+  .retail-selected,
+  .retail-selected .btn {
+    width: 100%;
+  }
+}
+
+@media (min-width: 48rem) {
+  .retail-totals-bar {
+    bottom: 0;
+    left: 13rem;
+  }
+
+  .retail-today {
+    padding-bottom: 4rem;
+  }
+}

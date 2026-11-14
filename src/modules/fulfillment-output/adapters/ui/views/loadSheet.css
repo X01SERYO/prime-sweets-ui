@@ -2,7 +2,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
   gap: 0.75rem 1.5rem;
 }
 
@@ -13,13 +12,43 @@
   font-weight: 700;
 }
 
+.stack:has(.load-sheet-totals) {
+  padding-bottom: 4.75rem;
+}
+
 .load-sheet-totals {
+  position: fixed;
+  z-index: 5;
+  right: 0;
+  bottom: 4.75rem;
+  left: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.25rem;
+  justify-content: flex-end;
+  gap: 1.25rem;
   margin: 0;
-  color: var(--deep);
+  padding: 0.7rem 1rem;
+  text-align: right;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 18px rgb(10 79 90 / 8%);
+}
+
+.load-sheet-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.load-sheet-total small {
+  color: var(--muted);
+  font-size: 0.7rem;
   font-weight: 700;
+}
+
+.load-sheet-total strong {
+  color: var(--deep);
+  font-size: 1.05rem;
 }
 
 .load-sheet-scroll {
@@ -34,43 +63,29 @@
 
 .load-sheet-table th,
 .load-sheet-table td {
-  padding: 0.55rem 0.4rem;
+  padding: 0.4rem 0.25rem;
   border-bottom: 1px solid var(--line);
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
+  font-size: 0.75rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .load-sheet-table th {
-  color: var(--deep);
-  font-size: 0.75rem;
   font-weight: 700;
 }
 
-.load-sheet-table th:not(.load-sheet-name):not(.load-sheet-edge),
-.load-sheet-table td:not(.load-sheet-name):not(.load-sheet-edge) {
-  width: 10%;
-}
-
 .load-sheet-edge {
-  width: 2.25rem;
-  padding-left: 0.15rem;
-  padding-right: 0.15rem;
+  width: 2.1rem;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
   overflow: visible;
 }
 
-.load-sheet-table th {
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.load-sheet-table td:not(.load-sheet-name) {
-  white-space: nowrap;
-}
-
 .load-sheet-name {
-  width: 40%;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  width: 28%;
 }
 
 .load-sheet-mixed td {
@@ -96,19 +111,20 @@
 .load-sheet-warn-text {
   display: none;
   position: absolute;
-  left: calc(100% + 0.45rem);
+  right: calc(100% + 0.35rem);
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
   width: max-content;
-  max-width: 16rem;
+  max-width: 14rem;
   padding: 0.35rem 0.55rem;
   border-radius: var(--radius);
   background: var(--deep);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.3;
+  text-align: left;
   white-space: normal;
 }
 
@@ -142,19 +158,12 @@
 .load-sheet-group td {
   background: #fff8f1;
   color: var(--deep);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
-@media (max-width: 40rem) {
-  .load-sheet-scroll {
-    overflow-x: auto;
-  }
-
-  .load-sheet-table {
-    table-layout: auto;
-  }
-
-  .load-sheet-name {
-    min-width: 12rem;
+@media (min-width: 48rem) {
+  .load-sheet-totals {
+    bottom: 0;
+    left: 13rem;
   }
 }
