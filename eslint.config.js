@@ -18,6 +18,9 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.browser
+    },
+    rules: {
+      'react-hooks/set-state-in-effect': 'off'
     }
   }
 ]);

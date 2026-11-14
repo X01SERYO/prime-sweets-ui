@@ -26,7 +26,8 @@ import { InvoiceInvalidError } from '../../modules/fulfillment-output/domain/err
 import { BrowserInvoicePrint } from '../../modules/fulfillment-output/adapters/infrastructure/browserInvoicePrint.ts';
 import { HttpSale } from '../../modules/sales/adapters/infrastructure/httpSale.ts';
 import { SaleInvalidError } from '../../modules/sales/domain/errors/saleInvalid.error.ts';
-import { parseQuantity, QuantityField } from '../../modules/sales/adapters/ui/views/QuantityField.tsx';
+import { QuantityField } from '../../modules/sales/adapters/ui/views/QuantityField.tsx';
+import { parseQuantity } from '../../modules/sales/domain/quantity.ts';
 import { HttpLoadSheetQuery } from '../../modules/fulfillment-output/adapters/infrastructure/httpLoadSheetQuery.ts';
 import { LoadSheetNotClosedError } from '../../modules/fulfillment-output/domain/errors/loadSheetNotClosed.error.ts';
 import { useInvoiceDocument } from '../../modules/fulfillment-output/adapters/ui/hooks/useInvoiceDocument.ts';

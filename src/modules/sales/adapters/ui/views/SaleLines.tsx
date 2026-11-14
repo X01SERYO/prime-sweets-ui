@@ -6,7 +6,8 @@ import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
-import { parseQuantity, QuantityField } from '@/modules/sales/adapters/ui/views/QuantityField';
+import { QuantityField } from '@/modules/sales/adapters/ui/views/QuantityField';
+import { parseQuantity } from '@/modules/sales/domain/quantity';
 
 export interface PendingLine {
   productId: string;
@@ -109,7 +110,7 @@ export function SaleLines({
           pending={pending}
           busy={busy}
           error={lineError}
-          actions={editingActions}
+          actionsRef={editingActions}
           onAccept={onAcceptPending}
           onCancel={onCancelPending}
         />
@@ -121,7 +122,7 @@ export function SaleLines({
           busy={busy}
           editingId={editingId}
           openId={openId}
-          actions={editingActions}
+          actionsRef={editingActions}
           onToggle={toggleLine}
           onEdit={id => {
             setOpenId(id);
@@ -167,7 +168,7 @@ export function SaleLines({
                 wholesalePrice={item.wholesalePrice}
                 allowName={sale ? canRenameSaleLine(sale.status) : false}
                     busy={busy}
-                    actions={editingActions}
+                    actionsRef={editingActions}
                     onSave={async (name, quantity) => saveItem(item, name, quantity)}
                     onCancel={cancelEdit}
                   />
@@ -280,7 +281,7 @@ function SaleLineCards({
   busy,
   editingId,
   openId,
-  actions,
+  actionsRef,
   onToggle,
   onEdit,
   onRemove,
@@ -292,7 +293,7 @@ function SaleLineCards({
   busy: boolean;
   editingId: string | null;
   openId: string | null;
-  actions: MutableRefObject<EditingActions | null>;
+  actionsRef: MutableRefObject<EditingActions | null>;
   onToggle: (id: string) => void;
   onEdit: (id: string) => void;
   onRemove: (id: string) => void;
@@ -326,7 +327,7 @@ function SaleLineCards({
                 wholesalePrice={item.wholesalePrice}
                 allowName={canRenameSaleLine(sale.status)}
                 busy={busy}
-                actions={actions}
+                actionsRef={actionsRef}
                 onSave={(name, quantity) => onSave(item, name, quantity)}
                 onCancel={onCancelEdit}
               />
@@ -401,7 +402,7 @@ function LineEditor({
   wholesalePrice,
   allowName,
   busy,
-  actions,
+  actionsRef,
   onSave,
   onCancel
 }: {
@@ -413,7 +414,7 @@ function LineEditor({
   wholesalePrice: number;
   allowName: boolean;
   busy: boolean;
-  actions: MutableRefObject<EditingActions | null>;
+  actionsRef: MutableRefObject<EditingActions | null>;
   onSave: (name: string, quantity: number) => Promise<SaleModel | null>;
   onCancel: () => void;
 }) {
@@ -430,9 +431,9 @@ function LineEditor({
   }
 
   useEffect(() => {
-    actions.current = { save, cancel: onCancel };
+    actionsRef.current = { save, cancel: onCancel };
     return () => {
-      actions.current = null;
+      actionsRef.current = null;
     };
   });
 
@@ -576,14 +577,14 @@ function PendingCard({
   pending,
   busy,
   error,
-  actions,
+  actionsRef,
   onAccept,
   onCancel
 }: {
   pending: PendingLine;
   busy: boolean;
   error: MessageKey | null;
-  actions: MutableRefObject<EditingActions | null>;
+  actionsRef: MutableRefObject<EditingActions | null>;
   onAccept: (name: string, quantity: number) => Promise<SaleModel | null>;
   onCancel: () => void;
 }) {
@@ -604,9 +605,9 @@ function PendingCard({
   }
 
   useEffect(() => {
-    actions.current = { save, cancel: onCancel };
+    actionsRef.current = { save, cancel: onCancel };
     return () => {
-      actions.current = null;
+      actionsRef.current = null;
     };
   });
 

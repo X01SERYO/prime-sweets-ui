@@ -1,16 +1,5 @@
+import { parseQuantity } from '@/modules/sales/domain/quantity';
 import { useLocale } from '@/shared/i18n/useLocale';
-
-export function parseQuantity(value: string): number | null {
-  const parsed = Number(value.trim().replace(',', '.'));
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return null;
-  }
-  const thousandths = Math.round(parsed * 1000);
-  if (Math.abs(parsed * 1000 - thousandths) > 1e-6) {
-    return null;
-  }
-  return thousandths / 1000;
-}
 
 export function QuantityField({
   value,

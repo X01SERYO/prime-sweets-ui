@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useCustomerSearch } from '@/modules/customers/adapters/ui/hooks/useCustomerSearch';
 import type { SearchCustomersUseCase } from '@/modules/customers/application/use-cases/searchCustomers.useCase';
