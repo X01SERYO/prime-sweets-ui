@@ -1,5 +1,5 @@
 import { RetailInvalidError } from '@/modules/retail-sales/domain/errors/retailInvalid.error';
-import type { RetailDayItem, RetailDayModel, RetailDayPage, RetailDayStatus, RetailProductOption } from '@/modules/retail-sales/domain/models/retailDay';
+import type { RetailDayItem, RetailDayModel, RetailDayPage, RetailDayStatus, RetailDaySummary, RetailProductOption } from '@/modules/retail-sales/domain/models/retailDay';
 
 function text(value: unknown): string {
   return typeof value === 'string' ? value : '';
@@ -100,12 +100,12 @@ export function toRetailDayPage(value: unknown): RetailDayPage {
   };
 }
 
-function summary(value: unknown) {
+function summary(value: unknown): RetailDaySummary {
   if (!value || typeof value !== 'object') {
     throw new RetailInvalidError();
   }
   const day = value as Record<string, unknown>;
-  const status = day.status === 'REVIEWED' || day.status === 'UNREVIEWED' ? day.status : null;
+  const status = retailStatus(day.status);
   if (typeof day.businessDate !== 'string' || status === null) {
     throw new RetailInvalidError();
   }
@@ -117,4 +117,8 @@ function summary(value: unknown) {
     reviewedAt: typeof day.reviewedAt === 'string' ? day.reviewedAt : null,
     reviewedByName: typeof day.reviewedByName === 'string' ? day.reviewedByName : null
   };
+}
+
+function retailStatus(value: unknown): RetailDayStatus | null {
+  return value === 'REVIEWED' || value === 'UNREVIEWED' ? value : null;
 }

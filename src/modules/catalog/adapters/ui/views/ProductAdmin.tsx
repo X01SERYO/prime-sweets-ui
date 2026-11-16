@@ -106,6 +106,9 @@ function patchFor(product: CatalogProduct, draft: Draft): CatalogProductPatch | 
   }
   const wholesaleCost = next.wholesaleCost === undefined ? product.wholesaleCost : next.wholesaleCost;
   const units = next.units === undefined ? product.units : next.units;
+  if (typeof wholesaleCost === 'string' || typeof units !== 'number') {
+    return 'invalid';
+  }
   const retailCost = retailUnitCost(wholesaleCost, units);
   if (retailCost <= 0) {
     return 'invalid';
