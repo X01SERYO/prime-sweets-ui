@@ -97,7 +97,7 @@ button.btn.product-brand-save {
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   white-space: normal;
   overflow: visible;
   overflow-wrap: break-word;
@@ -143,6 +143,32 @@ button.btn.product-brand-save {
   .product-admin-table th:nth-child(9),
   .product-admin-table td:nth-child(9) {
     width: 4.2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .product-admin-table {
+    table-layout: auto;
+  }
+
+  .product-admin-table th:nth-child(1),
+  .product-admin-table td:nth-child(1),
+  .product-admin-table th:nth-child(3),
+  .product-admin-table td:nth-child(3),
+  .product-admin-table th:nth-child(4),
+  .product-admin-table td:nth-child(4),
+  .product-admin-table th:nth-child(5),
+  .product-admin-table td:nth-child(5),
+  .product-admin-table th:nth-child(6),
+  .product-admin-table td:nth-child(6),
+  .product-admin-table th:nth-child(7),
+  .product-admin-table td:nth-child(7),
+  .product-admin-table th:nth-child(8),
+  .product-admin-table td:nth-child(8),
+  .product-admin-table th:nth-child(9),
+  .product-admin-table td:nth-child(9) {
+    width: 1%;
+    white-space: nowrap;
   }
 }
 

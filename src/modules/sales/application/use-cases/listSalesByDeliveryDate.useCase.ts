@@ -32,6 +32,7 @@ export class ListSalesByDeliveryDateUseCase {
         customerId: sale.customerId,
         customerName: names.get(sale.customerId) ?? '',
         status: sale.status,
+        productCount: sale.items.length,
         quantity: sale.totalQuantity,
         total: sale.totalAmount,
         invoiceNumber: sale.invoiceNumber

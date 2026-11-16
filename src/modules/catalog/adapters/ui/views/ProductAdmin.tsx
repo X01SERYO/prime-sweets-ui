@@ -236,20 +236,13 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
           void load(1, query);
         }}
       >
-        <div className="search-label">
-          <label htmlFor="product-admin-query">{t('searchProduct')}</label>
-          <button type="button" className="info-tip" aria-label={t('searchHint')}>
-            <InfoIcon />
-            <span className="info-tip-text" role="tooltip">
-              {t('searchHint')}
-            </span>
-          </button>
-        </div>
+        <label htmlFor="product-admin-query">{t('searchProduct')}</label>
         <div className="search-row">
           <input
             className="search-field"
             id="product-admin-query"
             value={query}
+            placeholder={t('productSearchPlaceholder')}
             autoComplete="off"
             onChange={event => setQuery(event.target.value)}
           />
@@ -458,16 +451,6 @@ function SearchIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
       <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.25" />
-      <path d="M8 7.25v4" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-      <circle cx="8" cy="5" r="0.75" fill="currentColor" />
     </svg>
   );
 }

@@ -3,6 +3,7 @@ import { catalog } from '@/shared/i18n/catalog';
 export const catalogMessages = catalog(
   {
     searchProduct: 'Buscar producto',
+    productSearchPlaceholder: 'Nombre o código del producto',
     search: 'Buscar',
     searching: 'Buscando…',
     searchHint: 'Nombre, marca o código. Mínimo 3 caracteres.',
@@ -52,6 +53,7 @@ export const catalogMessages = catalog(
   },
   {
     searchProduct: 'Search product',
+    productSearchPlaceholder: 'Product name or code',
     search: 'Search',
     searching: 'Searching…',
     searchHint: 'Name, brand, or code. At least 3 characters.',

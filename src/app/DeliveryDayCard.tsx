@@ -15,7 +15,7 @@ export function DeliveryDayCard({ deliveryDate, onChange }: DeliveryDayCardProps
         <span className="delivery-day-value">{formatDeliveryHeading(deliveryDate, locale)}</span>
       </div>
       {onChange ? (
-        <button className="btn btn-secondary" type="button" onClick={onChange}>
+        <button className="text-button" type="button" onClick={onChange}>
           {t('changeDeliveryDay')}
         </button>
       ) : null}

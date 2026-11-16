@@ -111,19 +111,14 @@ export function RetailProductPicker({
           void submitSearch();
         }}
       >
-        <div className="search-label">
-          <label htmlFor="retail-product-query">{t('searchProduct')}</label>
-          <button type="button" className="info-tip" aria-label={t('searchHint')}>
-            <InfoIcon />
-            <span className="info-tip-text" role="tooltip">{t('searchHint')}</span>
-          </button>
-        </div>
+        <label htmlFor="retail-product-query">{t('searchProduct')}</label>
         <div className="search-row">
           <input
             ref={searchRef}
             id="retail-product-query"
             className="search-field"
             value={query}
+            placeholder={t('productSearchPlaceholder')}
             role="combobox"
             aria-expanded={open}
             aria-controls={listId}
@@ -220,12 +215,3 @@ function SearchIcon() {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.25" />
-      <path d="M8 7.25v4" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-      <circle cx="8" cy="5" r="0.75" fill="currentColor" />
-    </svg>
-  );
-}

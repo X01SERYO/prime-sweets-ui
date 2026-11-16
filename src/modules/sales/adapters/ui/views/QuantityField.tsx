@@ -4,11 +4,17 @@ import { useLocale } from '@/shared/i18n/useLocale';
 export function QuantityField({
   value,
   onChange,
-  disabled
+  disabled,
+  autoFocus,
+  inputTabIndex,
+  stepperTabIndex
 }: {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  autoFocus?: boolean;
+  inputTabIndex?: number;
+  stepperTabIndex?: number;
 }) {
   const { t } = useLocale();
   const current = parseQuantity(value);
@@ -23,17 +29,19 @@ export function QuantityField({
 
   return (
     <div className="qty">
-      <button className="btn btn-secondary" type="button" aria-label={t('decreaseQuantity')} disabled={disabled || (current ?? 1) - 1 <= 0} onClick={() => step(-1)}>
+      <button className="btn btn-secondary" type="button" tabIndex={stepperTabIndex} aria-label={t('decreaseQuantity')} disabled={disabled || (current ?? 1) - 1 <= 0} onClick={() => step(-1)}>
         −
       </button>
       <input
         value={value}
         disabled={disabled}
+        autoFocus={autoFocus}
+        tabIndex={inputTabIndex}
         inputMode="decimal"
         aria-label={t('quantityName')}
         onChange={event => onChange(event.target.value)}
       />
-      <button className="btn btn-secondary" type="button" aria-label={t('increaseQuantity')} disabled={disabled} onClick={() => step(1)}>
+      <button className="btn btn-secondary" type="button" tabIndex={stepperTabIndex} aria-label={t('increaseQuantity')} disabled={disabled} onClick={() => step(1)}>
         +
       </button>
     </div>

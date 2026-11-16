@@ -29,7 +29,23 @@ export const shellMessages = catalog(
     draftCount: 'Borradores',
     confirmedCount: 'Confirmadas',
     voidedCount: 'Anuladas',
-    confirmedTotal: 'Total por mayor'
+    confirmedTotal: 'Total por mayor',
+    goToToday: 'Ir a hoy',
+    allSales: 'Todas',
+    searchSaleCustomer: 'Buscar por cliente',
+    noSalesDay: 'Aún no hay ventas para este día',
+    noSalesFilter: 'No hay ventas con ese filtro',
+    continueSale: 'Continuar',
+    viewSale: 'Ver',
+    draftAlertOne: 'Tienes 1 borrador sin confirmar.',
+    draftAlertMany: 'Tienes {count} borradores sin confirmar.',
+    confirmedDayTotal: 'Total confirmado del día',
+    nothingToDeliver: 'Sin entregas',
+    toDeliver: '{count} por entregar',
+    nothingToLoad: 'Nada que cargar',
+    unitsToLoad: '{count} unidades',
+    daySaleCountOne: '1 venta',
+    daySaleCount: '{count} ventas'
   },
   {
     languageLabel: 'Switch language to Spanish',
@@ -59,6 +75,22 @@ export const shellMessages = catalog(
     draftCount: 'Drafts',
     confirmedCount: 'Confirmed',
     voidedCount: 'Voided',
-    confirmedTotal: 'Wholesale total'
+    confirmedTotal: 'Wholesale total',
+    goToToday: 'Go to today',
+    allSales: 'All',
+    searchSaleCustomer: 'Search by customer',
+    noSalesDay: 'No sales for this day yet',
+    noSalesFilter: 'No sales match that filter',
+    continueSale: 'Continue',
+    viewSale: 'View',
+    draftAlertOne: 'You have 1 unconfirmed draft.',
+    draftAlertMany: 'You have {count} unconfirmed drafts.',
+    confirmedDayTotal: 'Confirmed total for the day',
+    nothingToDeliver: 'Nothing to deliver',
+    toDeliver: '{count} to deliver',
+    nothingToLoad: 'Nothing to load',
+    unitsToLoad: '{count} units',
+    daySaleCountOne: '1 sale',
+    daySaleCount: '{count} sales'
   }
 );

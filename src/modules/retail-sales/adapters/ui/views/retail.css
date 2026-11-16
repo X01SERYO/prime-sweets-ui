@@ -108,7 +108,7 @@
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: middle;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   white-space: normal;
   overflow-wrap: anywhere;
 }
@@ -127,6 +127,8 @@
 .retail-table th:nth-child(4),
 .retail-table td:nth-child(4) {
   width: 18%;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .retail-table th:nth-child(5),

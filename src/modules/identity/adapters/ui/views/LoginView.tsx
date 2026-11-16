@@ -22,7 +22,7 @@ export function LoginView({ login, onLoggedIn }: LoginViewProps) {
   }
 
   return (
-    <section className="stack">
+    <section className="stack login-panel">
       <ScreenTitle>{t('loginTitle')}</ScreenTitle>
       <form className="card" onSubmit={onSubmit}>
         <label htmlFor="login-email">{t('email')}</label>

@@ -11,6 +11,7 @@ export interface DaySummary {
 
 export function useDaySummary(deliveryDate: string, listSales: ListSalesByDeliveryDateUseCase) {
   const [summary, setSummary] = useState<DaySummary | null>(null);
+  const [sales, setSales] = useState<DaySaleModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
@@ -22,11 +23,13 @@ export function useDaySummary(deliveryDate: string, listSales: ListSalesByDelive
       .execute(deliveryDate)
       .then(rows => {
         if (!cancelled) {
+          setSales(rows);
           setSummary(summarize(rows));
         }
       })
       .catch(() => {
         if (!cancelled) {
+          setSales([]);
           setSummary(null);
           setFailed(true);
         }
@@ -41,7 +44,37 @@ export function useDaySummary(deliveryDate: string, listSales: ListSalesByDelive
     };
   }, [deliveryDate, listSales]);
 
-  return { summary, loading, failed };
+  return { summary, sales, loading, failed };
+}
+
+export function useWeekSaleCounts(dates: string[], listSales: ListSalesByDeliveryDateUseCase) {
+  const key = dates.join(',');
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(
+      dates.map(async date => {
+        const rows = await listSales.execute(date);
+        return [date, rows.filter(sale => sale.status !== 'VOIDED').length] as const;
+      })
+    )
+      .then(rows => {
+        if (!cancelled) {
+          setCounts(Object.fromEntries(rows));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCounts({});
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [key, listSales]);
+
+  return counts;
 }
 
 function summarize(rows: DaySaleModel[]): DaySummary {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
 import type { SaleItemModel, SaleModel } from '@/modules/sales/domain/models/sale';
-import { addedSaleLineName, previewLineTotal } from '@/modules/sales/domain/saleLineName';
+import { addedSaleLineName, composeSaleLineName, groupSaleItems, previewLineTotal } from '@/modules/sales/domain/saleLineName';
 import { canConfirmSale, canEditSaleLines, canRenameSaleLine } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
@@ -63,6 +63,10 @@ export function SaleLines({
   const [openId, setOpenId] = useState<string | null>(null);
   const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
   const editable = sale ? canEditSaleLines(sale.status) : false;
+  const nested = Boolean(
+    sale && groupSaleItems(sale.items).some(group => group.length > 1 || group.some(item => addedSaleLineName(item.catalogName, item.itemName)))
+  );
+  const actionColumn = editable || nested;
   const editing = Boolean(pending) || editingId !== null;
   const editingActions = useRef<EditingActions | null>(null);
 
@@ -140,66 +144,35 @@ export function SaleLines({
               <th>{t('productCode')}</th>
               <th>{t('itemName')}</th>
               <th>{t('quantity')}</th>
-              <th>{t('unitPrice')}</th>
-              <th>{t('lineTotal')}</th>
-              {editable ? (
-                <>
-                  <th />
-                  <th />
-                </>
-              ) : null}
+              <th className="num">{t('unitPrice')}</th>
+              <th className="num">{t('lineTotal')}</th>
+              {actionColumn ? <th /> : null}
             </tr>
           </thead>
           <tbody>
             {!sale || sale.items.length === 0 ? (
               <tr>
-                <td className="lines-empty" colSpan={editable ? 7 : 5}>
+                <td className="lines-empty" colSpan={actionColumn ? 6 : 5}>
                   <StatusMessage tone="info">{t('saleEmpty')}</StatusMessage>
                 </td>
               </tr>
             ) : null}
-            {sale?.items.map(item => (
-              <tr key={item.id} className={editingId === item.id ? 'is-editing' : undefined}>
-                {editingId === item.id ? (
-                  <LineEditor
-                    productCode={item.productCode}
-                itemName={item.itemName}
-                catalogName={item.catalogName}
-                quantity={item.quantity}
-                wholesalePrice={item.wholesalePrice}
-                allowName={sale ? canRenameSaleLine(sale.status) : false}
-                    busy={busy}
-                    actionsRef={editingActions}
-                    onSave={async (name, quantity) => saveItem(item, name, quantity)}
-                    onCancel={cancelEdit}
-                  />
-                ) : (
-                  <>
-                    <td>{item.productCode}</td>
-                    <td className="product-cell">
-                      <ItemName name={item.itemName} catalogName={item.catalogName} />
-                    </td>
-                    <td>{item.quantity}</td>
-                    <td>{formatCurrency(item.wholesalePrice)}</td>
-                    <td>{formatCurrency(item.lineTotal)}</td>
-                    {editable ? (
-                      <>
-                        <td className="line-col">
-                          <button className="btn icon-btn icon-void" type="button" aria-label={t('removeItem')} disabled={busy} onClick={() => setPendingRemoveId(item.id)}>
-                            <RemoveIcon />
-                          </button>
-                        </td>
-                        <td className="line-col">
-                          <button className="btn icon-btn icon-edit" type="button" aria-label={t('editSale')} disabled={busy} onClick={() => setEditingId(item.id)}>
-                            <PencilIcon />
-                          </button>
-                        </td>
-                      </>
-                    ) : null}
-                  </>
-                )}
-              </tr>
-            ))}
+            {sale ? groupSaleItems(sale.items).map(group => (
+              <SaleLineGroupRows
+                key={group[0].id}
+                group={group}
+                editable={editable}
+                busy={busy}
+                editingId={editingId}
+                allowName={canRenameSaleLine(sale.status)}
+                actionsRef={editingActions}
+                onEdit={setEditingId}
+                onRemove={setPendingRemoveId}
+                onSave={saveItem}
+                onCancelEdit={cancelEdit}
+                padAction={!editable && actionColumn}
+              />
+            )) : null}
           </tbody>
         </table>
       )}
@@ -219,7 +192,7 @@ export function SaleLines({
         />
       ) : null}
       {sale ? (
-        <div className="card">
+        <div className="sale-dock">
           {confirmError ? <StatusMessage tone="error">{t(confirmError)}</StatusMessage> : null}
           {editNotice ? (
             <ConfirmDialog
@@ -251,6 +224,11 @@ export function SaleLines({
             <p className="sale-total">
               {t('saleTotal')} {formatCurrency(sale.totalAmount)}
             </p>
+            <p className="sale-summary">
+              {t('saleSummary')
+                .replace('{products}', String(sale.items.length))
+                .replace('{units}', String(sale.items.reduce((sum, item) => sum + item.quantity, 0)))}
+            </p>
             {canEditSaleLines(sale.status) ? (
               <button
                 className="btn"
@@ -267,6 +245,9 @@ export function SaleLines({
                 {confirming ? t('confirmingSale') : t('confirmSale')}
               </button>
             ) : null}
+            {canEditSaleLines(sale.status) && sale.items.length === 0 ? (
+              <p id="sale-confirm-hint" className="sale-confirm-hint">{t('saleConfirmNeedsItems')}</p>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -275,6 +256,223 @@ export function SaleLines({
 }
 
 type EditingActions = { save: () => Promise<SaleModel | null>; cancel: () => void };
+
+function SaleLineGroupRows({
+  group,
+  editable,
+  busy,
+  editingId,
+  allowName,
+  actionsRef,
+  onEdit,
+  onRemove,
+  onSave,
+  onCancelEdit,
+  padAction = false
+}: {
+  group: SaleItemModel[];
+  editable: boolean;
+  busy: boolean;
+  editingId: string | null;
+  allowName: boolean;
+  actionsRef: MutableRefObject<EditingActions | null>;
+  onEdit: (id: string) => void;
+  onRemove: (id: string) => void;
+  onSave: (item: SaleItemModel, name: string, quantity: number) => Promise<SaleModel | null>;
+  onCancelEdit: () => void;
+  padAction?: boolean;
+}) {
+  const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const head = group[0];
+  const split = group.length > 1 || group.some(item => addedSaleLineName(item.catalogName, item.itemName));
+  const quantity = group.reduce((sum, item) => sum + item.quantity, 0);
+  const total = group.reduce((sum, item) => sum + item.lineTotal, 0);
+  const samePrice = group.every(item => item.wholesalePrice === head.wholesalePrice);
+  const expanded = open || group.some(item => item.id === editingId);
+
+  if (!split) {
+    const item = head;
+    return (
+      <SaleLineRow
+        item={item}
+        editable={editable}
+        busy={busy}
+        editing={editingId === item.id}
+        allowName={allowName}
+        actionsRef={actionsRef}
+        onEdit={() => onEdit(item.id)}
+        onRemove={() => onRemove(item.id)}
+        onSave={(name, quantityValue) => onSave(item, name, quantityValue)}
+        onCancelEdit={onCancelEdit}
+        padAction={padAction}
+      />
+    );
+  }
+
+  return (
+    <>
+      <tr className="line-group">
+        <td>{head.productCode}</td>
+        <td className="product-cell">{head.catalogName || head.itemName}</td>
+        <td>{quantity}</td>
+        <td className="num">{samePrice ? formatCurrency(head.wholesalePrice) : ''}</td>
+        <td className="num">{formatCurrency(total)}</td>
+        <td className="line-col">
+          <button
+            className="btn icon-btn line-fold"
+            type="button"
+            aria-expanded={expanded}
+            aria-label={expanded ? t('hideVariants') : t('showVariants')}
+            onClick={() => setOpen(current => !current)}
+          >
+            <ChevronIcon />
+          </button>
+        </td>
+      </tr>
+      {expanded ? group.map(item => (
+        <SaleLineRow
+          key={item.id}
+          item={item}
+          variant
+          editable={editable}
+          busy={busy}
+          editing={editingId === item.id}
+          allowName={allowName}
+          actionsRef={actionsRef}
+          onEdit={() => onEdit(item.id)}
+          onRemove={() => onRemove(item.id)}
+          onSave={(name, quantityValue) => onSave(item, name, quantityValue)}
+          onCancelEdit={onCancelEdit}
+          padAction={padAction}
+        />
+      )) : null}
+    </>
+  );
+}
+
+function SaleLineRow({
+  item,
+  variant,
+  editable,
+  busy,
+  editing,
+  allowName,
+  actionsRef,
+  onEdit,
+  onRemove,
+  onSave,
+  onCancelEdit,
+  padAction
+}: {
+  item: SaleItemModel;
+  variant?: boolean;
+  editable: boolean;
+  busy: boolean;
+  editing: boolean;
+  allowName: boolean;
+  actionsRef: MutableRefObject<EditingActions | null>;
+  onEdit: () => void;
+  onRemove: () => void;
+  onSave: (name: string, quantity: number) => Promise<SaleModel | null>;
+  onCancelEdit: () => void;
+  padAction?: boolean;
+}) {
+  const extra = addedSaleLineName(item.catalogName, item.itemName);
+  return (
+    <tr className={editing ? 'is-editing' : variant ? 'line-variant' : undefined}>
+      {editing ? (
+        <LineEditor
+          productCode={variant ? '' : item.productCode}
+          itemName={item.itemName}
+          catalogName={item.catalogName}
+          quantity={item.quantity}
+          wholesalePrice={item.wholesalePrice}
+          allowName={allowName}
+          busy={busy}
+          actionsRef={actionsRef}
+          onSave={onSave}
+          onCancel={onCancelEdit}
+        />
+      ) : (
+        <>
+          <td>{variant ? '' : item.productCode}</td>
+          <td className="product-cell">
+            {variant ? extra || item.itemName : <ItemName name={item.itemName} catalogName={item.catalogName} />}
+          </td>
+          <td>{item.quantity}</td>
+          <td className="num">{formatCurrency(item.wholesalePrice)}</td>
+          <td className="num">{formatCurrency(item.lineTotal)}</td>
+          {editable ? (
+            <td className="line-col">
+              <LineMenu busy={busy} onEdit={onEdit} onRemove={onRemove} />
+            </td>
+          ) : padAction ? <td /> : null}
+        </>
+      )}
+    </tr>
+  );
+}
+
+function LineMenu({ busy, onEdit, onRemove }: { busy: boolean; onEdit: () => void; onRemove: () => void }) {
+  const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    function onPointer(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onPointer);
+    return () => document.removeEventListener('mousedown', onPointer);
+  }, [open]);
+
+  return (
+    <div className="line-menu" ref={rootRef}>
+      <button
+        className="btn icon-btn"
+        type="button"
+        aria-label={t('lineActions')}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        disabled={busy}
+        onClick={() => setOpen(current => !current)}
+      >
+        ⋯
+      </button>
+      {open ? (
+        <div className="line-menu-pop" role="menu">
+          <button
+            role="menuitem"
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              onEdit();
+            }}
+          >
+            {t('editSale')}
+          </button>
+          <button
+            role="menuitem"
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              onRemove();
+            }}
+          >
+            {t('removeItem')}
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 
 function SaleLineCards({
   sale,
@@ -353,14 +551,7 @@ function SaleLineCards({
                     code={item.productCode}
                     unitPrice={formatCurrency(item.wholesalePrice)}
                     actions={editable ? (
-                      <>
-                        <button className="btn icon-btn icon-void" type="button" aria-label={t('removeItem')} disabled={busy} onClick={() => onRemove(item.id)}>
-                          <RemoveIcon />
-                        </button>
-                        <button className="btn icon-btn icon-edit" type="button" aria-label={t('editSale')} disabled={busy} onClick={() => onEdit(item.id)}>
-                          <PencilIcon />
-                        </button>
-                      </>
+                      <LineMenu busy={busy} onEdit={() => onEdit(item.id)} onRemove={() => onRemove(item.id)} />
                     ) : null}
                   />
                 ) : null}
@@ -420,11 +611,12 @@ function LineEditor({
   onCancel: () => void;
 }) {
   const { t } = useLocale();
-  const [name, setName] = useState(itemName);
+  const [variantText, setVariantText] = useState(addedSaleLineName(catalogName, itemName) ?? '');
   const [qty, setQty] = useState(String(quantity));
 
   function save() {
     const next = parseQuantity(qty);
+    const name = composeSaleLineName(catalogName, variantText);
     if (next === null || !name.trim()) {
       return Promise.resolve(null);
     }
@@ -454,13 +646,13 @@ function LineEditor({
   if (layout === 'card') {
     return (
       <div className="line-editor pending-line">
-        <label htmlFor="line-edit-name">{t('itemName')}</label>
+        <label htmlFor="line-edit-name">{t('lineVariant')}</label>
         <input
           id="line-edit-name"
-          value={name}
+          value={variantText}
           disabled={busy || !allowName}
-          onChange={event => setName(event.target.value)}
-          aria-label={t('itemName')}
+          onChange={event => setVariantText(event.target.value)}
+          aria-label={t('lineVariant')}
         />
         <QuantityField value={qty} disabled={busy} onChange={setQty} />
         <div className="pending-footer">
@@ -488,7 +680,7 @@ function LineEditor({
       <td>{productCode}</td>
       <td className="product-cell">
         {allowName ? (
-          <input value={name} disabled={busy} onChange={event => setName(event.target.value)} aria-label={t('itemName')} />
+          <input value={variantText} disabled={busy} onChange={event => setVariantText(event.target.value)} aria-label={t('lineVariant')} placeholder={t('lineVariant')} />
         ) : (
           <ItemName name={itemName} catalogName={catalogName} />
         )}
@@ -496,10 +688,9 @@ function LineEditor({
       <td>
         <QuantityField value={qty} disabled={busy} onChange={setQty} />
       </td>
-      <td>{formatCurrency(wholesalePrice)}</td>
-      <td>{lineTotal !== null ? formatCurrency(lineTotal) : ''}</td>
-      <td className="line-col">{cancelButton}</td>
-      <td className="line-col">{saveButton}</td>
+      <td className="num">{formatCurrency(wholesalePrice)}</td>
+      <td className="num">{lineTotal !== null ? formatCurrency(lineTotal) : ''}</td>
+      <td className="line-col line-edit-actions">{cancelButton}{saveButton}</td>
     </>
   );
 }
@@ -592,7 +783,7 @@ function PendingCard({
   const { t } = useLocale();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [name, setName] = useState(pending.name);
+  const [variant, setVariant] = useState('');
   const [quantity, setQuantity] = useState('1');
   const lineQuantity = parseQuantity(quantity);
   const lineTotal =
@@ -602,7 +793,7 @@ function PendingCard({
     if (lineQuantity === null) {
       return Promise.resolve(null);
     }
-    return onAccept(name, lineQuantity);
+    return onAccept(composeSaleLineName(pending.name, variant), lineQuantity);
   }
 
   useEffect(() => {
@@ -618,10 +809,6 @@ function PendingCard({
       return;
     }
     dialog.showModal();
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-    titleRef.current?.focus();
     return () => {
       if (dialog.open) {
         dialog.close();
@@ -652,12 +839,26 @@ function PendingCard({
           save();
         }}
       >
-        <h2 ref={titleRef} className="pending-catalog" tabIndex={-1}>
+        <h2 ref={titleRef} className="pending-catalog">
           {pending.name}
         </h2>
-        <label htmlFor="pending-name">{t('itemName')}</label>
-        <input id="pending-name" value={name} disabled={busy} onChange={event => setName(event.target.value)} />
-        <QuantityField value={quantity} disabled={busy} onChange={setQuantity} />
+        <QuantityField
+          value={quantity}
+          disabled={busy}
+          autoFocus
+          inputTabIndex={1}
+          stepperTabIndex={-1}
+          onChange={setQuantity}
+        />
+        <label htmlFor="pending-variant">{t('lineVariant')}</label>
+        <input
+          id="pending-variant"
+          value={variant}
+          tabIndex={2}
+          disabled={busy}
+          placeholder={t('lineVariant')}
+          onChange={event => setVariant(event.target.value)}
+        />
         <div className="pending-footer">
           <p className="line-prices">
             <span className="line-prices-unit">

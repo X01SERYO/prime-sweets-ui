@@ -53,6 +53,17 @@ select {
   min-height: 100vh;
 }
 
+.shell:not(:has(.app-nav)) {
+  display: flex;
+  flex-direction: column;
+}
+
+.shell:not(:has(.app-nav)) main {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
 .shell-head {
   position: sticky;
   top: 0;
@@ -227,9 +238,14 @@ select {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  width: min(64rem, 100%);
-  margin: 0 auto;
-  padding: 1rem;
+  width: 100%;
+  margin-inline: auto;
+  padding: 1rem 0.75rem;
+}
+
+.login-panel {
+  width: min(100%, 28rem);
+  max-width: 28rem;
 }
 
 .stack,
@@ -265,8 +281,18 @@ select {
   line-height: 1.3;
 }
 
-.delivery-day-card .btn {
+.delivery-day-card .text-button {
   flex: 0 0 auto;
+  min-height: 0;
+  padding: 0.15rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--deep);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .customer-card {
@@ -299,8 +325,8 @@ select {
 }
 
 .customer-kicker {
-  color: var(--muted);
-  font-size: 0.75rem;
+  color: #244248;
+  font-size: 0.875rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -308,9 +334,8 @@ select {
 .customer-name {
   margin: 0;
   color: var(--deep);
-  font-family: Fraunces, serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.25;
 }
 
@@ -377,11 +402,55 @@ select {
   list-style: none;
 }
 
+.customer-results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.customer-hits {
+  max-height: 18rem;
+  overflow: auto;
+}
+
 .customer-hit {
+  display: flex;
+  width: 100%;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.customer-hit:hover {
+  background: #f3f7f8;
+}
+
+.customer-hit mark {
+  padding: 0 0.1rem;
+  background: #ffe08a;
+}
+
+.customer-hit-action {
+  color: var(--deep);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.result-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .customer-hit-text {
@@ -424,7 +493,7 @@ select {
   padding: 0.45rem 0.4rem;
   border-bottom: 1px solid var(--line);
   color: var(--ink);
-  font-size: 0.95rem;
+  font-size: 1.125rem;
   text-align: center;
   vertical-align: middle;
 }
@@ -583,10 +652,9 @@ select {
 .line-summary-name {
   min-width: 0;
   color: var(--deep);
-  font-family: Fraunces, serif;
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.25;
 }
 
 .lines td .item-name-added,
@@ -710,8 +778,8 @@ select {
 
 .m {
   margin: 0;
-  color: var(--muted);
-  font-size: 0.8125rem;
+  color: #244248;
+  font-size: 0.875rem;
 }
 
 .btn {
@@ -816,6 +884,8 @@ button.btn.search-submit {
   min-height: 2.75rem;
   padding: 0;
   border-radius: 50%;
+  background: var(--deep);
+  color: #fff;
 }
 
 .search-submit svg {
@@ -843,10 +913,99 @@ button.btn.search-submit {
 }
 
 .card.sale-close,
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.line-group td {
+  font-weight: 700;
+  background: #f4fafa;
+}
+
+.line-variant td {
+  font-size: 0.86em;
+}
+
+.line-variant td.product-cell {
+  padding-left: 1.25rem;
+}
+
+.line-fold svg {
+  transform: rotate(-90deg);
+}
+
+.line-fold[aria-expanded='true'] svg {
+  transform: rotate(0deg);
+}
+
+.line-edit-actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.line-menu {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.line-menu-pop {
+  position: absolute;
+  top: calc(100% + 0.2rem);
+  right: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 8.5rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgb(16 52 58 / 16%);
+}
+
+.line-menu-pop button {
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.line-menu-pop button:hover {
+  background: #f3f7f8;
+}
+
+.sale-dock {
+  position: sticky;
+  bottom: 4.5rem;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: 0 -8px 18px rgb(10 79 90 / 8%);
+}
+
+.sale-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .sale-close {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.85rem;
 }
@@ -1172,8 +1331,9 @@ dialog.pending-modal {
 }
 
 .day-summary span {
-  font-size: 0.72rem;
-  color: #5f746f;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #244248;
 }
 
 .day-summary strong {
@@ -1811,7 +1971,6 @@ code {
   .shell {
     height: auto;
     min-height: 100svh;
-    min-height: 100dvh;
   }
 
   html,
@@ -1840,14 +1999,23 @@ code {
 }
 
 @media (min-width: 64rem) {
+  html {
+    font-size: clamp(16px, 0.35vw + 12px, 20px);
+  }
+
   .shell main {
-    width: min(76rem, 100%);
-    padding: 2rem 1.25rem;
+    padding-block: 2rem;
   }
 }
 
 .app-frame {
   min-height: calc(100vh - 4rem);
+}
+
+@media (max-width: 40rem) {
+  .app-frame {
+    min-height: 0;
+  }
 }
 
 .app-nav {
@@ -1878,6 +2046,12 @@ code {
   height: 1.35rem;
 }
 
+.app-nav a[aria-current='page'] {
+  font-weight: 700;
+  background: #e7f3f4;
+  box-shadow: inset 0 3px 0 currentColor;
+}
+
 .app-nav a[data-section='wholesale'][aria-current='page'] {
   color: #1d4e89;
 }
@@ -1895,7 +2069,7 @@ code {
 }
 
 .shell main {
-  padding-bottom: 4.75rem;
+  padding-bottom: calc(3.65rem + env(safe-area-inset-bottom, 0px));
 }
 
 .retail-tabs {
@@ -1916,6 +2090,10 @@ code {
 }
 
 @media (min-width: 48rem) {
+  .sale-dock {
+    bottom: 0.75rem;
+  }
+
   .app-frame {
     display: grid;
     grid-template-columns: 13rem minmax(0, 1fr);
@@ -1935,6 +2113,15 @@ code {
     gap: 0.55rem;
     padding: 0.8rem 1rem;
     font-size: 0.95rem;
+  }
+
+  .app-nav a[aria-current='page'] {
+    box-shadow: inset 3px 0 0 currentColor;
+  }
+
+  .shell main {
+    width: min(calc(100% - 8rem), 1440px);
+    padding-inline: 0;
   }
 
   .shell main,

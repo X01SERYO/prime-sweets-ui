@@ -5,6 +5,7 @@ export interface DaySaleModel {
   customerId: string;
   customerName: string;
   status: DaySaleStatus;
+  productCount: number;
   quantity: number;
   total: number;
   invoiceNumber: string | null;

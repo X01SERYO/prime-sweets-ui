@@ -67,13 +67,27 @@
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: middle;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   white-space: normal;
   overflow-wrap: anywhere;
 }
 
 .load-sheet-table th {
   font-weight: 700;
+}
+
+.load-sheet-table th:nth-child(3),
+.load-sheet-table td:nth-child(3),
+.load-sheet-table th:nth-child(4),
+.load-sheet-table td:nth-child(4),
+.load-sheet-table th:nth-child(6),
+.load-sheet-table td:nth-child(6),
+.load-sheet-table th:nth-child(7),
+.load-sheet-table td:nth-child(7),
+.load-sheet-table th:nth-child(8),
+.load-sheet-table td:nth-child(8) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .load-sheet-edge {

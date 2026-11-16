@@ -24,9 +24,8 @@ In `src/app/styles.css`:
 
 ```css
 .shell main {
-  width: min(100%, 120rem);
-  margin-inline: auto;
-  padding-inline: clamp(1rem, 2vw, 2.5rem);
+  width: 100%;
+  padding-inline: 0.75rem;
 }
 
 @media (min-width: 64rem) {

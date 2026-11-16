@@ -22,23 +22,18 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
   return (
     <section className="stack customer-choice">
       <div className="row customer-choice-actions">
-        <Link className="btn" to="/customers">
+        <Link className="btn btn-secondary" to="/customers">
           {t('customerCreate')}
         </Link>
       </div>
       <form className="card" onSubmit={onSearch}>
-          <div className="search-label">
-            <label htmlFor="customer-query">{t('findCustomer')}</label>
-            <button type="button" className="info-tip" aria-label={t('customerSearchHint')}>
-              <InfoIcon />
-              <span className="info-tip-text" role="tooltip">{t('customerSearchHint')}</span>
-            </button>
-          </div>
+          <label htmlFor="customer-query">{t('findCustomer')}</label>
           <div className="search-row">
             <input
               className="search-field"
               id="customer-query"
               value={search.query}
+              placeholder={t('customerSearch')}
               onChange={event => search.setQuery(event.target.value)}
               autoComplete="off"
             />
@@ -62,29 +57,31 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
             </StatusMessage>
           ) : null}
           {search.customers.length > 0 ? (
-            <ul className="list">
-              {search.customers.map(customer => (
-                <li key={customer.id} className="card customer-hit">
-                  <span className="customer-hit-text">
-                    <b>{customer.name}</b>
-                    <span className="m">
-                      {customer.documentType} {customer.documentNumber}
-                    </span>
-                  </span>
-                  <button
-                    className="btn icon-btn icon-edit"
-                    type="button"
-                    aria-label={t('chooseCustomer')}
-                    onClick={() => {
-                      onSelect(customer.id);
-                      search.closeResults();
-                    }}
-                  >
-                    <AddIcon />
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="result-count">{t('customerResultCount').replace('{count}', String(search.customers.length))}</p>
+              <ul className="list customer-hits">
+                {search.customers.map(customer => (
+                  <li key={customer.id}>
+                    <button
+                      className="customer-hit"
+                      type="button"
+                      onClick={() => {
+                        onSelect(customer.id);
+                        search.closeResults();
+                      }}
+                    >
+                      <span className="customer-hit-text">
+                        <b>{highlightMatch(customer.name, search.query)}</b>
+                        <span className="m">
+                          {highlightMatch(`${customer.documentType} ${customer.documentNumber}`, search.query)}
+                        </span>
+                      </span>
+                      <span className="customer-hit-action">{t('chooseCustomer')}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : null}
         </CustomerResults>
       ) : null}
@@ -138,18 +135,28 @@ function CustomerResults({
   );
 }
 
+function highlightMatch(text: string, query: string): ReactNode {
+  const needle = query.trim();
+  if (!needle) {
+    return text;
+  }
+  const index = text.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
+  if (index < 0) {
+    return text;
+  }
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + needle.length)}</mark>
+      {text.slice(index + needle.length)}
+    </>
+  );
+}
+
 function CloseIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M18.3 5.71 12 12.01l6.3 6.3-1.42 1.41L10.59 13.4l-6.3 6.3-1.41-1.42 6.3-6.29-6.3-6.3 1.42-1.41 6.29 6.29 6.3-6.3z" />
-    </svg>
-  );
-}
-
-function AddIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5z" />
     </svg>
   );
 }
@@ -163,12 +170,3 @@ function SearchIcon() {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.25" />
-      <path d="M8 7.25v4" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-      <circle cx="8" cy="5" r="0.75" fill="currentColor" />
-    </svg>
-  );
-}

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, test } from 'vitest';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { App } from '../../app/App.tsx';
@@ -313,8 +313,8 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
     fireEvent.click(screen.getAllByRole('button', { name: /^buscar$/i })[0]);
     const add = await screen.findByRole('button', { name: 'Agregar' });
     fireEvent.click(add);
-    const confirmLine = await screen.findByRole('button', { name: 'Guardar cambio' });
-    fireEvent.click(confirmLine);
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Agregar' }));
   }
   fireEvent.click(screen.getByRole('button', { name: 'Cambiar día' }));
   const days = document.querySelectorAll('.delivery-days button');
@@ -330,9 +330,9 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   if (quantity) {
     fireEvent.change(quantity, { target: { value: '3' } });
   }
-  const saveLine = screen.queryByRole('button', { name: 'Guardar cambio' });
+  const saveLine = screen.queryByRole('dialog');
   if (saveLine) {
-    fireEvent.click(saveLine);
+    fireEvent.click(within(saveLine).getByRole('button', { name: 'Agregar' }));
   }
   fireEvent.click(screen.getByRole('button', { name: 'Salir' }));
 });

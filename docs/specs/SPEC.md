@@ -110,7 +110,7 @@ Where the code lives:
 
 The shell records its wide class at `min-width: 64rem` in `src/app/styles.css`. Placeholder routes share that shell. A feature view adds its own media query only when its content needs a different reflow. The shell does not grow a device-specific router.
 
-How the wide class fills a small laptop and a large monitor, including type scale, is [PDR-005](../pdrs/PDR-005.md) and [SPEC-005](./SPEC-005.md). Until that CSS lands, the running shell still caps the column at `64rem` / `76rem`.
+How the wide class fills a small laptop and a large monitor, including type scale, is [PDR-005](../pdrs/PDR-005.md) and [SPEC-005](./SPEC-005.md). The shell uses the full width with `0.75rem` of side padding in the narrow class. From `48rem` the column is `min(calc(100% - 8rem), 1440px)`, centered. The root font size stays fluid from `min-width: 64rem`.
 
 ## 5. Use cases
 
