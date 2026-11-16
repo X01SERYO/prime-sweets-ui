@@ -97,7 +97,6 @@ export const salesMessages = catalog(
     showVariants: 'Show variants',
     hideVariants: 'Hide variants',
     saleSummary: '{products} products · {units} units',
-    saleConfirmNeedsItems: 'Add at least one product',
     saveEditing: 'Save',
     cancelLine: 'Cancel',
     productId: 'ID',

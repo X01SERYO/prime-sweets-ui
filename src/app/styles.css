@@ -947,6 +947,7 @@ button.btn.search-submit {
 
 .line-menu {
   position: relative;
+  z-index: 6;
   display: flex;
   justify-content: flex-end;
 }
@@ -955,7 +956,7 @@ button.btn.search-submit {
   position: absolute;
   top: calc(100% + 0.2rem);
   right: 0;
-  z-index: 4;
+  z-index: 6;
   display: flex;
   flex-direction: column;
   min-width: 8.5rem;
@@ -964,6 +965,11 @@ button.btn.search-submit {
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 10px 24px rgb(16 52 58 / 16%);
+}
+
+.line-menu-pop.is-up {
+  top: auto;
+  bottom: calc(100% + 0.2rem);
 }
 
 .line-menu-pop button {

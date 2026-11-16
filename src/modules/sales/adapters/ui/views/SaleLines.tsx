@@ -245,9 +245,6 @@ export function SaleLines({
                 {confirming ? t('confirmingSale') : t('confirmSale')}
               </button>
             ) : null}
-            {canEditSaleLines(sale.status) && sale.items.length === 0 ? (
-              <p id="sale-confirm-hint" className="sale-confirm-hint">{t('saleConfirmNeedsItems')}</p>
-            ) : null}
           </div>
         </div>
       ) : null}
@@ -414,6 +411,20 @@ function SaleLineRow({
   );
 }
 
+function LineIconActions({ busy, onEdit, onRemove }: { busy: boolean; onEdit: () => void; onRemove: () => void }) {
+  const { t } = useLocale();
+  return (
+    <div className="line-detail-actions">
+      <button className="btn icon-btn icon-edit" type="button" aria-label={t('editSale')} disabled={busy} onClick={onEdit}>
+        <PencilIcon />
+      </button>
+      <button className="btn icon-btn icon-void" type="button" aria-label={t('removeItem')} disabled={busy} onClick={onRemove}>
+        <RemoveIcon />
+      </button>
+    </div>
+  );
+}
+
 function LineMenu({ busy, onEdit, onRemove }: { busy: boolean; onEdit: () => void; onRemove: () => void }) {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
@@ -446,7 +457,7 @@ function LineMenu({ busy, onEdit, onRemove }: { busy: boolean; onEdit: () => voi
         ⋯
       </button>
       {open ? (
-        <div className="line-menu-pop" role="menu">
+        <div className="line-menu-pop is-up" role="menu">
           <button
             role="menuitem"
             type="button"
@@ -551,7 +562,7 @@ function SaleLineCards({
                     code={item.productCode}
                     unitPrice={formatCurrency(item.wholesalePrice)}
                     actions={editable ? (
-                      <LineMenu busy={busy} onEdit={() => onEdit(item.id)} onRemove={() => onRemove(item.id)} />
+                      <LineIconActions busy={busy} onEdit={() => onEdit(item.id)} onRemove={() => onRemove(item.id)} />
                     ) : null}
                   />
                 ) : null}

@@ -33,6 +33,7 @@ Screen: `/?deliveryDate=`.
 3. Changing the delivery date of a draft updates that sale. Changing it on a confirmed sale asks for confirmation, then follows the new sale id when the API returns one.
 4. A draft cannot be voided. A confirmed sale can be edited or voided, including a sale from a previous week.
 5. The sale screen does not link to the invoice preview. That link lives on Entregas.
+6. On a wide screen, each sold line keeps **Edit** and **Remove** inside a **⋯** menu that always opens upward, above the sticky total and confirm bar. On a phone those two actions are icons on the line; the **⋯** menu is not shown. Confirm stays disabled while the sale has no lines and does not show an extra hint.
 
 ## 5. Entregas and Cargue
 
