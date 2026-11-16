@@ -139,7 +139,6 @@ export function RetailProductPicker({
           />
           <button className="retail-search-go" type="submit" aria-label={t('search')} disabled={!canSearch} />
         </div>
-        <p className="retail-hint">{t('retailSearchHint')}</p>
       </form>
       {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       {open ? (

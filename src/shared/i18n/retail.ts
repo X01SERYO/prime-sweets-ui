@@ -4,7 +4,6 @@ export const retailMessages = catalog(
   {
     retailTodayTitle: 'Detal de hoy',
     retailAddProduct: 'Agregar producto',
-    retailSearchHint: 'Toca un resultado o pulsa Enter para agregarlo. Si ya está en la venta, suma una unidad.',
     retailInSale: 'En venta',
     retailUnitShort: 'Precio unit.',
     retailLineTotal: 'Total',
@@ -61,7 +60,6 @@ export const retailMessages = catalog(
   {
     retailTodayTitle: 'Today’s retail',
     retailAddProduct: 'Add product',
-    retailSearchHint: 'Tap a result or press Enter to add it. If it is already in the sale, one unit is added.',
     retailInSale: 'In the sale',
     retailUnitShort: 'Unit price',
     retailLineTotal: 'Total',

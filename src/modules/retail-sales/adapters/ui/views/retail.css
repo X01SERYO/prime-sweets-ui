@@ -78,12 +78,6 @@
   cursor: pointer;
 }
 
-.retail-hint {
-  margin: 0.45rem 0 0;
-  color: #244248;
-  font-size: 0.8rem;
-}
-
 .retail-results {
   position: absolute;
   right: 1rem;
