@@ -349,21 +349,14 @@
 }
 
 .wholesale-new,
-.wholesale-fab,
-.wholesale-end {
+.wholesale-fab {
   gap: 0.4rem;
 }
 
 .wholesale-new svg,
-.wholesale-fab svg,
-.wholesale-end svg {
+.wholesale-fab svg {
   width: 1.1rem;
   height: 1.1rem;
-}
-
-.wholesale-end {
-  align-self: flex-end;
-  margin-top: 0.4rem;
 }
 
 .wholesale-shortcut {
@@ -406,8 +399,7 @@
   }
 
   .wholesale-today,
-  .btn.wholesale-new,
-  .btn.wholesale-end {
+  .btn.wholesale-new {
     display: none;
   }
 

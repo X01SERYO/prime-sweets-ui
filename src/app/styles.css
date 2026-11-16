@@ -2072,21 +2072,40 @@ code {
   padding-bottom: calc(3.65rem + env(safe-area-inset-bottom, 0px));
 }
 
-.retail-tabs {
+.retail-head {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.retail-head h1 {
+  margin: 0;
+}
+
+.retail-tabs {
+  display: inline-flex;
+  gap: 0;
+  padding: 0.2rem;
+  border: 1.5px solid #cfe0e3;
+  border-radius: 999px;
+  background: #fff;
 }
 
 .retail-tabs a {
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--line);
+  padding: 0.45rem 1.1rem;
+  border: 0;
   border-radius: 999px;
+  color: #5d7379;
+  font-weight: 700;
   text-decoration: none;
 }
 
 .retail-tabs a[aria-current='page'] {
-  background: #e7f6ec;
-  border-color: #1b7a45;
+  background: var(--deep);
+  color: #fff;
 }
 
 @media (min-width: 48rem) {

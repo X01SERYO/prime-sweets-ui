@@ -178,11 +178,6 @@ export function WeekHome({ listSales }: WeekHomeProps) {
         </aside>
       </div>
 
-      <Link className="btn wholesale-end" to={`/sales?deliveryDate=${encodeURIComponent(selected)}`}>
-        <PlusIcon />
-        {t('newSale')}
-      </Link>
-
       <Link className="btn wholesale-fab" to={`/sales?deliveryDate=${encodeURIComponent(selected)}`}>
         <PlusIcon />
         {t('newSale')}

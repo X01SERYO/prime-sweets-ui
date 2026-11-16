@@ -20,31 +20,24 @@ export function RetailLines({
   const { t } = useLocale();
   return (
     <div className="retail-lines">
-      <table className="retail-table">
-        <thead>
-          <tr>
-            <th>{t('retailCode')}</th>
-            <th>{t('retailBrand')}</th>
-            <th>{t('retailProduct')}</th>
-            <th>{t('retailUnitPrice')}</th>
-            <th>{t('retailQuantity')}</th>
-            <th />
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {items.map(item => (
-            <RetailRow
-              key={item.productId}
-              item={item}
-              pending={pendingId === item.productId}
-              highlighted={highlightId === item.productId}
-              onQuantity={onQuantity}
-              onDelete={onDelete}
-            />
-          ))}
-        </tbody>
-      </table>
+      <div className="retail-line retail-line-head">
+        <span>{t('retailCode')}</span>
+        <span>{t('retailProduct')}</span>
+        <span className="retail-center">{t('retailQuantity')}</span>
+        <span className="num">{t('retailUnitShort')}</span>
+        <span className="num">{t('retailLineTotal')}</span>
+        <span />
+      </div>
+      {items.map(item => (
+        <RetailRow
+          key={item.productId}
+          item={item}
+          pending={pendingId === item.productId}
+          highlighted={highlightId === item.productId}
+          onQuantity={onQuantity}
+          onDelete={onDelete}
+        />
+      ))}
     </div>
   );
 }
@@ -85,20 +78,10 @@ function RetailRow({
   }
 
   return (
-    <tr className={highlighted ? 'is-highlighted' : undefined} data-pending={pending ? 'true' : undefined}>
-      <td data-label={t('retailCode')}>{item.productCode}</td>
-      <td data-label={t('retailBrand')}>{item.brandName}</td>
-      <td data-label={t('retailProduct')}>{item.productName}</td>
-      <td data-label={t('retailUnitPrice')}>{formatCurrency(item.retailPrice)}</td>
-      <td data-label={t('retailQuantity')}>
-        <RetailQuantity
-          value={draft}
-          disabled={pending}
-          onChange={setDraft}
-          onCommit={value => void commit(value)}
-        />
-      </td>
-      <td className="retail-edge">
+    <div className={highlighted ? 'retail-line is-highlighted' : 'retail-line'} data-pending={pending ? 'true' : undefined}>
+      <span className="retail-code">{item.productCode}</span>
+      <span className="retail-name">
+        {item.productName}
         {!item.hasCost ? (
           <span className="retail-warn" tabIndex={0}>
             <WarningIcon />
@@ -107,13 +90,16 @@ function RetailRow({
             </span>
           </span>
         ) : null}
-      </td>
-      <td>
-        <button type="button" className="btn btn-secondary retail-delete" aria-label={t('retailDelete')} disabled={pending} onClick={() => void onDelete(item.productId)}>
-          🗑
-        </button>
-      </td>
-    </tr>
+      </span>
+      <RetailQuantity value={draft} disabled={pending} onChange={setDraft} onCommit={value => void commit(value)} />
+      <span className="num retail-unit">{formatCurrency(item.retailPrice)}</span>
+      <span className="num retail-tot">
+        <b>{formatCurrency(item.totalPrice)}</b>
+      </span>
+      <button type="button" className="retail-delete" aria-label={t('retailDelete')} disabled={pending} onClick={() => void onDelete(item.productId)}>
+        <TrashIcon />
+      </button>
+    </div>
   );
 }
 
@@ -143,7 +129,7 @@ function RetailQuantity({
 
   return (
     <div
-      className="qty"
+      className="retail-stepper"
       onBlur={event => {
         if (!event.currentTarget.contains(event.relatedTarget)) {
           onCommit(value);
@@ -169,6 +155,14 @@ function RetailQuantity({
         +
       </button>
     </div>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 

@@ -59,9 +59,14 @@ export function RetailTodayView({
               ) : null}
             </div>
           ) : (
-            <RetailProductPicker searchProducts={searchProducts} onAdd={today.add} />
+            <RetailProductPicker searchProducts={searchProducts} items={day.items} onAdd={today.add} />
           )}
-          {day.items.length === 0 ? <StatusMessage tone="info">{t('retailEmpty')}</StatusMessage> : null}
+          {day.items.length === 0 ? (
+            <div className="retail-empty">
+              <h3>{t('retailEmptyTitle')}</h3>
+              <p>{t('retailEmptyHint')}</p>
+            </div>
+          ) : null}
           {day.items.length > 0 && !closed ? (
             <RetailLines
               items={day.items}
@@ -71,7 +76,12 @@ export function RetailTodayView({
               onDelete={today.remove}
             />
           ) : null}
-          <RetailTotals sold={day.totalAmount} profit={day.totalProfit} />
+          <RetailTotals
+            sold={day.totalAmount}
+            profit={day.totalProfit}
+            products={day.items.length}
+            units={day.items.reduce((sum, item) => sum + item.quantity, 0)}
+          />
         </>
       ) : null}
     </div>

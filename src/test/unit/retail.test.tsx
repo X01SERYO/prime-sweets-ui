@@ -176,13 +176,12 @@ test('today retail screen adds, changes, and removes a product', async () => {
   fireEvent.keyDown(search, { key: 'Escape' });
   fireEvent.keyDown(search, { key: 'Enter' });
   fireEvent.click(await screen.findByRole('button', { name: /CHOC/ }));
-  fireEvent.click(screen.getByRole('button', { name: '+ Agregar' }));
   const quantities = screen.getAllByLabelText('Cantidad');
-  fireEvent.change(quantities[1], { target: { value: 'x' } });
-  fireEvent.blur(quantities[1]);
-  fireEvent.change(quantities[1], { target: { value: '4' } });
-  fireEvent.keyDown(quantities[1], { key: 'Enter' });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Disminuir cantidad' })[1]);
+  fireEvent.change(quantities[0], { target: { value: 'x' } });
+  fireEvent.blur(quantities[0]);
+  fireEvent.change(quantities[0], { target: { value: '4' } });
+  fireEvent.keyDown(quantities[0], { key: 'Enter' });
+  fireEvent.click(screen.getAllByRole('button', { name: 'Disminuir cantidad' })[0]);
   fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
   await screen.findByText('SODA');
 });

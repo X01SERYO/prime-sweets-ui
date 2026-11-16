@@ -2,6 +2,18 @@ import { catalog } from '@/shared/i18n/catalog';
 
 export const retailMessages = catalog(
   {
+    retailTodayTitle: 'Detal de hoy',
+    retailAddProduct: 'Agregar producto',
+    retailSearchHint: 'Toca un resultado o pulsa Enter para agregarlo. Si ya está en la venta, suma una unidad.',
+    retailInSale: 'En venta',
+    retailUnitShort: 'Precio unit.',
+    retailLineTotal: 'Total',
+    retailEmptyTitle: 'Aún no vendes nada hoy',
+    retailEmptyHint: 'Busca un producto arriba y agrégalo. Las cantidades se editan aquí mismo.',
+    retailSoldToday: 'Vendido hoy',
+    retailProfitToday: 'Ganancia de hoy',
+    retailNoneYet: 'Sin ventas todavía',
+    retailSaleSummary: '{products} productos · {units} unidades',
     retailDate: 'Hoy',
     retailUnreviewed: 'Sin revisar',
     retailReviewed: 'Revisado',
@@ -47,6 +59,18 @@ export const retailMessages = catalog(
     retailProfitShort: 'Ganancia'
   },
   {
+    retailTodayTitle: 'Today’s retail',
+    retailAddProduct: 'Add product',
+    retailSearchHint: 'Tap a result or press Enter to add it. If it is already in the sale, one unit is added.',
+    retailInSale: 'In the sale',
+    retailUnitShort: 'Unit price',
+    retailLineTotal: 'Total',
+    retailEmptyTitle: 'Nothing sold today yet',
+    retailEmptyHint: 'Search for a product above and add it. Quantities are edited here.',
+    retailSoldToday: 'Sold today',
+    retailProfitToday: 'Today’s profit',
+    retailNoneYet: 'No sales yet',
+    retailSaleSummary: '{products} products · {units} units',
     retailDate: 'Today',
     retailUnreviewed: 'Unreviewed',
     retailReviewed: 'Reviewed',
