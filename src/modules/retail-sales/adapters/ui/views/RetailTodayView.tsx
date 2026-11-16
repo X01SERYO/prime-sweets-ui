@@ -39,10 +39,25 @@ export function RetailTodayView({
       {day ? (
         <>
           {closed ? (
-            <p>
-              {t('retailClosed')}
-              {day.reviewedAt ? ` ${t('retailReviewedAt')} ${new Date(day.reviewedAt).toLocaleString(locale === 'en' ? 'en' : 'es-CO')}.` : ''}
-            </p>
+            <div className="retail-closed-note">
+              <p>{t('retailClosed')}</p>
+              {day.reviewedByName || day.reviewedAt ? (
+                <p className="retail-review-meta">
+                  {day.reviewedByName ? (
+                    <span>
+                      <small>{t('retailReviewedBy')}</small>
+                      <strong>{day.reviewedByName}</strong>
+                    </span>
+                  ) : null}
+                  {day.reviewedAt ? (
+                    <span>
+                      <small>{t('retailReviewedAt')}</small>
+                      <strong>{new Date(day.reviewedAt).toLocaleString(locale === 'en' ? 'en' : 'es-CO')}</strong>
+                    </span>
+                  ) : null}
+                </p>
+              ) : null}
+            </div>
           ) : (
             <RetailProductPicker searchProducts={searchProducts} onAdd={today.add} />
           )}

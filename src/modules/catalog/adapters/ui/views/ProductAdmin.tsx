@@ -10,6 +10,7 @@ import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
 import { AppToast } from '@/shared/ui/AppToast';
+import { Pager } from '@/shared/ui/Pager';
 import { HttpRequestError } from '@/shared/infrastructure/http/httpClient';
 import './productAdmin.css';
 
@@ -30,7 +31,6 @@ type Draft = {
 };
 
 const fields = ['wholesaleCost', 'wholesalePrice', 'retailPrice', 'units', 'pack'] as const;
-const PAGE_SIZES = [10, 20, 30, 40, 50];
 
 function draftFrom(product: CatalogProduct): Draft {
   return {
@@ -311,33 +311,16 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
           onSave={() => void save(editing)}
         />
       ) : null}
-      <div className="product-admin-pager">
-        <button className="btn btn-secondary" type="button" disabled={page <= 1} onClick={() => void load(page - 1, query)}>
-          {t('previousPage')}
-        </button>
-        <span>
-          {page} / {Math.max(1, Math.ceil(total / pageSize))}
-        </span>
-        <button className="btn btn-secondary" type="button" disabled={page * pageSize >= total} onClick={() => void load(page + 1, query)}>
-          {t('nextPage')}
-        </button>
-        <label className="product-admin-size">
-          <select aria-label={t('pageSize')}
-            value={pageSize}
-            onChange={event => {
-              const size = Number(event.target.value);
-              setPageSize(size);
-              void load(1, query, size);
-            }}
-          >
-            {PAGE_SIZES.map(size => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <Pager
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPage={next => void load(next, query)}
+        onPageSize={size => {
+          setPageSize(size);
+          void load(1, query, size);
+        }}
+      />
       {!editing && (error || notice) ? <Toast error={error} notice={notice} onDone={dismissToast} /> : null}
     </section>
   );

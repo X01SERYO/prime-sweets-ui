@@ -57,6 +57,7 @@ export function toRetailDay(value: unknown): RetailDayModel {
     editable: day.editable === true,
     status: status as RetailDayStatus,
     reviewedAt: typeof day.reviewedAt === 'string' ? day.reviewedAt : null,
+    reviewedByName: typeof day.reviewedByName === 'string' ? day.reviewedByName : null,
     totalAmount: money(day.totalAmount),
     totalProfit: money(day.totalProfit),
     items: day.items.map(item)

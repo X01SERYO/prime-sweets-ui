@@ -118,7 +118,7 @@ When an item has `hasCost: false`, the row shows a warning icon next to the prod
 
 ### No review action on Hoy
 
-Hoy has no **Cerrar caja** button. Today is closed from Días anteriores (§3). If today was already reviewed there, Hoy shows the closed state: status **Revisado**, totals, who and when; no search, no table, no inputs.
+Hoy has no **Cerrar caja** button. Today is closed from Días anteriores (§3). If today was already reviewed there, Hoy shows the closed state and, when the API sends them, **Revisado por** and **Revisado el**. There is no search, no table, and no inputs.
 
 ### Day boundaries and sessions
 
@@ -129,9 +129,8 @@ Hoy has no **Cerrar caja** button. Today is closed from Días anteriores (§3). 
 ## 3. Días anteriores
 
 - Two views as segmented buttons: **Sin revisar** (default) and **Revisados**. The view, page, and page size live in the URL query, so back/forward and reload keep them.
-- Reads `GET /retail-days?status=&page=&pageSize=` with `pageSize` default **10**, using the shared `Pager` (same controls as Productos).
-- Each entry (row on PC, card on phone): date with weekday ("Hoy" for today), status badge, total vendido, total ganancia.
-- There is no product detail for past days. Days without sales do not exist, so they never appear.
+- Reads `GET /retail-days?status=&page=&pageSize=` with `pageSize` default **10**, using the shared `Pager`. Productos uses that same component.
+- Each reviewed day is one row, title above the value: sale date, total vendido, total ganancia, **Revisado por**, **Revisado el**. Sin revisar keeps the date and the two totals, plus the row checkbox. There is no product detail for past days. Days without sales do not exist, so they never appear.
 
 ### Sin revisar: select and close
 

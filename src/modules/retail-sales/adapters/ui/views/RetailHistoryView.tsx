@@ -135,7 +135,7 @@ export function RetailHistoryView({
           const checked = selected.includes(item.businessDate);
           return (
             <li key={item.businessDate}>
-              <label>
+              <label className={status === 'REVIEWED' ? 'is-reviewed' : undefined}>
                 {status === 'UNREVIEWED' ? (
                   <input
                     type="checkbox"
@@ -143,7 +143,7 @@ export function RetailHistoryView({
                     onChange={() => setSelected(current => (checked ? current.filter(date => date !== item.businessDate) : [...current, item.businessDate]))}
                   />
                 ) : null}
-                <span>
+                <span className="retail-history-when">
                   <strong>
                     {ago === 0 ? `${t('retailDate')} · ` : ''}
                     {formatHeading(item.businessDate, locale)}
@@ -158,10 +158,17 @@ export function RetailHistoryView({
                   <small>{t('retailTotalProfit')}</small>
                   <strong>{formatCurrency(item.totalProfit)}</strong>
                 </span>
-                {status === 'REVIEWED' ? (
-                  <small>
-                    {item.reviewedByName ?? ''} {item.reviewedAt ? new Date(item.reviewedAt).toLocaleString(locale === 'en' ? 'en' : 'es-CO') : ''}
-                  </small>
+                {status === 'REVIEWED' && item.reviewedByName ? (
+                  <span className="retail-review-meta">
+                    <small>{t('retailReviewedBy')}</small>
+                    <strong>{item.reviewedByName}</strong>
+                  </span>
+                ) : null}
+                {status === 'REVIEWED' && item.reviewedAt ? (
+                  <span className="retail-review-meta">
+                    <small>{t('retailReviewedAt')}</small>
+                    <strong>{new Date(item.reviewedAt).toLocaleString(locale === 'en' ? 'en' : 'es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</strong>
+                  </span>
                 ) : null}
               </label>
             </li>

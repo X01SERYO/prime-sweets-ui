@@ -28,6 +28,7 @@ const day: RetailDayModel = {
   editable: true,
   status: 'UNREVIEWED',
   reviewedAt: null,
+  reviewedByName: null,
   totalAmount: 1000,
   totalProfit: 200,
   items: [
@@ -187,7 +188,13 @@ test('today retail screen adds, changes, and removes a product', async () => {
 });
 
 test('retail screens show a closed day and a failed load', async () => {
-  const closed: RetailDayModel = { ...day, editable: false, status: 'REVIEWED', reviewedAt: '2026-11-14T12:00:00Z' };
+  const closed: RetailDayModel = {
+    ...day,
+    editable: false,
+    status: 'REVIEWED',
+    reviewedAt: '2026-11-14T12:00:00Z',
+    reviewedByName: 'Ana'
+  };
   const closedPort = new MemoryRetail();
   closedPort.getToday = async () => closed;
   render(
@@ -201,7 +208,8 @@ test('retail screens show a closed day and a failed load', async () => {
       />
     </LocaleProvider>
   );
-  await screen.findByText(/ya está revisado/);
+  await screen.findByText('Revisado por');
+  await screen.findByText('Ana');
   cleanup();
 
   const failing = new MemoryRetail();

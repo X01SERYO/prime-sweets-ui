@@ -18,6 +18,7 @@ export interface RetailDayModel {
   editable: boolean;
   status: RetailDayStatus;
   reviewedAt: string | null;
+  reviewedByName: string | null;
   totalAmount: number;
   totalProfit: number;
   items: RetailDayItem[];
