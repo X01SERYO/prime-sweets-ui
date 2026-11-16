@@ -21,6 +21,9 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | [adrs/ADR-003.md](./adrs/ADR-003.md) | Product administration is a catalog screen | Proposed. Binding for PDR-003. |
 | [pdrs/PDR-004.md](./pdrs/PDR-004.md) | Daily retail sale (Venta detal) | Proposal. Not implemented. |
 | [specs/SPEC-004.md](./specs/SPEC-004.md) | Implementation guide for UI PDR-004 | Proposed. Do not copy it into architecture, model, or flows until the code lands. |
+| [pdrs/PDR-005.md](./pdrs/PDR-005.md) | PC content fills the window; type scales | Proposal. Not implemented. |
+| [specs/SPEC-005.md](./specs/SPEC-005.md) | Implementation guide for UI PDR-005 | Proposed. CSS only. Do not copy it into architecture, model, or flows until the code lands. |
+| [adrs/ADR-004.md](./adrs/ADR-004.md) | Fluid PC shell; phone layout unchanged | Proposed. Binding for PDR-005. |
 | [architecture/](./architecture/README.md) | C4 model of **the current UI** | Implemented. One C4 set only. |
 | [model/](./model/README.md) | Client structures verified in code | Session, catalog hit, sale, delivery-day row, load sheet, and invoice models. |
 | [flows/](./flows/README.md) | User and application flows verified in code | Login through invoice print. Remaining gaps are listed, not invented. |
