@@ -2,6 +2,8 @@
 
 **Sources:** `src/main.tsx`, `src/app/App.tsx`, `src/app/composition.ts`, `src/modules/sales/adapters/ui/views/WeekHome.tsx`, `DaySalesList.tsx`.
 
+Pedidos is not a flow in the client yet. The target screens are [SPEC-006](../specs/SPEC-006.md).
+
 ## 1. Open the application
 
 1. The browser loads `index.html` and `src/main.tsx`.
