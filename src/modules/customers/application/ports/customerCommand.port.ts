@@ -2,4 +2,5 @@ import type { CustomerModel, NewCustomer } from '@/modules/customers/domain/mode
 
 export interface CustomerCommandPort {
   create(customer: NewCustomer): Promise<CustomerModel>;
+  update(id: string, customer: NewCustomer): Promise<CustomerModel>;
 }

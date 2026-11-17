@@ -107,6 +107,15 @@ export class HttpSale implements SaleCommandPort, SaleQueryPort {
     }
   }
 
+  async assignCustomer(saleId: string, customerId: string): Promise<SaleModel> {
+    try {
+      const body = await this.http.patch<Envelope>(`/sales/${encodeURIComponent(saleId)}/customer`, { customerId });
+      return toSaleEnvelope(body);
+    } catch (error) {
+      mapSaleError(error);
+    }
+  }
+
   async addItem(saleId: string, productId: string, quantity: number, itemName: string): Promise<SaleModel> {
     try {
       const body = await this.http.post<Envelope>(`/sales/${encodeURIComponent(saleId)}/items`, {

@@ -129,6 +129,13 @@ test('brands, customers, invoices, and sales reject a broken payload', async () 
   await assert.rejects(() => invoices.execute(' '), InvoiceInvalidError);
   assert.equal((await invoices.execute(' 2026-11-14 ')).length, 1);
   assert.equal(parseQuantity('1,5'), 1.5);
+  assert.equal(parseQuantity('1.5'), 1.5);
+  assert.equal(parseQuantity('2,25'), 2.25);
+  assert.equal(parseQuantity('1,'), 1);
+  assert.equal(parseQuantity('1.'), 1);
+  assert.equal(parseQuantity(',5'), 0.5);
+  assert.equal(parseQuantity('.5'), 0.5);
+  assert.equal(parseQuantity('1.2,3'), null);
   assert.equal(parseQuantity('0'), null);
   assert.equal(parseQuantity('1.0001'), null);
 });

@@ -15,8 +15,6 @@ import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale
 import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
 import { useDraftSale } from '@/modules/sales/adapters/ui/hooks/useDraftSale';
 import { useSaleMutations } from '@/modules/sales/adapters/ui/hooks/useSaleMutations';
-import { DeliveryDateModal } from '@/modules/sales/adapters/ui/views/DeliveryDateModal';
-import { businessToday, deliveryDaysThroughSunday } from '@/modules/sales/domain/deliveryDays';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
 import { PurchaseOrderSheetView } from '@/modules/purchasing/adapters/ui/views/PurchaseOrderSheetView';
@@ -92,8 +90,9 @@ function SaleSearch({ container }: { container: AppContainer }) {
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
-  const [changingDelivery, setChangingDelivery] = useState(false);
   const [pendingMove, setPendingMove] = useState<string | null>(null);
+  const [changingCustomer, setChangingCustomer] = useState(false);
+  const [customerError, setCustomerError] = useState<MessageKey | null>(null);
   const [deliveryError, setDeliveryError] = useState<MessageKey | null>(null);
   const [pending, setPending] = useState<PendingLine | null>(null);
   const [searchOutcome, setSearchOutcome] = useState<{ id: number; added: boolean } | null>(null);
@@ -135,7 +134,6 @@ function SaleSearch({ container }: { container: AppContainer }) {
       .execute(current.id, date)
       .then(saved => {
         setDeliveryError(null);
-        setChangingDelivery(false);
         if (saved.id !== current.id) {
           allowLeave.current = true;
           navigate(`/sales?saleId=${encodeURIComponent(saved.id)}`);
@@ -145,7 +143,6 @@ function SaleSearch({ container }: { container: AppContainer }) {
       })
       .catch((caught: unknown) => {
         setDeliveryError(saleErrorKey(caught, 'saleLineFailed'));
-        setChangingDelivery(false);
       });
   }
 
@@ -160,37 +157,74 @@ function SaleSearch({ container }: { container: AppContainer }) {
   return (
     <div className="sale-screen">
       <ScreenTitle>{t('sale')}</ScreenTitle>
-      {!shownCustomerId && !draft.loading ? (
-        <SaleCustomerChoice searchCustomers={container.searchCustomers} onSelect={id => setParams({ customerId: id })} />
-      ) : (
-        <SelectedCustomer customerId={shownCustomerId} getCustomer={container.getCustomer} />
-      )}
-      {draft.sale?.deliveryDate ? (
-        <DeliveryDayCard
-          deliveryDate={draft.sale.deliveryDate}
-          onChange={canEditLines ? () => setChangingDelivery(true) : undefined}
+      {(!shownCustomerId || changingCustomer) && !draft.loading ? (
+        <SaleCustomerChoice
+          searchCustomers={container.searchCustomers}
+          createCustomer={container.createCustomer}
+          changing={changingCustomer}
+          onCancelChange={() => setChangingCustomer(false)}
+          onSelect={id => {
+            const current = draft.sale;
+            if (!current) {
+              setCustomerError(null);
+              setChangingCustomer(false);
+              setDeliveryDate(null);
+              setParams({ customerId: id });
+              return;
+            }
+            if (current.customerId === id) {
+              setCustomerError(null);
+              setChangingCustomer(false);
+              setParams({ saleId: current.id, customerId: id });
+              return;
+            }
+            void container.assignSaleCustomer
+              .execute(current.id, id)
+              .then(saved => {
+                setCustomerError(null);
+                setChangingCustomer(false);
+                draft.setSale(saved);
+                setParams({ saleId: saved.id, customerId: saved.customerId });
+              })
+              .catch((caught: unknown) => {
+                setCustomerError(saleErrorKey(caught, 'saleCustomerFailed'));
+              });
+          }}
         />
-      ) : null}
-      {deliveryError ? <StatusMessage tone="error">{t(deliveryError)}</StatusMessage> : null}
-      {changingDelivery && draft.sale ? (
-        <DeliveryDateModal
-          title={t('changeDeliveryDay')}
-          days={deliveryDaysThroughSunday(businessToday())}
-          onClose={() => setChangingDelivery(false)}
+      ) : (
+        <SelectedCustomer
+          customerId={shownCustomerId}
+          getCustomer={container.getCustomer}
+          updateCustomer={container.updateCustomer}
+          onChange={() => {
+            setCustomerError(null);
+            setChangingCustomer(true);
+          }}
+        />
+      )}
+      {customerError ? <StatusMessage tone="error">{t(customerError)}</StatusMessage> : null}
+      {shownCustomerId ? (
+        <DeliveryDayCard
+          selectedDate={draft.sale?.deliveryDate ?? null}
+          disabled={Boolean(draft.sale) && !canEditLines}
           onSelect={date => {
             const current = draft.sale;
             if (!current) {
+              setDeliveryDate(date);
               return;
             }
-            if (current.status === 'CONFIRMED' && date !== current.deliveryDate) {
+            if (date === current.deliveryDate || !canEditLines) {
+              return;
+            }
+            if (current.status === 'CONFIRMED') {
               setPendingMove(date);
-              setChangingDelivery(false);
               return;
             }
             moveDelivery(date);
           }}
         />
       ) : null}
+      {deliveryError ? <StatusMessage tone="error">{t(deliveryError)}</StatusMessage> : null}
       {pendingMove && draft.sale ? (
         <ConfirmDialog
           title={t('changeDeliveryDay')}
@@ -206,12 +240,6 @@ function SaleSearch({ container }: { container: AppContainer }) {
             moveDelivery(date);
           }}
           onCancel={() => setPendingMove(null)}
-        />
-      ) : null}
-      {shownCustomerId && !saleId && !draft.sale && !draft.loading ? (
-        <DeliveryDateModal
-          onSelect={setDeliveryDate}
-          onClose={() => setParams({})}
         />
       ) : null}
       {shownCustomerId && draft.sale && canEditLines ? (

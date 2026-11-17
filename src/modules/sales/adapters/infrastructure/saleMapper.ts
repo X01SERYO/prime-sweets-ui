@@ -17,9 +17,12 @@ function toItem(raw: unknown): SaleItemModel {
   if (
     typeof data.id !== 'string' ||
     typeof data.productId !== 'string' ||
-    typeof data.itemName !== 'string' ||
-    typeof data.quantity !== 'number'
+    typeof data.itemName !== 'string'
   ) {
+    throw new SaleInvalidError();
+  }
+  const quantity = money(data.quantity);
+  if (quantity <= 0) {
     throw new SaleInvalidError();
   }
   return {
@@ -28,7 +31,7 @@ function toItem(raw: unknown): SaleItemModel {
     itemName: data.itemName,
     productCode: typeof data.productCode === 'string' ? data.productCode : '',
     catalogName: typeof data.catalogName === 'string' && data.catalogName.trim() ? data.catalogName : data.itemName,
-    quantity: data.quantity,
+    quantity,
     wholesalePrice: money(data.wholesalePrice),
     lineTotal: money(data.totalPrice)
   };

@@ -1,4 +1,4 @@
-import { parseQuantity } from '@/modules/sales/domain/quantity';
+import { formatQuantityInput, parseQuantity, sanitizeQuantityInput } from '@/modules/sales/domain/quantity';
 import { useLocale } from '@/shared/i18n/useLocale';
 
 export function QuantityField({
@@ -24,7 +24,7 @@ export function QuantityField({
     if (next <= 0) {
       return;
     }
-    onChange(String(next));
+    onChange(formatQuantityInput(next, value.includes(',') ? ',' : '.'));
   }
 
   return (
@@ -39,7 +39,7 @@ export function QuantityField({
         tabIndex={inputTabIndex}
         inputMode="decimal"
         aria-label={t('quantityName')}
-        onChange={event => onChange(event.target.value)}
+        onChange={event => onChange(sanitizeQuantityInput(event.target.value))}
       />
       <button className="btn btn-secondary" type="button" tabIndex={stepperTabIndex} aria-label={t('increaseQuantity')} disabled={disabled} onClick={() => step(1)}>
         +

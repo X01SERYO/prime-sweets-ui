@@ -2,6 +2,7 @@ import { HttpProductSearch } from '@/modules/catalog/adapters/infrastructure/htt
 import { HttpCustomerCommand } from '@/modules/customers/adapters/infrastructure/httpCustomerCommand';
 import { HttpCustomerQuery } from '@/modules/customers/adapters/infrastructure/httpCustomerQuery';
 import { CreateCustomerUseCase } from '@/modules/customers/application/use-cases/createCustomer.useCase';
+import { UpdateCustomerUseCase } from '@/modules/customers/application/use-cases/updateCustomer.useCase';
 import { GetCustomerUseCase } from '@/modules/customers/application/use-cases/getCustomer.useCase';
 import { SearchCustomersUseCase } from '@/modules/customers/application/use-cases/searchCustomers.useCase';
 import { HttpCatalogProduct } from '@/modules/catalog/adapters/infrastructure/httpCatalogProduct';
@@ -22,6 +23,7 @@ import { AddSaleItemUseCase } from '@/modules/sales/application/use-cases/addSal
 import { ConfirmSaleUseCase } from '@/modules/sales/application/use-cases/confirmSale.useCase';
 import { CreateDraftSaleUseCase } from '@/modules/sales/application/use-cases/createDraftSale.useCase';
 import { SetSaleDeliveryDateUseCase } from '@/modules/sales/application/use-cases/setSaleDeliveryDate.useCase';
+import { AssignSaleCustomerUseCase } from '@/modules/sales/application/use-cases/assignSaleCustomer.useCase';
 import { GetSaleUseCase } from '@/modules/sales/application/use-cases/getSale.useCase';
 import { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application/use-cases/listSalesByDeliveryDate.useCase';
 import { ListDraftSalesUseCase } from '@/modules/sales/application/use-cases/listDraftSales.useCase';
@@ -75,11 +77,13 @@ export interface AppContainer {
   searchCustomers: SearchCustomersUseCase;
   getCustomer: GetCustomerUseCase;
   createCustomer: CreateCustomerUseCase;
+  updateCustomer: UpdateCustomerUseCase;
   listDraftSales: ListDraftSalesUseCase;
   getSale: GetSaleUseCase;
   listDeliverySales: ListSalesByDeliveryDateUseCase;
   createDraftSale: CreateDraftSaleUseCase;
   setSaleDeliveryDate: SetSaleDeliveryDateUseCase;
+  assignSaleCustomer: AssignSaleCustomerUseCase;
   addSaleItem: AddSaleItemUseCase;
   updateSaleItemQuantity: UpdateSaleItemQuantityUseCase;
   updateSaleItemName: UpdateSaleItemNameUseCase;
@@ -132,11 +136,13 @@ export function createAppContainer(): AppContainer {
     searchCustomers: new SearchCustomersUseCase(new HttpCustomerQuery(http)),
     getCustomer: new GetCustomerUseCase(new HttpCustomerQuery(http)),
     createCustomer: new CreateCustomerUseCase(new HttpCustomerCommand(http)),
+    updateCustomer: new UpdateCustomerUseCase(new HttpCustomerCommand(http)),
     listDraftSales: new ListDraftSalesUseCase(new HttpSale(http)),
     getSale: new GetSaleUseCase(new HttpSale(http)),
     listDeliverySales: new ListSalesByDeliveryDateUseCase(new HttpSale(http), new HttpCustomerQuery(http)),
     createDraftSale: new CreateDraftSaleUseCase(new HttpSale(http)),
     setSaleDeliveryDate: new SetSaleDeliveryDateUseCase(new HttpSale(http)),
+    assignSaleCustomer: new AssignSaleCustomerUseCase(new HttpSale(http)),
     addSaleItem: new AddSaleItemUseCase(new HttpSale(http)),
     updateSaleItemQuantity: new UpdateSaleItemQuantityUseCase(new HttpSale(http)),
     updateSaleItemName: new UpdateSaleItemNameUseCase(new HttpSale(http)),

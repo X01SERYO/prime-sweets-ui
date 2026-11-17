@@ -1,6 +1,8 @@
-import { Search, X } from 'lucide-react';
-import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
+import { Plus, Search, X } from 'lucide-react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
+import { CustomerFormDialog } from '@/modules/customers/adapters/ui/views/CustomerFormDialog';
+import type { CreateCustomerUseCase } from '@/modules/customers/application/use-cases/createCustomer.useCase';
 import { useCustomerSearch } from '@/modules/customers/adapters/ui/hooks/useCustomerSearch';
 import type { SearchCustomersUseCase } from '@/modules/customers/application/use-cases/searchCustomers.useCase';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -8,12 +10,16 @@ import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface SaleCustomerChoiceProps {
   searchCustomers: SearchCustomersUseCase;
+  createCustomer: CreateCustomerUseCase;
+  changing?: boolean;
+  onCancelChange?: () => void;
   onSelect: (customerId: string) => void;
 }
 
-export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerChoiceProps) {
+export function SaleCustomerChoice({ searchCustomers, createCustomer, changing, onCancelChange, onSelect }: SaleCustomerChoiceProps) {
   const { t } = useLocale();
   const search = useCustomerSearch(searchCustomers);
+  const [creating, setCreating] = useState(false);
 
   function onSearch(event: FormEvent) {
     event.preventDefault();
@@ -22,13 +28,11 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
 
   return (
     <section className="stack customer-choice">
-      <div className="row customer-choice-actions">
-        <Link className="btn btn-secondary" to="/customers">
-          {t('customerCreate')}
-        </Link>
-      </div>
       <form className="card" onSubmit={onSearch}>
-          <label htmlFor="customer-query">{t('findCustomer')}</label>
+          <label className="step-label" htmlFor="customer-query">
+            <span className="step-num">1</span>
+            {t('findCustomer')}
+          </label>
           <div className="search-row">
             <input
               className="search-field"
@@ -47,10 +51,54 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
               <Search aria-hidden="true" strokeWidth={1.8} />
             </button>
           </div>
+          <div className="row customer-choice-actions">
+            <button className="btn btn-secondary" type="button" onClick={() => setCreating(true)}>
+              <Plus aria-hidden="true" strokeWidth={1.8} />
+              {t('customerMissing')}
+            </button>
+            {changing && onCancelChange ? (
+              <button className="btn btn-secondary" type="button" onClick={onCancelChange}>{t('customerCancelChange')}</button>
+            ) : null}
+          </div>
       </form>
+      {creating ? (
+        <CustomerFormDialog
+          createCustomer={createCustomer}
+          onClose={() => setCreating(false)}
+          onSaved={saved => {
+            setCreating(false);
+            onSelect(saved.id);
+          }}
+        />
+      ) : null}
       {search.error && !search.searched ? <StatusMessage tone="error">{t(search.error)}</StatusMessage> : null}
       {search.searched ? (
-        <CustomerResults title={t('searchResults')} closeLabel={t('closeSearch')} onClose={search.closeResults}>
+        <CustomerResults
+          title={t('searchResults')}
+          closeLabel={t('closeSearch')}
+          onClose={search.closeResults}
+          search={
+            <form className="modal-search search-row" onSubmit={event => { event.preventDefault(); void search.submit(search.query); }}>
+              <input
+                className="search-field"
+                id="customer-query-modal"
+                value={search.query}
+                placeholder={t('customerSearch')}
+                onChange={event => search.refine(event.target.value)}
+                autoComplete="off"
+                autoFocus
+              />
+              <button
+                className="btn search-submit"
+                type="submit"
+                aria-label={search.loading ? t('searching') : t('search')}
+                disabled={!search.query.trim() || search.loading}
+              >
+                <Search aria-hidden="true" strokeWidth={1.8} />
+              </button>
+            </form>
+          }
+        >
           {search.error ? <StatusMessage tone="error">{t(search.error)}</StatusMessage> : null}
           {!search.loading && !search.error && search.customers.length === 0 ? (
             <StatusMessage tone="info">
@@ -94,11 +142,13 @@ function CustomerResults({
   title,
   closeLabel,
   onClose,
+  search,
   children
 }: {
   title: string;
   closeLabel: string;
   onClose: () => void;
+  search: ReactNode;
   children: ReactNode;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -131,6 +181,7 @@ function CustomerResults({
           <X aria-hidden="true" strokeWidth={1.8} />
         </button>
       </div>
+      {search}
       <div className="modal-scroll">{children}</div>
     </dialog>
   );

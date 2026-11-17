@@ -212,6 +212,7 @@ function Page() {
             }
           ]
         }}
+        createCustomer={{ execute: async () => ({ id: 'c2', documentType: 'CC', documentNumber: '2', name: 'NUEVO', phone: null, email: null, address: null }) }}
         onSelect={() => undefined}
       />
       <LoginView
@@ -281,12 +282,10 @@ test('editing a product, a sale line, and a search runs the screen actions', asy
   fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' })[0]);
 
   fireEvent.click(screen.getByRole('button', { name: 'Ver variantes' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Acciones' }));
-  fireEvent.click(screen.getByRole('menuitem', { name: 'Quitar' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Quitar' }));
   fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' }).at(-1)!);
   fireEvent.click(screen.getByRole('button', { name: 'Confirmar venta' }));
-  fireEvent.click(screen.getAllByRole('button', { name: 'Acciones' }).at(-1)!);
-  fireEvent.click(screen.getByRole('menuitem', { name: 'Editar' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
   fireEvent.change(screen.getAllByLabelText('Sabores o detalle (opcional)').at(-1)!, { target: { value: 'SODA extra roja' } });
   fireEvent.change(screen.getAllByLabelText('Cantidad').at(-1)!, { target: { value: '4' } });
   fireEvent.click(screen.getAllByRole('button', { name: 'Guardar' }).at(-1)!);

@@ -299,7 +299,6 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
 
   open('/sales?customerId=c1&saleId=s2');
   await waitFor(() => screen.getByText('SODA'));
-  fireEvent.click(screen.getByRole('button', { name: 'Cambiar día' }));
   const moveDays = document.querySelectorAll('.delivery-days button');
   fireEvent.click(moveDays[moveDays.length - 1]);
   fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
@@ -316,7 +315,6 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
     const dialog = await screen.findByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: 'Agregar' }));
   }
-  fireEvent.click(screen.getByRole('button', { name: 'Cambiar día' }));
   const days = document.querySelectorAll('.delivery-days button');
   fireEvent.click(days[days.length - 1]);
   await waitFor(() => {

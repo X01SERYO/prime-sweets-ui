@@ -8,21 +8,48 @@
 }
 
 .product-hits li {
+  display: block;
+}
+
+.product-hit {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.45rem 0.65rem;
+  width: 100%;
+  padding: 0.7rem 0.75rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fff;
+  text-align: left;
+  cursor: pointer;
 }
 
-.product-hits li span:nth-child(2) {
+.product-hit:hover:not(:disabled),
+.product-hit:focus-visible {
+  border-color: var(--deep);
+  background: #f4fafa;
+}
+
+.product-hit > span:nth-child(2) {
   flex: 1;
   min-width: 0;
   color: var(--deep);
   font-weight: 650;
+}
+
+.product-hit-plus {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1.5px solid var(--deep);
+  border-radius: 10px;
+  color: var(--deep);
+}
+
+.product-hit-plus svg {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .product-hits mark {

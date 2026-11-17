@@ -17,7 +17,7 @@ interface ProductSearchViewProps {
 
 export function ProductSearchView({ searchProducts, onSelect, selecting, outcome }: ProductSearchViewProps) {
   const { t } = useLocale();
-  const { query, setQuery, submit, products, loading, error, searched, canSearch, closeResults, keepQuery, resetQuery } = useProductSearch(searchProducts);
+  const { query, setQuery, submit, refine, products, loading, error, searched, canSearch, closeResults, keepQuery, resetQuery } = useProductSearch(searchProducts);
   const seenOutcome = useRef<number | null>(null);
   const queryRef = useRef<HTMLInputElement>(null);
 
@@ -42,7 +42,10 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
   return (
     <section className="stack">
       <form className="card" onSubmit={onSubmit}>
-        <label htmlFor="product-query">{t('searchProduct')}</label>
+        <label className="step-label" htmlFor="product-query">
+          <span className="step-num">3</span>
+          {t('searchProduct')}
+        </label>
         <div className="search-row">
           <input
             ref={queryRef}
@@ -68,6 +71,27 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
           title={t('searchResults')}
           closeLabel={t('closeSearch')}
           onClose={closeResults}
+          search={
+            <form className="modal-search search-row" onSubmit={event => { event.preventDefault(); void submit(query); }}>
+              <input
+                className="search-field"
+                id="product-query-modal"
+                value={query}
+                placeholder={t('productSearchPlaceholder')}
+                onChange={event => refine(event.target.value)}
+                autoComplete="off"
+                autoFocus
+              />
+              <button
+                className="btn search-submit"
+                type="submit"
+                aria-label={loading ? t('searching') : t('search')}
+                disabled={!canSearch || loading}
+              >
+                <Search aria-hidden="true" strokeWidth={1.8} />
+              </button>
+            </form>
+          }
         >
           {error ? <StatusMessage tone="error">{t(error)}</StatusMessage> : null}
           {!loading && !error && products.length === 0 ? (
@@ -77,25 +101,28 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
             <ul className="product-hits">
               {products.map(product => (
                 <li key={product.id}>
-                  <span className="product-hit-code">{highlightMatch(product.code, query)}</span>
-                  <span>{product.name ? highlightMatch(product.name, query) : t('noName')}</span>
-                  <span className="product-hit-price">
-                    {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)}
-                  </span>
-                  {onSelect ? (
-                    <button
-                      className="btn icon-btn icon-edit"
-                      type="button"
-                      aria-label={t('addItem')}
-                      disabled={selecting}
-                      onClick={() => {
-                        onSelect(product);
-                        closeResults();
-                      }}
-                    >
-                      <Plus aria-hidden="true" strokeWidth={1.8} />
-                    </button>
-                  ) : null}
+                  <button
+                    className="product-hit"
+                    type="button"
+                    aria-label={t('addItem')}
+                    disabled={!onSelect || selecting}
+                    onClick={() => {
+                      if (!onSelect) {
+                        return;
+                      }
+                      onSelect(product);
+                      closeResults();
+                    }}
+                  >
+                    <span className="product-hit-code">{highlightMatch(product.code, query)}</span>
+                    <span>{product.name ? highlightMatch(product.name, query) : t('noName')}</span>
+                    <span className="product-hit-price">
+                      {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)}
+                    </span>
+                    <span className="product-hit-plus" aria-hidden="true">
+                      <Plus strokeWidth={1.8} />
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -128,11 +155,13 @@ function SearchResults({
   title,
   closeLabel,
   onClose,
+  search,
   children
 }: {
   title: string;
   closeLabel: string;
   onClose: () => void;
+  search: ReactNode;
   children: ReactNode;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -165,6 +194,7 @@ function SearchResults({
           <X aria-hidden="true" strokeWidth={1.8} />
         </button>
       </div>
+      {search}
       <div className="modal-scroll">{children}</div>
     </dialog>
   );

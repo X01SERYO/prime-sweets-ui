@@ -34,4 +34,22 @@ export class HttpCustomerCommand implements CustomerCommandPort {
       throw error;
     }
   }
+
+  async update(id: string, customer: NewCustomer): Promise<CustomerModel> {
+    try {
+      const body = await this.http.put<Envelope>(`/customers/${encodeURIComponent(id)}`, customer);
+      if (!body || body.success !== true) {
+        throw new CustomerInvalidError();
+      }
+      return toCustomer(body.data);
+    } catch (error) {
+      if (error instanceof CustomerInvalidError) {
+        throw error;
+      }
+      if (error instanceof HttpRequestError && error.code === 'CUSTOMER_ALREADY_EXISTS') {
+        throw new CustomerAlreadyExistsError();
+      }
+      throw error;
+    }
+  }
 }

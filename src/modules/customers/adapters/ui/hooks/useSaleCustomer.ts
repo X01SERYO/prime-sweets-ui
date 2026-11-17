@@ -34,5 +34,5 @@ export function useSaleCustomer(customerId: string | null, getCustomer: GetCusto
     };
   }, [customerId, getCustomer]);
 
-  return { customer, error };
+  return { customer, error, replace: setCustomer };
 }

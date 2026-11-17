@@ -36,9 +36,10 @@ export function useDraftSale(
         : Promise.resolve(null);
     load
       .then(draft => {
-        if (!cancelled && draft) {
-          setSale(draft);
+        if (cancelled) {
+          return;
         }
+        setSale(draft);
       })
       .catch((caught: unknown) => {
         if (!cancelled) {

@@ -1,4 +1,4 @@
-import { Check, ChevronRight, MoreHorizontal, Pencil, Trash2, X } from 'lucide-react';
+import { Check, ChevronRight, Pencil, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
 import type { SaleItemModel, SaleModel } from '@/modules/sales/domain/models/sale';
 import { addedSaleLineName, composeSaleLineName, groupSaleItems, previewLineTotal } from '@/modules/sales/domain/saleLineName';
@@ -222,14 +222,16 @@ export function SaleLines({
                 {t('invoiceAssigned')} {sale.invoiceNumber}
               </p>
             ) : null}
-            <p className="sale-total">
-              {t('saleTotal')} {formatCurrency(sale.totalAmount)}
-            </p>
-            <p className="sale-summary">
-              {t('saleSummary')
-                .replace('{products}', String(sale.items.length))
-                .replace('{units}', String(sale.items.reduce((sum, item) => sum + item.quantity, 0)))}
-            </p>
+            <div className="sale-totals">
+              <p className="sale-total">
+                {t('saleTotal')} {formatCurrency(sale.totalAmount)}
+              </p>
+              <p className="sale-summary">
+                {t('saleSummary')
+                  .replace('{products}', String(sale.items.length))
+                  .replace('{units}', String(sale.items.reduce((sum, item) => sum + item.quantity, 0)))}
+              </p>
+            </div>
             {canEditSaleLines(sale.status) ? (
               <button
                 className="btn"
@@ -288,6 +290,9 @@ function SaleLineGroupRows({
   const total = group.reduce((sum, item) => sum + item.lineTotal, 0);
   const samePrice = group.every(item => item.wholesalePrice === head.wholesalePrice);
   const expanded = open || group.some(item => item.id === editingId);
+  const countLabel = group.length === 1
+    ? t('variantCountOne')
+    : t('variantCount').replace('{count}', String(group.length));
 
   if (!split) {
     const item = head;
@@ -312,7 +317,10 @@ function SaleLineGroupRows({
     <>
       <tr className="line-group">
         <td>{head.productCode}</td>
-        <td className="product-cell">{head.catalogName || head.itemName}</td>
+        <td className="product-cell">
+          {head.catalogName || head.itemName}
+          <em className="line-variant-count">{countLabel}</em>
+        </td>
         <td>{quantity}</td>
         <td className="num">{samePrice ? formatCurrency(head.wholesalePrice) : ''}</td>
         <td className="num">{formatCurrency(total)}</td>
@@ -403,7 +411,7 @@ function SaleLineRow({
           <td className="num">{formatCurrency(item.lineTotal)}</td>
           {editable ? (
             <td className="line-col">
-              <LineMenu busy={busy} onEdit={onEdit} onRemove={onRemove} />
+              <LineIconActions busy={busy} onEdit={onEdit} onRemove={onRemove} />
             </td>
           ) : padAction ? <td /> : null}
         </>
@@ -426,64 +434,6 @@ function LineIconActions({ busy, onEdit, onRemove }: { busy: boolean; onEdit: ()
   );
 }
 
-function LineMenu({ busy, onEdit, onRemove }: { busy: boolean; onEdit: () => void; onRemove: () => void }) {
-  const { t } = useLocale();
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    function onPointer(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', onPointer);
-    return () => document.removeEventListener('mousedown', onPointer);
-  }, [open]);
-
-  return (
-    <div className="line-menu" ref={rootRef}>
-      <button
-        className="btn icon-btn"
-        type="button"
-        aria-label={t('lineActions')}
-        aria-expanded={open}
-        aria-haspopup="menu"
-        disabled={busy}
-        onClick={() => setOpen(current => !current)}
-      >
-        <MoreHorizontal aria-hidden="true" strokeWidth={1.8} />
-      </button>
-      {open ? (
-        <div className="line-menu-pop is-up" role="menu">
-          <button
-            role="menuitem"
-            type="button"
-            onClick={() => {
-              setOpen(false);
-              onEdit();
-            }}
-          >
-            {t('editSale')}
-          </button>
-          <button
-            role="menuitem"
-            type="button"
-            onClick={() => {
-              setOpen(false);
-              onRemove();
-            }}
-          >
-            {t('removeItem')}
-          </button>
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 
 function SaleLineCards({
@@ -524,7 +474,26 @@ function SaleLineCards({
     {!sale || sale.items.length === 0 ? <StatusMessage tone="info">{t('saleEmpty')}</StatusMessage> : null}
     {sale && sale.items.length > 0 ? (
     <ul className="line-cards">
-      {sale.items.map(item => {
+      {groupSaleItems(sale.items).map(group => {
+        const split = group.length > 1 || group.some(item => addedSaleLineName(item.catalogName, item.itemName));
+        if (split) {
+          return (
+            <SaleLineCardGroup
+              key={group[0].id}
+              group={group}
+              sale={sale}
+              editable={editable}
+              busy={busy}
+              editingId={editingId}
+              actionsRef={actionsRef}
+              onEdit={onEdit}
+              onRemove={onRemove}
+              onSave={onSave}
+              onCancelEdit={onCancelEdit}
+            />
+          );
+        }
+        const item = group[0];
         const open = openId === item.id || editingId === item.id;
         return (
           <li key={item.id} className={editingId === item.id ? 'card line-card is-editing' : 'card line-card'}>
@@ -575,6 +544,92 @@ function SaleLineCards({
     </ul>
     ) : null}
     </div>
+  );
+}
+
+function SaleLineCardGroup({
+  group,
+  sale,
+  editable,
+  busy,
+  editingId,
+  actionsRef,
+  onEdit,
+  onRemove,
+  onSave,
+  onCancelEdit
+}: {
+  group: SaleItemModel[];
+  sale: SaleModel;
+  editable: boolean;
+  busy: boolean;
+  editingId: string | null;
+  actionsRef: MutableRefObject<EditingActions | null>;
+  onEdit: (id: string) => void;
+  onRemove: (id: string) => void;
+  onSave: (item: SaleItemModel, name: string, quantity: number) => Promise<SaleModel | null>;
+  onCancelEdit: () => void;
+}) {
+  const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const head = group[0];
+  const quantity = group.reduce((sum, item) => sum + item.quantity, 0);
+  const total = group.reduce((sum, item) => sum + item.lineTotal, 0);
+  const expanded = open || group.some(item => item.id === editingId);
+  const countLabel = group.length === 1 ? t('variantCountOne') : t('variantCount').replace('{count}', String(group.length));
+
+  return (
+    <li className="card line-card is-group">
+      <button
+        className={expanded ? 'line-summary open' : 'line-summary'}
+        type="button"
+        aria-expanded={expanded}
+        aria-label={`${head.catalogName || head.itemName}, ${countLabel}. ${expanded ? t('hideVariants') : t('showVariants')}`}
+        onClick={() => setOpen(current => !current)}
+      >
+        <span className="line-summary-name">
+          {head.catalogName || head.itemName}
+          <em className="line-variant-count">{countLabel}</em>
+        </span>
+        <span className="line-summary-qty">{quantity}</span>
+        <span className="line-summary-total">{formatCurrency(total)}</span>
+        <ChevronRight aria-hidden="true" strokeWidth={1.8} />
+      </button>
+      {expanded ? (
+        <ul className="line-variant-list">
+          {group.map(item => {
+            const detail = addedSaleLineName(item.catalogName, item.itemName) || item.itemName;
+            if (editingId === item.id) {
+              return (
+                <li key={item.id} className="line-variant-row is-editing">
+                  <LineEditor
+                    layout="card"
+                    productCode={item.productCode}
+                    itemName={item.itemName}
+                    catalogName={item.catalogName}
+                    quantity={item.quantity}
+                    wholesalePrice={item.wholesalePrice}
+                    allowName={canRenameSaleLine(sale.status)}
+                    busy={busy}
+                    actionsRef={actionsRef}
+                    onSave={(name, nextQuantity) => onSave(item, name, nextQuantity)}
+                    onCancel={onCancelEdit}
+                  />
+                </li>
+              );
+            }
+            return (
+              <li key={item.id} className="line-variant-row">
+                <span className="line-summary-name">{detail}</span>
+                <span className="line-summary-qty">{item.quantity}</span>
+                <span className="line-summary-total">{formatCurrency(item.lineTotal)}</span>
+                {editable ? <LineIconActions busy={busy} onEdit={() => onEdit(item.id)} onRemove={() => onRemove(item.id)} /> : <span />}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </li>
   );
 }
 
@@ -802,7 +857,7 @@ function PendingCard({
       }}
     >
       <form
-        className="pending-line"
+        className="pending-line is-dialog"
         onSubmit={event => {
           event.preventDefault();
           save();
@@ -811,23 +866,26 @@ function PendingCard({
         <h2 ref={titleRef} className="pending-catalog">
           {pending.name}
         </h2>
-        <QuantityField
-          value={quantity}
-          disabled={busy}
-          autoFocus
-          inputTabIndex={1}
-          stepperTabIndex={-1}
-          onChange={setQuantity}
-        />
-        <label htmlFor="pending-variant">{t('lineVariant')}</label>
-        <input
-          id="pending-variant"
-          value={variant}
-          tabIndex={2}
-          disabled={busy}
-          placeholder={t('lineVariant')}
-          onChange={event => setVariant(event.target.value)}
-        />
+        <div className="pending-fields">
+          <label htmlFor="pending-variant">{t('lineVariant')}</label>
+          <span className="pending-qty-label">{t('quantityName')}</span>
+          <input
+            id="pending-variant"
+            value={variant}
+            tabIndex={2}
+            disabled={busy}
+            placeholder={t('lineVariantPlaceholder')}
+            onChange={event => setVariant(event.target.value)}
+          />
+          <QuantityField
+            value={quantity}
+            disabled={busy}
+            autoFocus
+            inputTabIndex={1}
+            stepperTabIndex={-1}
+            onChange={setQuantity}
+          />
+        </div>
         <div className="pending-footer">
           <p className="line-prices">
             <span className="line-prices-unit">
