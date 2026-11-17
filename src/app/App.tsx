@@ -91,7 +91,7 @@ function SaleSearch({ container }: { container: AppContainer }) {
   const [params, setParams] = useSearchParams();
   const customerId = params.get('customerId');
   const saleId = params.get('saleId');
-  const [deliveryDate, setDeliveryDate] = useState<string | null>(params.get('deliveryDate'));
+  const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [changingDelivery, setChangingDelivery] = useState(false);
   const [pendingMove, setPendingMove] = useState<string | null>(null);
   const [deliveryError, setDeliveryError] = useState<MessageKey | null>(null);
