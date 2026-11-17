@@ -4,6 +4,8 @@ import type { Session } from '@/modules/identity/domain/models/session';
 const storageKey = 'prime-sweets.session';
 
 export class BrowserSessionStore implements SessionStorePort {
+  private readonly listeners = new Set<() => void>();
+
   read(): Session | null {
     const raw = sessionStorage.getItem(storageKey);
     if (!raw) {
@@ -11,27 +13,38 @@ export class BrowserSessionStore implements SessionStorePort {
     }
     try {
       const parsed: unknown = JSON.parse(raw);
-      if (!isSession(parsed)) {
-        sessionStorage.removeItem(storageKey);
-        return null;
-      }
-      if (Date.parse(parsed.expiresAt) <= Date.now()) {
-        sessionStorage.removeItem(storageKey);
+      if (!isSession(parsed) || Date.parse(parsed.expiresAt) <= Date.now()) {
+        this.clear();
         return null;
       }
       return parsed;
     } catch {
-      sessionStorage.removeItem(storageKey);
+      this.clear();
       return null;
     }
   }
 
   write(session: Session): void {
     sessionStorage.setItem(storageKey, JSON.stringify(session));
+    this.emit();
   }
 
   clear(): void {
     sessionStorage.removeItem(storageKey);
+    this.emit();
+  }
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private emit(): void {
+    for (const listener of this.listeners) {
+      listener();
+    }
   }
 }
 

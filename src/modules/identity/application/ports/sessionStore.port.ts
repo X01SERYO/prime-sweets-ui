@@ -4,4 +4,5 @@ export interface SessionStorePort {
   read(): Session | null;
   write(session: Session): void;
   clear(): void;
+  subscribe(listener: () => void): () => void;
 }

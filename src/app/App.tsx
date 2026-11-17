@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, Navigate, Outlet, Route, Routes, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 import { AppShellNav } from '@/app/AppShell';
 import { DeliveryDayCard } from '@/app/DeliveryDayCard';
 import { RetailSection } from '@/modules/retail-sales/adapters/ui/views/RetailSection';
@@ -282,7 +282,48 @@ function SaleSearch({ container }: { container: AppContainer }) {
 
 export function App({ container }: AppProps) {
   const { t, toggleLocale, locale } = useLocale();
+  const shellRef = useRef<HTMLDivElement>(null);
   const [session, setSession] = useState<Session | null>(() => container.sessionStore.read());
+
+  useEffect(() => {
+    const sync = () => setSession(container.sessionStore.read());
+    const stop = container.sessionStore.subscribe(sync);
+    window.addEventListener('focus', sync);
+    return () => {
+      stop();
+      window.removeEventListener('focus', sync);
+    };
+  }, [container]);
+
+  useEffect(() => {
+    if (!session) {
+      return;
+    }
+    const remaining = Date.parse(session.expiresAt) - Date.now();
+    if (!Number.isFinite(remaining) || remaining > 2_147_483_647) {
+      return;
+    }
+    const timer = window.setTimeout(() => setSession(container.sessionStore.read()), Math.max(0, remaining));
+    return () => window.clearTimeout(timer);
+  }, [container, session]);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    const head = shell?.querySelector('.shell-head');
+    if (!shell || !head) {
+      return;
+    }
+    const sync = () => {
+      shell.style.setProperty('--shell-head-offset', `${head.getBoundingClientRect().height}px`);
+    };
+    sync();
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const observer = new ResizeObserver(sync);
+    observer.observe(head);
+    return () => observer.disconnect();
+  }, [session]);
 
   async function signOut() {
     try {
@@ -294,7 +335,7 @@ export function App({ container }: AppProps) {
 
   return (
     <NavigationHistory>
-    <div className="shell">
+    <div className="shell" ref={shellRef}>
       <div className="shell-head">
       <header className="topbar">
         <Link to={session ? '/' : '/login'} aria-label={t('home')}>
@@ -326,132 +367,74 @@ export function App({ container }: AppProps) {
               )
             }
           />
-          <Route
-            path="/"
-            element={session ? <WeekHome listSales={container.listDeliverySales} /> : <Navigate to="/login" replace />}
-          />
+          <Route element={session ? <Outlet /> : <Navigate to="/login" replace />}>
+          <Route path="/" element={<WeekHome listSales={container.listDeliverySales} />} />
           <Route path="/sales-day" element={<Navigate to="/" replace />} />
           <Route
             path="/products/new"
             element={
-              session ? (
-                <ProductCreate
-                  createCatalogProduct={container.createCatalogProduct}
-                  listBrands={container.listBrands}
-                  createBrand={container.createBrand}
-                />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <ProductCreate
+                createCatalogProduct={container.createCatalogProduct}
+                listBrands={container.listBrands}
+                createBrand={container.createBrand}
+              />
             }
           />
           <Route
             path="/products"
             element={
-              session ? (
-                <ProductAdmin
-                  searchCatalogProducts={container.searchCatalogProducts}
-                  updateCatalogProduct={container.updateCatalogProduct}
-                />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <ProductAdmin
+                searchCatalogProducts={container.searchCatalogProducts}
+                updateCatalogProduct={container.updateCatalogProduct}
+              />
             }
           />
-          <Route
-            path="/customers"
-            element={
-              session ? (
-                <CustomerList createCustomer={container.createCustomer} />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/delivery-sales"
-            element={session ? <DeliverySalesPage container={container} /> : <Navigate to="/login" replace />}
-          />
+          <Route path="/customers" element={<CustomerList createCustomer={container.createCustomer} />} />
+          <Route path="/delivery-sales" element={<DeliverySalesPage container={container} />} />
           <Route path="/day-sales/:salesDayId?" element={<Navigate to="/" replace />} />
-          <Route
-            path="/sales"
-            element={
-              session ? <SaleSearch container={container} /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/load-sheets"
-            element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/purchasing/orders/:orderId"
-            element={
-              session ? <PurchaseOrderPage container={container} /> : <Navigate to="/login" replace />
-            }
-          />
-          <Route
-            path="/purchasing/:supplierId/order"
-            element={session ? <PurchaseSheetPage container={container} /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/purchasing/:supplierId"
-            element={session ? <SupplierPage container={container} /> : <Navigate to="/login" replace />}
-          />
+          <Route path="/sales" element={<SaleSearch container={container} />} />
+          <Route path="/load-sheets" element={<LoadSheetList listLoadSheet={container.listLoadSheet} />} />
+          <Route path="/purchasing/orders/:orderId" element={<PurchaseOrderPage container={container} />} />
+          <Route path="/purchasing/:supplierId/order" element={<PurchaseSheetPage container={container} />} />
+          <Route path="/purchasing/:supplierId" element={<SupplierPage container={container} />} />
           <Route
             path="/purchasing"
             element={
-              session ? (
-                <SupplierListView
-                  listSuppliers={container.listSuppliers}
-                  createSupplier={container.createSupplier}
-                  renameSupplier={container.renameSupplier}
-                />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <SupplierListView
+                listSuppliers={container.listSuppliers}
+                createSupplier={container.createSupplier}
+                renameSupplier={container.renameSupplier}
+              />
             }
           />
           <Route
             path="/retail-sales/history"
             element={
-              session ? (
-                <RetailSection>
-                  <RetailHistoryView listDays={container.listRetailDays} reviewDays={container.reviewRetailDays} />
-                </RetailSection>
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <RetailSection>
+                <RetailHistoryView listDays={container.listRetailDays} reviewDays={container.reviewRetailDays} />
+              </RetailSection>
             }
           />
           <Route
             path="/retail-sales"
             element={
-              session ? (
-                <RetailSection>
-                  <RetailTodayView
-                    getToday={container.getTodayRetailDay}
-                    searchProducts={container.searchRetailProducts}
-                    addItem={container.addRetailItem}
-                    setQuantity={container.setRetailItemQuantity}
-                    removeItem={container.removeRetailItem}
-                  />
-                </RetailSection>
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <RetailSection>
+                <RetailTodayView
+                  getToday={container.getTodayRetailDay}
+                  searchProducts={container.searchRetailProducts}
+                  addItem={container.addRetailItem}
+                  setQuantity={container.setRetailItemQuantity}
+                  removeItem={container.removeRetailItem}
+                />
+              </RetailSection>
             }
           />
           <Route
             path="/invoices/:saleId"
-            element={
-              session ? (
-                <InvoicePreview generateInvoice={container.generateInvoice} printInvoices={container.printInvoices} />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
+            element={<InvoicePreview generateInvoice={container.generateInvoice} printInvoices={container.printInvoices} />}
           />
-          <Route path="*" element={<Navigate to={session ? '/' : '/login'} replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
         </Routes>
       </main>
       </div>

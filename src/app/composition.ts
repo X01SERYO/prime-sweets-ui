@@ -110,7 +110,11 @@ export interface AppContainer {
 
 export function createAppContainer(): AppContainer {
   const sessionStore = new BrowserSessionStore();
-  const http = createHttpClient(env.apiBaseUrl, () => sessionStore.read()?.token ?? null);
+  const http = createHttpClient(
+    env.apiBaseUrl,
+    () => sessionStore.read()?.token ?? null,
+    () => sessionStore.clear()
+  );
   const auth = new HttpAuth(http);
   const purchasing = new HttpPurchasing(http);
   return {

@@ -34,47 +34,45 @@ async function readJson<T>(response: Response): Promise<T> {
   return body as T;
 }
 
-export function createHttpClient(baseUrl: string, getToken?: () => string | null): HttpClient {
-  function headers(options?: RequestOptions): HeadersInit {
+export function createHttpClient(
+  baseUrl: string,
+  getToken?: () => string | null,
+  onUnauthorized?: () => void
+): HttpClient {
+  async function send<T>(path: string, init: RequestInit, options?: RequestOptions): Promise<T> {
     const token = options?.token ?? getToken?.() ?? null;
-    return {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    };
+    try {
+      const response = await fetch(`${baseUrl}${path}`, {
+        ...init,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+      return await readJson<T>(response);
+    } catch (error) {
+      if (token && error instanceof HttpRequestError && error.status === 401) {
+        onUnauthorized?.();
+      }
+      throw error;
+    }
   }
 
   return {
-    async get<T>(path: string, options?: RequestOptions): Promise<T> {
-      const response = await fetch(`${baseUrl}${path}`, { headers: headers(options) });
-      return readJson<T>(response);
+    get<T>(path: string, options?: RequestOptions): Promise<T> {
+      return send<T>(path, {}, options);
     },
-    async post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
-      const response = await fetch(`${baseUrl}${path}`, {
-        method: 'POST',
-        headers: headers(options),
-        body: JSON.stringify(body)
-      });
-      return readJson<T>(response);
+    post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+      return send<T>(path, { method: 'POST', body: JSON.stringify(body) }, options);
     },
-    async patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
-      const response = await fetch(`${baseUrl}${path}`, {
-        method: 'PATCH',
-        headers: headers(options),
-        body: JSON.stringify(body)
-      });
-      return readJson<T>(response);
+    patch<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+      return send<T>(path, { method: 'PATCH', body: JSON.stringify(body) }, options);
     },
-    async put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
-      const response = await fetch(`${baseUrl}${path}`, {
-        method: 'PUT',
-        headers: headers(options),
-        body: JSON.stringify(body)
-      });
-      return readJson<T>(response);
+    put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+      return send<T>(path, { method: 'PUT', body: JSON.stringify(body) }, options);
     },
-    async delete<T>(path: string, options?: RequestOptions): Promise<T> {
-      const response = await fetch(`${baseUrl}${path}`, { method: 'DELETE', headers: headers(options) });
-      return readJson<T>(response);
+    delete<T>(path: string, options?: RequestOptions): Promise<T> {
+      return send<T>(path, { method: 'DELETE' }, options);
     },
     url(path: string): string {
       if (path.startsWith('http://') || path.startsWith('https://')) {

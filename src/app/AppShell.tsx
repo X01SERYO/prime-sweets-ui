@@ -1,4 +1,4 @@
-import { Boxes, ClipboardList, Package, ShoppingBag, ShoppingCart, type LucideIcon } from 'lucide-react';
+import { Boxes, Calculator, ClipboardList, Package, ShoppingBag, ShoppingCart, type LucideIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 import { useLocale } from '@/shared/i18n/useLocale';
 
@@ -23,6 +23,10 @@ export function AppShellNav() {
       <SectionLink to="/load-sheets" section="load" current={current} label={t('loadSheet')} />
       <SectionLink to="/purchasing" section="purchasing" current={current} label={t('purchaseSection')} />
       <SectionLink to="/products" section="products" current={current} label={t('products')} />
+      <span className="app-nav-disabled" aria-disabled="true" title={t('accountingUnavailable')}>
+        <Calculator aria-hidden="true" strokeWidth={1.8} />
+        {t('accountingSection')}
+      </span>
     </nav>
   );
 }
