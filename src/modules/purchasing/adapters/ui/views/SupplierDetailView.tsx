@@ -53,7 +53,7 @@ export function SupplierDetailView({
     void getSupplier
       .execute(supplierId)
       .then(next => {
-        setSheet(next);
+        setSheet(sortedSheet(next));
         setQuantities(draftQuantities(next.products, editing));
       })
       .catch(caught => setError(messageOf(caught)));
@@ -81,7 +81,10 @@ export function SupplierDetailView({
     setError(null);
     try {
       const next = await setSupplierProducts.execute(supplierId, [...sheet.products.map(product => product.productId), productId]);
-      setSheet(next);
+      const known = new Set(sheet.products.map(product => product.productId));
+      const added = next.products.filter(product => !known.has(product.productId));
+      const kept = sheet.products.flatMap(product => next.products.filter(item => item.productId === product.productId));
+      setSheet({ ...next, products: [...added, ...kept] });
       setQuantities(current => ({ ...draftQuantities(next.products, editing), ...current }));
     } catch (caught) {
       setError(messageOf(caught));
@@ -92,7 +95,12 @@ export function SupplierDetailView({
     if (!sheet) return;
     setError(null);
     try {
-      setSheet(await setSupplierProducts.execute(supplierId, sheet.products.filter(product => product.productId !== productId).map(product => product.productId)));
+      const next = await setSupplierProducts.execute(
+        supplierId,
+        sheet.products.filter(product => product.productId !== productId).map(product => product.productId)
+      );
+      const kept = sheet.products.flatMap(product => next.products.filter(item => item.productId === product.productId));
+      setSheet({ ...next, products: kept });
     } catch (caught) {
       setError(messageOf(caught));
     }
@@ -119,7 +127,7 @@ export function SupplierDetailView({
         setQuantities({});
       }
       const next = await getSupplier.execute(supplierId);
-      setSheet(next);
+      setSheet(sortedSheet(next));
       if (editing) setQuantities(draftQuantities(next.products, true));
       setRevision(current => current + 1);
       setSaved(true);
@@ -137,7 +145,7 @@ export function SupplierDetailView({
       {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       <StatusMessage tone="info">{editing ? t('editingLastOrder') : t('newOrderHint')}</StatusMessage>
 
-      <ProductSearchView searchProducts={searchProducts} onSelect={product => void link(product.id)} />
+      <ProductSearchView searchProducts={searchProducts} step={null} onSelect={product => void link(product.id)} />
 
       <form onSubmit={event => void onSave(event)}>
         <div className="purchase-sheet">
@@ -230,6 +238,15 @@ function columnDate(value: string, locale: string): string {
     month: 'long',
     timeZone: 'America/Bogota'
   }).format(date);
+}
+
+function sortedSheet(sheet: SupplierSheet): SupplierSheet {
+  return {
+    ...sheet,
+    products: [...sheet.products].sort((left, right) =>
+      (left.productCode ?? '').localeCompare(right.productCode ?? '', 'es', { numeric: true })
+    )
+  };
 }
 
 function draftQuantities(products: SupplierProduct[], editing: boolean): Record<string, string> {

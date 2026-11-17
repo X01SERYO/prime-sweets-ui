@@ -121,7 +121,7 @@ export function SaleLines({
           onCancel={onCancelPending}
         />
       ) : null}
-      {narrow ? (
+      {!sale || sale.items.length === 0 ? <EmptySale /> : narrow ? (
         <SaleLineCards
           sale={sale}
           editable={editable}
@@ -151,13 +151,6 @@ export function SaleLines({
             </tr>
           </thead>
           <tbody>
-            {!sale || sale.items.length === 0 ? (
-              <tr>
-                <td className="lines-empty" colSpan={actionColumn ? 6 : 5}>
-                  <StatusMessage tone="info">{t('saleEmpty')}</StatusMessage>
-                </td>
-              </tr>
-            ) : null}
             {sale ? groupSaleItems(sale.items).map(group => (
               <SaleLineGroupRows
                 key={group[0].id}
@@ -436,6 +429,16 @@ function LineIconActions({ busy, onEdit, onRemove }: { busy: boolean; onEdit: ()
 
 
 
+function EmptySale() {
+  const { t } = useLocale();
+  return (
+    <div className="sale-empty">
+      <h3>{t('saleEmptyTitle')}</h3>
+      <p>{t('saleEmptyHint')}</p>
+    </div>
+  );
+}
+
 function SaleLineCards({
   sale,
   editable,
@@ -471,7 +474,6 @@ function SaleLineCards({
       <span>{t('lineTotal')}</span>
       <span />
     </div>
-    {!sale || sale.items.length === 0 ? <StatusMessage tone="info">{t('saleEmpty')}</StatusMessage> : null}
     {sale && sale.items.length > 0 ? (
     <ul className="line-cards">
       {groupSaleItems(sale.items).map(group => {

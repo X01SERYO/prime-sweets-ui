@@ -458,9 +458,11 @@
 }
 
 .retail-past {
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: #fff;
+  overflow: hidden;
 }
 
 .retail-status-switch {
@@ -590,12 +592,17 @@
 .retail-history-list label,
 .retail-history-list .retail-history-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  gap: 0.4rem 1rem;
+  grid-template-columns: 1.35rem minmax(7rem, 1.6fr) minmax(6.25rem, 0.8fr) minmax(6.25rem, 0.8fr) minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 0.4rem 0.75rem;
+  min-width: 0;
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid var(--line);
   cursor: pointer;
+}
+
+.retail-history-list .retail-history-row.is-reviewed::before {
+  content: '';
 }
 
 .retail-history-list label.is-picked {
@@ -603,12 +610,20 @@
 }
 
 .retail-history-list .retail-history-row.is-reviewed {
-  grid-template-columns: minmax(0, 1.2fr) auto auto minmax(0, 1fr) minmax(0, 1fr);
   cursor: default;
+}
+
+.retail-history-list .retail-history-metric,
+.retail-history-list .retail-review-meta {
+  min-width: 0;
 }
 
 .retail-history-list .retail-history-metric {
   align-items: flex-start;
+}
+
+.retail-history-list .retail-history-metric strong {
+  white-space: nowrap;
 }
 
 .retail-history-when {
@@ -691,6 +706,21 @@
   color: #fff;
 }
 
+@media (max-width: 72rem) {
+  .retail-history-list label,
+  .retail-history-list .retail-history-row,
+  .retail-history-list .retail-history-row.is-reviewed {
+    grid-template-columns: 1.35rem minmax(0, 1fr) minmax(6.25rem, max-content) minmax(6.25rem, max-content);
+  }
+
+  .retail-history-list .retail-review-meta {
+    grid-column: 2 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.45rem;
+  }
+}
+
 @media (min-width: 48rem) {
   .retail-history-bar {
     bottom: 0;
@@ -754,6 +784,10 @@
 
   .retail-history-list .retail-history-row.is-reviewed {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .retail-history-list .retail-history-row.is-reviewed::before {
+    content: none;
   }
 
   .retail-history-bar {

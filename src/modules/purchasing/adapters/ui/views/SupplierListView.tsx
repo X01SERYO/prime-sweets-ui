@@ -43,7 +43,7 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
   }
 
   async function onRename(item: SupplierListItem) {
-    const next = draft.trim();
+    const next = draft.trim().toLocaleUpperCase('es-CO');
     if (!next || next === item.name) {
       setEditingId(null);
       return;
@@ -65,7 +65,7 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
       <form className="card" onSubmit={event => void onCreate(event)}>
         <label htmlFor="supplier-name">{t('supplierName')}</label>
         <div className="search-row">
-          <input id="supplier-name" value={name} onChange={event => setName(event.target.value)} required />
+          <input id="supplier-name" value={name} onChange={event => setName(event.target.value.toLocaleUpperCase('es-CO'))} required />
           <button className="btn" type="submit">
             {t('createSupplier')}
           </button>
@@ -83,7 +83,7 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
                   aria-label={t('supplierName')}
                   value={draft}
                   autoFocus
-                  onChange={event => setDraft(event.target.value)}
+                  onChange={event => setDraft(event.target.value.toLocaleUpperCase('es-CO'))}
                   onKeyDown={event => {
                     if (event.key === 'Escape') setEditingId(null);
                     if (event.key === 'Enter') void onRename(item);

@@ -29,7 +29,7 @@ export function RetailLines({
         <span className="num">{t('retailLineTotal')}</span>
         <span />
       </div>
-      {items.map(item => (
+      {[...items].reverse().map(item => (
         <RetailRow
           key={item.productId}
           item={item}

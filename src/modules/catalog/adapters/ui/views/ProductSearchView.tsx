@@ -13,9 +13,10 @@ interface ProductSearchViewProps {
   onSelect?: (product: ProductHit) => void;
   selecting?: boolean;
   outcome?: { id: number; added: boolean } | null;
+  step?: number | null;
 }
 
-export function ProductSearchView({ searchProducts, onSelect, selecting, outcome }: ProductSearchViewProps) {
+export function ProductSearchView({ searchProducts, onSelect, selecting, outcome, step = 3 }: ProductSearchViewProps) {
   const { t } = useLocale();
   const { query, setQuery, submit, refine, products, loading, error, searched, canSearch, closeResults, keepQuery, resetQuery } = useProductSearch(searchProducts);
   const seenOutcome = useRef<number | null>(null);
@@ -43,7 +44,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
     <section className="stack">
       <form className="card" onSubmit={onSubmit}>
         <label className="step-label" htmlFor="product-query">
-          <span className="step-num">3</span>
+          {step != null ? <span className="step-num">{step}</span> : null}
           {t('searchProduct')}
         </label>
         <div className="search-row">
