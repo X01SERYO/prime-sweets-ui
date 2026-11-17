@@ -688,6 +688,42 @@
   border-radius: 0;
 }
 
+.modal p:has(+ .review-confirm) {
+  margin-bottom: 0;
+}
+
+.review-confirm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0 0 0.85rem;
+}
+
+.review-confirm div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f4fafa;
+}
+
+.review-confirm dt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.review-confirm dd {
+  margin: 0;
+  color: var(--deep);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
 .retail-history {
   padding-bottom: 4.5rem;
 }

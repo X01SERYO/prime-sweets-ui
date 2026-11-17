@@ -43,7 +43,10 @@ export const retailMessages = catalog(
     retailSelectPage: 'Seleccionar página',
     retailSelectedDays: 'días seleccionados',
     retailCloseTill: 'Confirmar revisión',
-    retailCloseTillTitle: 'Confirmar revisión',
+    retailCloseTillTitle: 'Cerrar cuentas',
+    retailCloseTillSummaryOne: 'Se cierra 1 día. Pasa a Revisado y no vuelve a Sin revisar.',
+    retailCloseTillSummary: 'Se cierran {count} días. Pasan a Revisado y no vuelven a Sin revisar.',
+    retailCloseTillToday: 'Si incluye hoy, hoy no se podrán registrar más ventas detal.',
     retailCloseTillBody:
       'Estos días pasarán a Revisado y no podrán volver a Sin revisar. Si incluye hoy, no podrá registrar más ventas detal hoy.',
     retailDaysReviewed: 'días revisados',
@@ -104,7 +107,10 @@ export const retailMessages = catalog(
     retailSelectPage: 'Select page',
     retailSelectedDays: 'days selected',
     retailCloseTill: 'Confirm review',
-    retailCloseTillTitle: 'Confirm review',
+    retailCloseTillTitle: 'Close accounts',
+    retailCloseTillSummaryOne: '1 day will close. It moves to Reviewed and cannot return to Unreviewed.',
+    retailCloseTillSummary: '{count} days will close. They move to Reviewed and cannot return to Unreviewed.',
+    retailCloseTillToday: 'If today is included, no more retail sales can be recorded today.',
     retailCloseTillBody:
       'These days will move to Reviewed and cannot return to Unreviewed. If today is included, you will not be able to record more retail sales today.',
     retailDaysReviewed: 'days reviewed',

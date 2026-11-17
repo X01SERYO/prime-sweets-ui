@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
 import type {
@@ -39,6 +40,7 @@ export function SupplierDetailView({
   updatePurchaseOrder
 }: SupplierDetailViewProps) {
   const { t, locale } = useLocale();
+  const navigate = useNavigate();
   const editing = Boolean(orderId);
   const [sheet, setSheet] = useState<SupplierSheet | null>(null);
   const [latestDate, setLatestDate] = useState<string | null>(null);
@@ -66,14 +68,18 @@ export function SupplierDetailView({
       .catch(() => undefined);
   }, [editing, getSupplier, listPurchaseOrders, revision, supplierId]);
 
-  const total = useMemo(() => {
-    if (!sheet) return 0;
+  const order = useMemo(() => {
+    if (!sheet) return { total: 0, products: 0, units: 0 };
     const rows = sheet.products.flatMap(product => {
       const quantity = Number(quantities[product.productId]);
-      if (!Number.isInteger(quantity) || quantity < 1 || product.unitCost == null) return [];
-      return [{ unitCost: product.unitCost, quantity }];
+      if (!Number.isInteger(quantity) || quantity < 1) return [];
+      return [{ unitCost: product.unitCost ?? 0, quantity }];
     });
-    return orderTotal(rows);
+    return {
+      total: orderTotal(rows),
+      products: rows.length,
+      units: rows.reduce((sum, row) => sum + row.quantity, 0)
+    };
   }, [quantities, sheet]);
 
   async function link(productId: string) {
@@ -124,13 +130,8 @@ export function SupplierDetailView({
         await updatePurchaseOrder.execute(orderId, lines);
       } else {
         await createPurchaseOrder.execute(supplierId, lines);
-        setQuantities({});
       }
-      const next = await getSupplier.execute(supplierId);
-      setSheet(sortedSheet(next));
-      if (editing) setQuantities(draftQuantities(next.products, true));
-      setRevision(current => current + 1);
-      setSaved(true);
+      navigate('/purchasing');
     } catch (caught) {
       setError(messageOf(caught));
     } finally {
@@ -172,24 +173,24 @@ export function SupplierDetailView({
             </thead>
             <tbody>
               {sheet?.products.map(product => {
-                const raw = quantities[product.productId] ?? '';
+                const raw = quantities[product.productId] ?? '0';
                 const quantity = Number(raw);
                 const cost =
-                  product.unitCost != null && Number.isInteger(quantity) && quantity >= 1
+                  product.unitCost != null && Number.isInteger(quantity) && quantity >= 0
                     ? lineCost(product.unitCost, quantity)
-                    : null;
+                    : 0;
                 return (
                   <tr key={product.productId}>
                     <td>{product.productCode}</td>
                     <td>{product.brandName}</td>
                     <td>{product.productName}</td>
                     <td>{product.unitCost == null ? '—' : formatCurrency(product.unitCost)}</td>
-                    <td className="qty-reference">{editing ? (product.previousQuantity ?? '') : (product.lastQuantity ?? '')}</td>
+                    <td className="qty-reference">{editing ? (product.previousQuantity ?? 0) : (product.lastQuantity ?? 0)}</td>
                     <td className="qty-entry">
                       <input
                         inputMode="numeric"
                         aria-label={editing ? t('orderBeingEdited') : t('newOrderColumn')}
-                        value={raw}
+                        value={raw === '' ? '0' : raw}
                         onChange={event =>
                           setQuantities(current => ({
                             ...current,
@@ -198,7 +199,7 @@ export function SupplierDetailView({
                         }
                       />
                     </td>
-                    <td>{cost == null ? '' : formatCurrency(cost)}</td>
+                    <td>{formatCurrency(cost)}</td>
                     <td>
                       <button className="btn btn-secondary" type="button" onClick={() => void unlink(product.productId)}>
                         {t('unlinkProduct')}
@@ -210,12 +211,21 @@ export function SupplierDetailView({
             </tbody>
           </table>
         </div>
-        <p className="purchase-total">
-          {t('orderTotal')}: <strong>{formatCurrency(total)}</strong>
-        </p>
-        <button className="btn" type="submit" disabled={saving || !sheet || sheet.products.length === 0}>
-          {t('saveOrder')}
-        </button>
+        <div className="sale-dock">
+          <div className="sale-close">
+            <div className="sale-totals">
+              <p className="sale-total">
+                {t('saleTotal')} {formatCurrency(order.total)}
+              </p>
+              <p className="sale-summary">
+                {t('saleSummary').replace('{products}', String(order.products)).replace('{units}', String(order.units))}
+              </p>
+            </div>
+            <button className="btn" type="submit" disabled={saving || !sheet || sheet.products.length === 0}>
+              {t('saveOrder')}
+            </button>
+          </div>
+        </div>
       </form>
     </section>
   );
@@ -250,9 +260,11 @@ function sortedSheet(sheet: SupplierSheet): SupplierSheet {
 }
 
 function draftQuantities(products: SupplierProduct[], editing: boolean): Record<string, string> {
-  if (!editing) return {};
   return Object.fromEntries(
-    products.map(product => [product.productId, product.lastQuantity == null ? '' : String(product.lastQuantity)])
+    products.map(product => [
+      product.productId,
+      editing && product.lastQuantity != null ? String(product.lastQuantity) : '0'
+    ])
   );
 }
 

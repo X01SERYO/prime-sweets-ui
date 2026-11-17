@@ -26,6 +26,52 @@
   white-space: nowrap;
 }
 
+.supplier-create {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.supplier-create input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.supplier-create .btn {
+  flex: 0 0 auto;
+}
+
+.supplier-name-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.supplier-rename {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--deep);
+  cursor: pointer;
+}
+
+.supplier-rename svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.supplier-rename:hover {
+  background: #f4fafa;
+}
+
 .supplier-row-name {
   min-width: 0;
   overflow: hidden;
@@ -73,10 +119,6 @@
   width: 6rem;
   border: 2px solid var(--deep);
   background: #fff;
-}
-
-.purchase-total {
-  font-size: 1.15rem;
 }
 
 .purchase-sheet {

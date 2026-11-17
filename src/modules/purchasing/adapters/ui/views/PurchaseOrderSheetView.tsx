@@ -82,7 +82,7 @@ export function PurchaseOrderSheetView({ supplierId, getSupplier, createPurchase
     });
     try {
       await createPurchaseOrder.execute(supplierId, lines);
-      navigate(`/purchasing/${supplierId}`, { state: { orderSaved: true } });
+      navigate('/purchasing');
     } catch (caught) {
       setError(caught instanceof PurchaseInvalidError ? caught.code : t('purchaseFailed'));
       setSaving(false);

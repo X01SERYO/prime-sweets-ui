@@ -1,3 +1,4 @@
+import { Pencil } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import type {
@@ -64,7 +65,7 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
       {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       <form className="card" onSubmit={event => void onCreate(event)}>
         <label htmlFor="supplier-name">{t('supplierName')}</label>
-        <div className="search-row">
+        <div className="supplier-create">
           <input id="supplier-name" value={name} onChange={event => setName(event.target.value.toLocaleUpperCase('es-CO'))} required />
           <button className="btn" type="submit">
             {t('createSupplier')}
@@ -77,25 +78,26 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
           const editing = editingId === item.id;
           return (
             <li key={item.id} className="supplier-row">
-              {editing ? (
-                <input
-                  className="supplier-row-input"
-                  aria-label={t('supplierName')}
-                  value={draft}
-                  autoFocus
-                  onChange={event => setDraft(event.target.value.toLocaleUpperCase('es-CO'))}
-                  onKeyDown={event => {
-                    if (event.key === 'Escape') setEditingId(null);
-                    if (event.key === 'Enter') void onRename(item);
-                  }}
-                />
-              ) : (
-                <span className="supplier-row-name">{item.name}</span>
-              )}
-              <span className="supplier-row-actions">
+              <span className="supplier-name-line">
+                {editing ? (
+                  <input
+                    className="supplier-row-input"
+                    aria-label={t('supplierName')}
+                    value={draft}
+                    autoFocus
+                    onChange={event => setDraft(event.target.value.toLocaleUpperCase('es-CO'))}
+                    onKeyDown={event => {
+                      if (event.key === 'Escape') setEditingId(null);
+                      if (event.key === 'Enter') void onRename(item);
+                    }}
+                  />
+                ) : (
+                  <span className="supplier-row-name">{item.name}</span>
+                )}
                 <button
-                  className="btn btn-secondary"
+                  className="supplier-rename"
                   type="button"
+                  aria-label={t('renameSupplier')}
                   onClick={() => {
                     if (editing) {
                       void onRename(item);
@@ -105,8 +107,10 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
                     setEditingId(item.id);
                   }}
                 >
-                  {t('renameSupplier')}
+                  <Pencil aria-hidden="true" strokeWidth={1.8} />
                 </button>
+              </span>
+              <span className="supplier-row-actions">
                 {item.latestOrderId ? (
                   <Link className="btn btn-secondary" to={`/purchasing/${item.id}?order=${item.latestOrderId}`}>
                     {t('editLastOrder')}

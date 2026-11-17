@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface ConfirmDialogProps {
   title: string;
-  message: string;
+  message?: string;
+  children?: ReactNode;
   confirmLabel: string;
   cancelLabel: string;
   busy?: boolean;
@@ -17,6 +18,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   title,
   message,
+  children,
   confirmLabel,
   cancelLabel,
   busy = false,
@@ -64,7 +66,8 @@ export function ConfirmDialog({
     >
       <div ref={panelRef} className="modal-panel" tabIndex={-1}>
       <h2>{title}</h2>
-      <p>{message}</p>
+      {message ? <p>{message}</p> : null}
+      {children}
       {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       <div className={alignEnd ? 'modal-actions modal-actions-end' : 'modal-actions'}>
         {alignEnd ? (

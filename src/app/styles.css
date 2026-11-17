@@ -394,6 +394,7 @@ select {
 
 .customer-bill summary {
   padding: 0.7rem 0;
+  color: var(--deep);
   font-weight: 700;
   cursor: pointer;
 }

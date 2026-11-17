@@ -28,6 +28,7 @@ export function CustomerFormDialog({ customer, createCustomer, updateCustomer, o
   const [email, setEmail] = useState(customer?.email ?? '');
   const [phone, setPhone] = useState(customer?.phone ?? '');
   const [address, setAddress] = useState(customer?.address ?? '');
+  const [billOpen, setBillOpen] = useState(Boolean(customer?.email || customer?.phone || customer?.address));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
 
@@ -101,7 +102,7 @@ export function CustomerFormDialog({ customer, createCustomer, updateCustomer, o
         </div>
         <label htmlFor="sale-customer-name">{t('customerName')}</label>
         <input id="sale-customer-name" value={name} disabled={saving} autoComplete="name" onChange={event => setName(event.target.value)} />
-        <details className="customer-bill" open={Boolean(email || phone || address)}>
+        <details className="customer-bill" open={billOpen} onToggle={event => setBillOpen(event.currentTarget.open)}>
           <summary>{t('extraInvoicing')}</summary>
           <label htmlFor="sale-customer-email">{t('email')}</label>
           <input id="sale-customer-email" type="email" value={email} disabled={saving} autoComplete="email" onChange={event => setEmail(event.target.value)} />

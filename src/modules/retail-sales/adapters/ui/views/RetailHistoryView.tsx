@@ -237,13 +237,25 @@ export function RetailHistoryView({
       {confirming ? (
         <ConfirmDialog
           title={t('retailCloseTillTitle')}
-          message={`${chosen.length} ${t('retailSelectedDays')}. ${t('retailSoldShort')} ${formatCurrency(sold)}. ${t('retailProfitShort')} ${formatCurrency(profit)}. ${t('retailCloseTillBody')}`}
+          message={chosen.length === 1 ? t('retailCloseTillSummaryOne') : t('retailCloseTillSummary').replace('{count}', String(chosen.length))}
           confirmLabel={t('retailCloseTill')}
           cancelLabel={t('cancelAction')}
+          alignEnd
           busy={busy}
           onConfirm={() => void closeTill()}
           onCancel={() => setConfirming(false)}
-        />
+        >
+          <dl className="review-confirm">
+            <div>
+              <dt>{t('retailSoldShort')}</dt>
+              <dd>{formatCurrency(sold)}</dd>
+            </div>
+            <div>
+              <dt>{t('retailProfitShort')}</dt>
+              <dd>{formatCurrency(profit)}</dd>
+            </div>
+          </dl>
+        </ConfirmDialog>
       ) : null}
       {toast ? <AppToast tone="success" message={toast} onDone={() => setToast(null)} /> : null}
     </div>
