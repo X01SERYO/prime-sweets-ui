@@ -183,13 +183,13 @@ export function SupplierDetailView({
       (drafts[product.productId] ?? []).flatMap(line => {
         const quantity = Number(line.quantity);
         if (!Number.isInteger(quantity) || quantity < 1) return [];
-        const detail = flavorName(product, line.detail);
+        const detail = storedFlavor(product, line.detail);
         return [{ productId: product.productId, quantity, ...(detail ? { itemName: detail } : {}) }];
       })
     );
     const assortment = sheet.products.flatMap(product =>
       (drafts[product.productId] ?? []).flatMap(line => {
-        const detail = flavorName(product, line.detail);
+        const detail = storedFlavor(product, line.detail);
         return detail ? [{ productId: product.productId, itemName: detail }] : [];
       })
     );
@@ -340,8 +340,23 @@ function blankLine(detail = ''): DraftLine {
 function flavorName(product: SupplierProduct, detail: string): string {
   const trimmed = detail.trim();
   if (!trimmed) return '';
-  const sameAsCatalog = trimmed.toLocaleLowerCase('es-CO') === (product.productName ?? '').toLocaleLowerCase('es-CO');
-  return sameAsCatalog ? '' : trimmed;
+  const catalog = (product.productName ?? '').trim();
+  const catalogKey = catalog.toLocaleLowerCase('es-CO');
+  const detailKey = trimmed.toLocaleLowerCase('es-CO');
+  if (!catalogKey || detailKey === catalogKey) return '';
+  const extra = detailKey.startsWith(`${catalogKey} `) ? trimmed.slice(catalog.length) : trimmed;
+  return sentence(extra);
+}
+
+function storedFlavor(product: SupplierProduct, detail: string): string {
+  const flavor = flavorName(product, detail);
+  return flavor ? `${(product.productName ?? '').trim()} ${flavor}` : '';
+}
+
+function sentence(value: string): string {
+  const text = value.trim().toLocaleLowerCase('es-CO');
+  if (!text) return '';
+  return text.charAt(0).toLocaleUpperCase('es-CO') + text.slice(1);
 }
 
 function storedItems(product: SupplierProduct): { itemName: string; lastQuantity: number | null }[] {
@@ -363,7 +378,7 @@ function initialDrafts(products: SupplierProduct[], editing: boolean): Record<st
       }
       return [product.productId, items.map(item => ({
         key: `${product.productId}:${item.itemName}`,
-        detail: item.itemName,
+        detail: flavorName(product, item.itemName),
         quantity: editing && item.lastQuantity != null ? String(item.lastQuantity) : '0'
       }))];
     })
@@ -426,7 +441,20 @@ function PurchaseRows({
   const countLabel = lines.length === 1 ? t('variantCountOne') : t('variantCount').replace('{count}', String(lines.length));
   return (
     <>
-      <tr className="line-group">
+      <tr
+        className="line-group"
+        tabIndex={0}
+        role="button"
+        aria-expanded={open}
+        aria-label={open ? t('hideVariants') : t('showVariants')}
+        onClick={onToggle}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onToggle();
+          }
+        }}
+      >
         <td>{product.productCode}</td>
         <td>{product.brandName}</td>
         <td>
@@ -438,9 +466,9 @@ function PurchaseRows({
         <td className="qty-entry">{summed}</td>
         <td>{formatCurrency(lineCost(unit, summed))}</td>
         <td>
-          <button className={open ? 'customer-fold open' : 'customer-fold'} type="button" aria-expanded={open} aria-label={open ? t('hideVariants') : t('showVariants')} onClick={onToggle}>
-            <ChevronRight aria-hidden="true" strokeWidth={1.8} />
-          </button>
+          <span className={open ? 'customer-fold open' : 'customer-fold'} aria-hidden="true">
+            <ChevronRight strokeWidth={1.8} />
+          </span>
         </td>
       </tr>
       {open ? lines.map(line => (

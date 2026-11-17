@@ -13,7 +13,7 @@ export function groupSaleItems<T extends { productId: string }>(items: T[]): T[]
 
 export function composeSaleLineName(catalogName: string, variant: string): string {
   const base = catalogName.trim();
-  const extra = variant.trim();
+  const extra = sentence(variant);
   if (!base) {
     return extra;
   }
@@ -25,8 +25,16 @@ export function addedSaleLineName(catalogName: string, itemName: string): string
   if (!base || itemName === base || !itemName.startsWith(base)) {
     return null;
   }
-  const extra = itemName.slice(base.length);
-  return extra.trim() ? extra : null;
+  const extra = sentence(itemName.slice(base.length));
+  return extra || null;
+}
+
+function sentence(value: string): string {
+  const text = value.trim().toLocaleLowerCase('es-CO');
+  if (!text) {
+    return '';
+  }
+  return text.charAt(0).toLocaleUpperCase('es-CO') + text.slice(1);
 }
 
 export function previewLineTotal(unitPrice: number, quantity: number): number {

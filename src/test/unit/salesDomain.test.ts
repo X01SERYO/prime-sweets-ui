@@ -26,7 +26,7 @@ test('business dates stay inside the current week and reject a bad day', () => {
 });
 
 test('a sale line keeps a suffix and a quantity of up to 3 decimals', () => {
-  assert.equal(addedSaleLineName('SODA', 'SODA roja'), ' roja');
+  assert.equal(addedSaleLineName('SODA', 'SODA roja'), 'Roja');
   assert.equal(addedSaleLineName('SODA', 'SODA'), null);
   assert.equal(previewLineTotal(1000, 1.5), 1500);
   assert.equal(isSellableQuantity(1.25), true);

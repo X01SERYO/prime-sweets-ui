@@ -1154,6 +1154,10 @@ button.btn.search-submit {
   font-variant-numeric: tabular-nums;
 }
 
+.line-group {
+  cursor: pointer;
+}
+
 .line-group td {
   font-weight: 700;
   background: #f4fafa;
