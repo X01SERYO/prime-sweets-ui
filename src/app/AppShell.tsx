@@ -1,13 +1,14 @@
-import { Boxes, Calculator, ClipboardList, Package, ShoppingBag, ShoppingCart, type LucideIcon } from 'lucide-react';
+import { Boxes, Calculator, Package, ShoppingBag, ShoppingCart, type LucideIcon } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 import { useLocale } from '@/shared/i18n/useLocale';
 
 type Section = 'wholesale' | 'retail' | 'load' | 'purchasing' | 'products';
 
+
 const sectionIcons: Record<Section, LucideIcon> = {
   wholesale: Package,
   retail: ShoppingBag,
-  load: ClipboardList,
+  load: Package,
   purchasing: ShoppingCart,
   products: Boxes
 };
@@ -20,7 +21,6 @@ export function AppShellNav() {
     <nav className="app-nav" aria-label={t('home')}>
       <SectionLink to="/" section="wholesale" current={current} label={t('wholesaleSection')} />
       <SectionLink to="/retail-sales" section="retail" current={current} label={t('retailSection')} />
-      <SectionLink to="/load-sheets" section="load" current={current} label={t('loadSheet')} />
       <SectionLink to="/purchasing" section="purchasing" current={current} label={t('purchaseSection')} />
       <SectionLink to="/products" section="products" current={current} label={t('products')} />
       <span className="app-nav-disabled" aria-disabled="true" title={t('accountingUnavailable')}>
