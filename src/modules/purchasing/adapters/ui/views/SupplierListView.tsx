@@ -1,4 +1,4 @@
-import { Pencil } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import type {
@@ -97,7 +97,7 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
                 <button
                   className="supplier-rename"
                   type="button"
-                  aria-label={t('renameSupplier')}
+                  aria-label={editing ? t('saveSupplier') : t('renameSupplier')}
                   onClick={() => {
                     if (editing) {
                       void onRename(item);
@@ -107,7 +107,7 @@ export function SupplierListView({ listSuppliers, createSupplier, renameSupplier
                     setEditingId(item.id);
                   }}
                 >
-                  <Pencil aria-hidden="true" strokeWidth={1.8} />
+                  {editing ? <Check aria-hidden="true" strokeWidth={1.8} /> : <Pencil aria-hidden="true" strokeWidth={1.8} />}
                 </button>
               </span>
               <span className="supplier-row-actions">

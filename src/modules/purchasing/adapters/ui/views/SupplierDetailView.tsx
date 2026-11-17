@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type SubmitEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
@@ -53,7 +53,6 @@ export function SupplierDetailView({
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     void getSupplier
@@ -70,7 +69,7 @@ export function SupplierDetailView({
         setPreviousDate(page.items[1]?.createdAt ?? null);
       })
       .catch(() => undefined);
-  }, [editing, getSupplier, listPurchaseOrders, revision, supplierId]);
+  }, [editing, getSupplier, listPurchaseOrders, supplierId]);
 
   const order = useMemo(() => {
     if (!sheet) return { total: 0, products: 0, units: 0 };
@@ -173,7 +172,7 @@ export function SupplierDetailView({
     }));
   }
 
-  async function onSave(event: FormEvent) {
+  async function onSave(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!sheet) return;
     setSaving(true);
