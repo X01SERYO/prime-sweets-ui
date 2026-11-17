@@ -45,6 +45,18 @@ import { RemoveRetailItemUseCase } from '@/modules/retail-sales/application/use-
 import { ReviewRetailDaysUseCase } from '@/modules/retail-sales/application/use-cases/reviewRetailDays.useCase';
 import { SearchRetailProductsUseCase } from '@/modules/retail-sales/application/use-cases/searchRetailProducts.useCase';
 import { SetRetailItemQuantityUseCase } from '@/modules/retail-sales/application/use-cases/setRetailItemQuantity.useCase';
+import { HttpPurchasing } from '@/modules/purchasing/adapters/infrastructure/httpPurchasing';
+import {
+  CreatePurchaseOrderUseCase,
+  CreateSupplierUseCase,
+  GetPurchaseOrderUseCase,
+  GetSupplierUseCase,
+  ListPurchaseOrdersUseCase,
+  ListSuppliersUseCase,
+  RenameSupplierUseCase,
+  SetSupplierProductsUseCase,
+  UpdatePurchaseOrderUseCase
+} from '@/modules/purchasing/application/use-cases/purchasing.useCases';
 import { env } from '@/shared/config/env';
 import { createHttpClient, type HttpClient } from '@/shared/infrastructure/http/httpClient';
 
@@ -85,12 +97,22 @@ export interface AppContainer {
   removeRetailItem: RemoveRetailItemUseCase;
   listRetailDays: ListRetailDaysUseCase;
   reviewRetailDays: ReviewRetailDaysUseCase;
+  listSuppliers: ListSuppliersUseCase;
+  createSupplier: CreateSupplierUseCase;
+  renameSupplier: RenameSupplierUseCase;
+  getSupplier: GetSupplierUseCase;
+  setSupplierProducts: SetSupplierProductsUseCase;
+  createPurchaseOrder: CreatePurchaseOrderUseCase;
+  updatePurchaseOrder: UpdatePurchaseOrderUseCase;
+  listPurchaseOrders: ListPurchaseOrdersUseCase;
+  getPurchaseOrder: GetPurchaseOrderUseCase;
 }
 
 export function createAppContainer(): AppContainer {
   const sessionStore = new BrowserSessionStore();
   const http = createHttpClient(env.apiBaseUrl, () => sessionStore.read()?.token ?? null);
   const auth = new HttpAuth(http);
+  const purchasing = new HttpPurchasing(http);
   return {
     apiBaseUrl: env.apiBaseUrl,
     http,
@@ -127,6 +149,15 @@ export function createAppContainer(): AppContainer {
     setRetailItemQuantity: new SetRetailItemQuantityUseCase(new HttpRetailDay(http)),
     removeRetailItem: new RemoveRetailItemUseCase(new HttpRetailDay(http)),
     listRetailDays: new ListRetailDaysUseCase(new HttpRetailDay(http)),
-    reviewRetailDays: new ReviewRetailDaysUseCase(new HttpRetailDay(http))
+    reviewRetailDays: new ReviewRetailDaysUseCase(new HttpRetailDay(http)),
+    listSuppliers: new ListSuppliersUseCase(purchasing),
+    createSupplier: new CreateSupplierUseCase(purchasing),
+    renameSupplier: new RenameSupplierUseCase(purchasing),
+    getSupplier: new GetSupplierUseCase(purchasing),
+    setSupplierProducts: new SetSupplierProductsUseCase(purchasing),
+    createPurchaseOrder: new CreatePurchaseOrderUseCase(purchasing),
+    updatePurchaseOrder: new UpdatePurchaseOrderUseCase(purchasing),
+    listPurchaseOrders: new ListPurchaseOrdersUseCase(purchasing),
+    getPurchaseOrder: new GetPurchaseOrderUseCase(purchasing)
   };
 }

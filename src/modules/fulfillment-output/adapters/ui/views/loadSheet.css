@@ -166,7 +166,7 @@
 }
 
 .load-sheet-toggle.open svg {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 .load-sheet-group td {

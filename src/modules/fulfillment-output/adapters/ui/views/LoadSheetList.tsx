@@ -1,3 +1,4 @@
+import { AlertCircle, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useLoadSheet } from '@/modules/fulfillment-output/adapters/ui/hooks/useLoadSheet';
@@ -37,7 +38,7 @@ function LoadSheetRow({
               aria-label={open ? t('hidePriceDetail') : t('showPriceDetail')}
               onClick={onToggle}
             >
-              <ChevronIcon />
+              <ChevronRight aria-hidden="true" strokeWidth={1.8} />
             </button>
           ) : null}
         </td>
@@ -51,7 +52,7 @@ function LoadSheetRow({
         <td className="load-sheet-edge">
           {mixed ? (
             <span className="load-sheet-warn" tabIndex={0}>
-              <WarningIcon />
+              <AlertCircle aria-hidden="true" strokeWidth={1.8} />
               <span className="load-sheet-warn-text" role="tooltip">
                 {t('mixedPurchasePrices')}
               </span>
@@ -75,25 +76,6 @@ function LoadSheetRow({
           ))
         : null}
     </>
-  );
-}
-
-function WarningIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M12 3.2 1.8 21h20.4L12 3.2zm0 6.3c.5 0 .9.4.9.9v4.2c0 .5-.4.9-.9.9s-.9-.4-.9-.9v-4.2c0-.5.4-.9.9-.9zm0 8.6a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2z"
-      />
-    </svg>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="m6 9 6 6 6-6" />
-    </svg>
   );
 }
 

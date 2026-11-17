@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react';
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import type { SearchRetailProductsUseCase } from '@/modules/retail-sales/application/use-cases/searchRetailProducts.useCase';
 import type { RetailProductOption } from '@/modules/retail-sales/domain/models/retailDay';
@@ -124,7 +125,7 @@ export function RetailProductPicker({
       >
         <label htmlFor="retail-product-query">{t('retailAddProduct')}</label>
         <div className="retail-field">
-          <SearchIcon />
+          <Search aria-hidden="true" strokeWidth={1.8} />
           <input
             ref={searchRef}
             id="retail-product-query"
@@ -181,15 +182,6 @@ function highlight(name: string, query: string) {
       <mark>{name.slice(index, index + needle.length)}</mark>
       {name.slice(index + needle.length)}
     </>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
   );
 }
 

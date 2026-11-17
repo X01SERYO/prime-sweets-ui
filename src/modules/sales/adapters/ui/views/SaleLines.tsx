@@ -1,3 +1,4 @@
+import { Check, ChevronRight, MoreHorizontal, Pencil, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
 import type { SaleItemModel, SaleModel } from '@/modules/sales/domain/models/sale';
 import { addedSaleLineName, composeSaleLineName, groupSaleItems, previewLineTotal } from '@/modules/sales/domain/saleLineName';
@@ -323,7 +324,7 @@ function SaleLineGroupRows({
             aria-label={expanded ? t('hideVariants') : t('showVariants')}
             onClick={() => setOpen(current => !current)}
           >
-            <ChevronIcon />
+            <ChevronRight aria-hidden="true" strokeWidth={1.8} />
           </button>
         </td>
       </tr>
@@ -416,10 +417,10 @@ function LineIconActions({ busy, onEdit, onRemove }: { busy: boolean; onEdit: ()
   return (
     <div className="line-detail-actions">
       <button className="btn icon-btn icon-edit" type="button" aria-label={t('editSale')} disabled={busy} onClick={onEdit}>
-        <PencilIcon />
+        <Pencil aria-hidden="true" strokeWidth={1.8} />
       </button>
       <button className="btn icon-btn icon-void" type="button" aria-label={t('removeItem')} disabled={busy} onClick={onRemove}>
-        <RemoveIcon />
+        <Trash2 aria-hidden="true" strokeWidth={1.8} />
       </button>
     </div>
   );
@@ -454,7 +455,7 @@ function LineMenu({ busy, onEdit, onRemove }: { busy: boolean; onEdit: () => voi
         disabled={busy}
         onClick={() => setOpen(current => !current)}
       >
-        ⋯
+        <MoreHorizontal aria-hidden="true" strokeWidth={1.8} />
       </button>
       {open ? (
         <div className="line-menu-pop is-up" role="menu">
@@ -555,7 +556,7 @@ function SaleLineCards({
                   </span>
                   <span className="line-summary-qty">{item.quantity}</span>
                   <span className="line-summary-total">{formatCurrency(item.lineTotal)}</span>
-                  <ChevronIcon />
+                  <ChevronRight aria-hidden="true" strokeWidth={1.8} />
                 </button>
                 {open ? (
                   <LineFacts
@@ -645,12 +646,12 @@ function LineEditor({
   const lineTotal = lineQuantity === null ? null : previewLineTotal(wholesalePrice, lineQuantity);
   const saveButton = (
     <button className="btn icon-btn icon-edit" type="button" aria-label={t('saveEditing')} disabled={busy} onClick={save}>
-      <CheckIcon />
+      <Check aria-hidden="true" strokeWidth={1.8} />
     </button>
   );
   const cancelButton = (
     <button className="btn icon-btn icon-void" type="button" aria-label={t('cancelLine')} disabled={busy} onClick={onCancel}>
-      <CloseIcon />
+      <X aria-hidden="true" strokeWidth={1.8} />
     </button>
   );
 
@@ -731,49 +732,6 @@ function useNarrowLayout() {
   }, []);
 
   return narrow;
-}
-
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M18.3 5.71 12 12.01l6.3 6.3-1.42 1.41L10.59 13.4l-6.3 6.3-1.41-1.42 6.3-6.29-6.3-6.3 1.42-1.41 6.29 6.29 6.3-6.3z" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
-    </svg>
-  );
-}
-
-function PencilIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.04a1 1 0 0 0 0-1.41l-2.5-2.5a1 1 0 0 0-1.41 0l-1.96 1.96 3.75 3.75 2.12-1.8z"
-      />
-    </svg>
-  );
-}
-
-function RemoveIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2zM4 6h16v2H4V6z" />
-    </svg>
-  );
 }
 
 function PendingCard({

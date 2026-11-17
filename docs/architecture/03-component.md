@@ -46,6 +46,7 @@ src/
     customers/                 customer create and sale customer search
     sales/                     week home, sale lines, delivery-day list
     fulfillment-output/        load sheet and invoice preview
+    purchasing/                suppliers and purchase orders
 ```
 
-Routes: `/login`, `/`, `/products`, `/products/new`, `/customers`, `/sales`, `/delivery-sales`, `/load-sheets`, `/invoices/:saleId`. `/` is the week home.
+Routes: `/login`, `/`, `/products`, `/products/new`, `/customers`, `/sales`, `/delivery-sales`, `/load-sheets`, `/invoices/:saleId`, `/purchasing`, `/purchasing/:supplierId`. `/` is the week home. `/purchasing/:supplierId?order=` edits the latest order.

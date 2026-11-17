@@ -1,3 +1,4 @@
+import { Plus, Search, X } from 'lucide-react';
 import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
 import type { SearchProductsUseCase } from '@/modules/catalog/application/use-cases/searchProducts.useCase';
 import type { ProductHit } from '@/modules/catalog/domain/models/productHit';
@@ -58,7 +59,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
             aria-label={loading ? t('searching') : t('search')}
             disabled={!canSearch || loading}
           >
-            <SearchIcon />
+            <Search aria-hidden="true" strokeWidth={1.8} />
           </button>
         </div>
       </form>
@@ -76,8 +77,8 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
             <ul className="product-hits">
               {products.map(product => (
                 <li key={product.id}>
-                  <span className="product-hit-code">{product.code}</span>
-                  <span>{product.name ?? t('noName')}</span>
+                  <span className="product-hit-code">{highlightMatch(product.code, query)}</span>
+                  <span>{product.name ? highlightMatch(product.name, query) : t('noName')}</span>
                   <span className="product-hit-price">
                     {product.wholesalePrice === null ? t('noPrice') : formatCurrency(product.wholesalePrice)}
                   </span>
@@ -92,7 +93,7 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
                         closeResults();
                       }}
                     >
-                      <AddIcon />
+                      <Plus aria-hidden="true" strokeWidth={1.8} />
                     </button>
                   ) : null}
                 </li>
@@ -102,6 +103,24 @@ export function ProductSearchView({ searchProducts, onSelect, selecting, outcome
         </SearchResults>
       ) : null}
     </section>
+  );
+}
+
+function highlightMatch(text: string, query: string): ReactNode {
+  const needle = query.trim();
+  if (!needle) {
+    return text;
+  }
+  const index = text.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
+  if (index < 0) {
+    return text;
+  }
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + needle.length)}</mark>
+      {text.slice(index + needle.length)}
+    </>
   );
 }
 
@@ -143,35 +162,10 @@ function SearchResults({
       <div className="modal-toolbar">
         <h2>{title}</h2>
         <button className="modal-x" type="button" aria-label={closeLabel} onClick={onClose}>
-          <CloseIcon />
+          <X aria-hidden="true" strokeWidth={1.8} />
         </button>
       </div>
       <div className="modal-scroll">{children}</div>
     </dialog>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M18.3 5.71 12 12.01l6.3 6.3-1.42 1.41L10.59 13.4l-6.3 6.3-1.41-1.42 6.3-6.29-6.3-6.3 1.42-1.41 6.29 6.29 6.3-6.3z" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function AddIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5z" />
-    </svg>
   );
 }

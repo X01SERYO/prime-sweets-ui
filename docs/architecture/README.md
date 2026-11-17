@@ -13,4 +13,4 @@ The seller flows in this folder are the running SPA. Product rules stay in the [
 
 Related: [model](../model/README.md), [flows](../flows/README.md).
 
-Pedidos is not in this C4 yet. The target is [ADR-005](../adrs/ADR-005.md) and [SPEC-006](../specs/SPEC-006.md). Add the `purchasing` module here only after the screens exist.
+`purchasing` is a feature module. Screens and routes are in [flows](../flows/README.md) and [SPEC-006](../specs/SPEC-006.md).

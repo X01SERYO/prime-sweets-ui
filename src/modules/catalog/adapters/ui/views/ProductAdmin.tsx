@@ -1,3 +1,4 @@
+import { Pencil, Search } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import type { SearchCatalogProductsUseCase } from '@/modules/catalog/application/use-cases/searchCatalogProducts.useCase';
@@ -252,7 +253,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
             aria-label={t('search')}
             disabled={query.trim().length > 0 && !isProductSearchTerm(query)}
           >
-            <SearchIcon />
+            <Search aria-hidden="true" strokeWidth={1.8} />
           </button>
         </div>
       </form>
@@ -285,7 +286,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
               <td className="product-admin-wide">{product.brandName ?? '—'}</td>
               <td>
                 <button className="btn icon-btn icon-edit" type="button" aria-label={t('editProduct')} onClick={() => openEditor(product)}>
-                  <EditIcon />
+                  <Pencil aria-hidden="true" strokeWidth={1.8} />
                 </button>
               </td>
             </tr>
@@ -443,26 +444,6 @@ function ProductEditor({
       </div>
       <Toast error={error} notice={null} onDone={onDismiss} />
     </dialog>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.04a1 1 0 0 0 0-1.41l-2.5-2.5a1 1 0 0 0-1.41 0l-1.96 1.96 3.75 3.75 2.12-1.8z"
-      />
-    </svg>
   );
 }
 

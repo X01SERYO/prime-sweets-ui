@@ -1,3 +1,4 @@
+import { ClipboardList, Plus, Truck } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { useDaySummary, useWeekSaleCounts } from '@/modules/sales/adapters/ui/hooks/useDaySummary';
@@ -101,7 +102,7 @@ export function WeekHome({ listSales }: WeekHomeProps) {
       <div className="wholesale-title">
         <h1>{longDate(selected, locale)}</h1>
         <Link className="btn wholesale-new" to={`/sales?deliveryDate=${encodeURIComponent(selected)}`}>
-          <PlusIcon />
+          <Plus aria-hidden="true" strokeWidth={2.4} />
           {t('newSale')}
         </Link>
       </div>
@@ -161,14 +162,14 @@ export function WeekHome({ listSales }: WeekHomeProps) {
           </div>
           <div className="wholesale-shortcuts">
             <Link className="wholesale-shortcut" to={`/delivery-sales?deliveryDate=${encodeURIComponent(selected)}`}>
-              <BoxIcon />
+              <Truck aria-hidden="true" strokeWidth={2} />
               <span>
                 {t('salesOfDay')}
                 <small>{summary?.confirmed ? t('toDeliver').replace('{count}', String(summary.confirmed)) : t('nothingToDeliver')}</small>
               </span>
             </Link>
             <Link className="wholesale-shortcut" to={`/load-sheets?deliveryDate=${encodeURIComponent(selected)}`}>
-              <TruckIcon />
+              <ClipboardList aria-hidden="true" strokeWidth={2} />
               <span>
                 {t('loadSheet')}
                 <small>{confirmedUnits ? t('unitsToLoad').replace('{count}', String(confirmedUnits)) : t('nothingToLoad')}</small>
@@ -179,7 +180,7 @@ export function WeekHome({ listSales }: WeekHomeProps) {
       </div>
 
       <Link className="btn wholesale-fab" to={`/sales?deliveryDate=${encodeURIComponent(selected)}`}>
-        <PlusIcon />
+        <Plus aria-hidden="true" strokeWidth={2.4} />
         {t('newSale')}
       </Link>
     </section>
@@ -213,33 +214,6 @@ function SaleRow({ sale, deliveryDate }: { sale: DaySaleModel; deliveryDate: str
         {sale.status === 'DRAFT' ? t('continueSale') : t('viewSale')}
       </Link>
     </li>
-  );
-}
-
-function BoxIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 7l9-4 9 4v10l-9 4-9-4V7Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <path d="m3 7 9 4 9-4M12 11v10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function TruckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 15h13v3H3zM16 12h3l2 3v3h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="7" cy="19" r="1.5" fill="none" stroke="currentColor" strokeWidth="2" />
-      <circle cx="18" cy="19" r="1.5" fill="none" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
-    </svg>
   );
 }
 

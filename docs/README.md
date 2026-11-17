@@ -24,9 +24,9 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 | [pdrs/PDR-005.md](./pdrs/PDR-005.md) | PC content fills the window; type scales | Proposal. Shell CSS is in `src/app/styles.css`. |
 | [specs/SPEC-005.md](./specs/SPEC-005.md) | Implementation guide for UI PDR-005 | Shell width and root type are in the client. |
 | [adrs/ADR-004.md](./adrs/ADR-004.md) | Fluid PC shell; phone layout unchanged | Proposed. Binding for PDR-005. |
-| [pdrs/PDR-006.md](./pdrs/PDR-006.md) | Pedidos screen (suppliers and purchase sheet) | Proposal. Not implemented. |
-| [specs/SPEC-006.md](./specs/SPEC-006.md) | Implementation guide for UI PDR-006 | Proposed. Do not copy it into architecture, model, or flows until the code lands. |
-| [adrs/ADR-005.md](./adrs/ADR-005.md) | Pedidos is its own feature module | Proposed. Binding for PDR-006. |
+| [pdrs/PDR-006.md](./pdrs/PDR-006.md) | Pedidos screen (suppliers and purchase sheet) | Implemented. The seller flow is in flows. |
+| [specs/SPEC-006.md](./specs/SPEC-006.md) | Implementation guide for UI PDR-006 | Implemented in `src/modules/purchasing`. |
+| [adrs/ADR-005.md](./adrs/ADR-005.md) | Pedidos is its own feature module | Accepted. The `purchasing` module follows it. |
 | [architecture/](./architecture/README.md) | C4 model of **the current UI** | Implemented. One C4 set only. |
 | [model/](./model/README.md) | Client structures verified in code | Session, catalog hit, sale, delivery-day row, load sheet, and invoice models. |
 | [flows/](./flows/README.md) | User and application flows verified in code | Login through invoice print. Remaining gaps are listed, not invented. |
@@ -48,12 +48,12 @@ Business rules (Sales Day, sale totals, invoice numbering, Load Sheet aggregatio
 |---|---|
 | Vite + React + TypeScript shell | Yes |
 | Composition root and shared HTTP client | Yes |
-| Feature modules (`identity`, `catalog`, `customers`, `sales-day`, `sales`, `fulfillment-output`) | Yes. Each screen calls the API through its use cases. |
+| Feature modules (`identity`, `catalog`, `customers`, `sales`, `fulfillment-output`, `purchasing`) | Yes. Each screen calls the API through its use cases. |
 | Seller session | Yes — login, logout, bearer token, and `sessionStorage`. The seller id comes from the session. |
 | Sales Day, customer, sale, Load Sheet, and invoice screens | Yes. Open, close, and reopen; customer search and create; draft lines with decimal quantity; confirm and void; load sheet table; invoice list, preview, and print. |
 | Invoice printing through the browser print dialog | Yes — one dialog, page break between selected invoices, oldest invoice number first inside that dialog. |
 | Narrow and wide shell (SPEC § 4.1) | Partial — navigation reflows at `64rem`. Lists stay one table on both widths. |
 | Spanish default and English option (SPEC § 2.1) | Yes for the current screens. The choice is stored in `localStorage`. |
-| Pedidos ([SPEC-006](./specs/SPEC-006.md)) | No. Design only: [PDR-006](./pdrs/PDR-006.md), [ADR-005](./adrs/ADR-005.md). |
+| Pedidos ([SPEC-006](./specs/SPEC-006.md)) | Yes — supplier list, inline rename, and the order screen in create or edit-last mode. |
 
 When a SPEC step is implemented, update `architecture/`, `model/`, and `flows/` to match the code. Do not mark SPEC sections as done only in the SPEC.

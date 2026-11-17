@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useSearchParams } from 'react-router';
+import { Link, Navigate, Route, Routes, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 import { AppShellNav } from '@/app/AppShell';
 import { DeliveryDayCard } from '@/app/DeliveryDayCard';
 import { RetailSection } from '@/modules/retail-sales/adapters/ui/views/RetailSection';
@@ -19,6 +19,10 @@ import { DeliveryDateModal } from '@/modules/sales/adapters/ui/views/DeliveryDat
 import { businessToday, deliveryDaysThroughSunday } from '@/modules/sales/domain/deliveryDays';
 import { DaySalesList } from '@/modules/sales/adapters/ui/views/DaySalesList';
 import { SaleLines, type PendingLine } from '@/modules/sales/adapters/ui/views/SaleLines';
+import { PurchaseOrderSheetView } from '@/modules/purchasing/adapters/ui/views/PurchaseOrderSheetView';
+import { PurchaseOrderView } from '@/modules/purchasing/adapters/ui/views/PurchaseOrderView';
+import { SupplierDetailView } from '@/modules/purchasing/adapters/ui/views/SupplierDetailView';
+import { SupplierListView } from '@/modules/purchasing/adapters/ui/views/SupplierListView';
 import { ProductAdmin } from '@/modules/catalog/adapters/ui/views/ProductAdmin';
 import { ProductCreate } from '@/modules/catalog/adapters/ui/views/ProductCreate';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
@@ -33,6 +37,40 @@ import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 interface AppProps {
   container: AppContainer;
+}
+
+function SupplierPage({ container }: { container: AppContainer }) {
+  const { supplierId = '' } = useParams();
+  const [params] = useSearchParams();
+  const orderId = params.get('order');
+  return (
+    <SupplierDetailView
+      supplierId={supplierId}
+      orderId={orderId}
+      getSupplier={container.getSupplier}
+      setSupplierProducts={container.setSupplierProducts}
+      searchProducts={container.searchProducts}
+      listPurchaseOrders={container.listPurchaseOrders}
+      createPurchaseOrder={container.createPurchaseOrder}
+      updatePurchaseOrder={container.updatePurchaseOrder}
+    />
+  );
+}
+
+function PurchaseSheetPage({ container }: { container: AppContainer }) {
+  const { supplierId = '' } = useParams();
+  return (
+    <PurchaseOrderSheetView
+      supplierId={supplierId}
+      getSupplier={container.getSupplier}
+      createPurchaseOrder={container.createPurchaseOrder}
+    />
+  );
+}
+
+function PurchaseOrderPage({ container }: { container: AppContainer }) {
+  const { orderId = '' } = useParams();
+  return <PurchaseOrderView orderId={orderId} getPurchaseOrder={container.getPurchaseOrder} />;
 }
 
 function DeliverySalesPage({ container }: { container: AppContainer }) {
@@ -344,6 +382,34 @@ export function App({ container }: AppProps) {
           <Route
             path="/load-sheets"
             element={session ? <LoadSheetList listLoadSheet={container.listLoadSheet} /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/purchasing/orders/:orderId"
+            element={
+              session ? <PurchaseOrderPage container={container} /> : <Navigate to="/login" replace />
+            }
+          />
+          <Route
+            path="/purchasing/:supplierId/order"
+            element={session ? <PurchaseSheetPage container={container} /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/purchasing/:supplierId"
+            element={session ? <SupplierPage container={container} /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/purchasing"
+            element={
+              session ? (
+                <SupplierListView
+                  listSuppliers={container.listSuppliers}
+                  createSupplier={container.createSupplier}
+                  renameSupplier={container.renameSupplier}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           <Route
             path="/retail-sales/history"

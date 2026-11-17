@@ -1,3 +1,4 @@
+import { Ban, ChevronRight, Eye, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
@@ -100,7 +101,7 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
                 <span className="day-sale-name">{sale.customerName}</span>
                 <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
                 <span className="day-sale-total">{formatCurrency(sale.total)}</span>
-                <ChevronIcon />
+                <ChevronRight aria-hidden="true" strokeWidth={1.8} />
               </button>
               {open ? (
                 <div className="day-sale-detail">
@@ -209,12 +210,12 @@ function SaleAction({
   const preview =
     canPreviewInvoice(sale.status) || (sale.status === 'VOIDED' && sale.invoiceNumber) ? (
       <Link className="btn icon-btn icon-preview" to={`/invoices/${sale.id}`} aria-label={t('invoicePreview')}>
-        <EyeIcon />
+        <Eye aria-hidden="true" strokeWidth={1.8} />
       </Link>
     ) : null;
   const edit = canEditSaleLines(sale.status) ? (
     <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
-      <EditIcon />
+      <Pencil aria-hidden="true" strokeWidth={1.8} />
     </Link>
   ) : null;
   const voidAction = canVoidSale(sale.status) ? (
@@ -225,7 +226,7 @@ function SaleAction({
       disabled={voidingId !== null || pendingVoidId === sale.id}
       onClick={() => onVoid(sale.id)}
     >
-      <VoidIcon />
+      <Ban aria-hidden="true" strokeWidth={1.8} />
     </button>
   ) : null;
 
@@ -245,51 +246,5 @@ function SaleAction({
       <span className="day-sale-action">{edit}</span>
       <span className="day-sale-action">{voidAction}</span>
     </>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
-      />
-      <circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-    </svg>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.04a1 1 0 0 0 0-1.41l-2.5-2.5a1 1 0 0 0-1.41 0l-1.96 1.96 3.75 3.75 2.12-1.8z"
-      />
-    </svg>
-  );
-}
-
-function VoidIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c1.85 0 3.55.63 4.9 1.69L5.69 16.9A8 8 0 0 1 12 4zm0 16a8 8 0 0 1-4.9-1.69L18.31 7.1A8 8 0 0 1 12 20z"
-      />
-    </svg>
   );
 }

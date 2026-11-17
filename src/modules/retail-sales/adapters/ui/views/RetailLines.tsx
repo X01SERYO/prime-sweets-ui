@@ -1,3 +1,4 @@
+import { AlertTriangle, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { RetailDayItem } from '@/modules/retail-sales/domain/models/retailDay';
 import { isRetailQuantity, parseRetailQuantity } from '@/modules/retail-sales/domain/quantity';
@@ -84,7 +85,7 @@ function RetailRow({
         {item.productName}
         {!item.hasCost ? (
           <span className="retail-warn" tabIndex={0}>
-            <WarningIcon />
+            <AlertTriangle aria-hidden="true" strokeWidth={1.8} />
             <span className="retail-warn-text" role="tooltip">
               {t('retailNoCost')}
             </span>
@@ -97,7 +98,7 @@ function RetailRow({
         <b>{formatCurrency(item.totalPrice)}</b>
       </span>
       <button type="button" className="retail-delete" aria-label={t('retailDelete')} disabled={pending} onClick={() => void onDelete(item.productId)}>
-        <TrashIcon />
+        <Trash2 aria-hidden="true" strokeWidth={1.8} />
       </button>
     </div>
   );
@@ -155,21 +156,5 @@ function RetailQuantity({
         +
       </button>
     </div>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function WarningIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M12 3.2 1.8 21h20.4L12 3.2zm0 6.3c.5 0 .9.4.9.9v4.2a.9.9 0 0 1-1.8 0v-4.2c0-.5.4-.9.9-.9zm0 8.8a1.05 1.05 0 1 1 0-2.1 1.05 1.05 0 0 1 0 2.1z" />
-    </svg>
   );
 }

@@ -348,7 +348,7 @@ select {
 }
 
 .customer-summary.open svg {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 .customer-details {
@@ -678,7 +678,7 @@ select {
 }
 
 .line-summary.open svg {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 .line-detail {
@@ -2031,7 +2031,7 @@ code {
   left: 0;
   z-index: 6;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: #fff;
   border-top: 1px solid var(--line);
 }
@@ -2068,6 +2068,10 @@ code {
 
 .app-nav a[data-section='load'][aria-current='page'] {
   color: #9a6700;
+}
+
+.app-nav a[data-section='purchasing'][aria-current='page'] {
+  color: #6b3fa0;
 }
 
 .app-nav a[data-section='products'][aria-current='page'] {

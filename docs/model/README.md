@@ -2,7 +2,7 @@
 
 **Sources:** `src/shared/config/env.ts`, `src/shared/infrastructure/http/httpClient.ts`, `src/app/composition.ts`.
 
-The client models the session, the product hit, the customer, the sale and its lines, the delivery-day row, the load sheet, and the invoice summary and document. There is no Sales Day model. There is no supplier or purchase-order model yet; that target is [SPEC-006](../specs/SPEC-006.md).
+The client models the session, the product hit, the customer, the sale and its lines, the delivery-day row, the load sheet, the invoice summary and document, and the supplier with its purchase order. There is no Sales Day model. Supplier fields are in [SPEC-006](../specs/SPEC-006.md).
 
 ## Product hit
 

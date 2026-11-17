@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { businessToday, deliveryDaysThroughSunday, type WeekDeliveryDay } from '@/modules/sales/domain/deliveryDays';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -40,12 +41,7 @@ export function DeliveryDateModal({ onSelect, onClose, days, title }: DeliveryDa
       <div className="modal-toolbar">
         <h2>{title ?? t('deliveryDate')}</h2>
         <button className="modal-x" type="button" aria-label={t('close')} onClick={onClose}>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"
-            />
-          </svg>
+          <X aria-hidden="true" strokeWidth={1.8} />
         </button>
       </div>
       <div className="delivery-days">

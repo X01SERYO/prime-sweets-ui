@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { useSaleCustomer } from '@/modules/customers/adapters/ui/hooks/useSaleCustomer';
 import type { GetCustomerUseCase } from '@/modules/customers/application/use-cases/getCustomer.useCase';
@@ -34,7 +35,7 @@ export function SelectedCustomer({ customerId, getCustomer }: SelectedCustomerPr
               <span className="customer-kicker">{t('saleCustomer')}</span>
               <span className="customer-name">{customer.name}</span>
             </span>
-            <ChevronIcon />
+            <ChevronRight aria-hidden="true" strokeWidth={1.8} />
           </button>
           {open ? (
             <dl className="customer-details">
@@ -67,13 +68,5 @@ export function SelectedCustomer({ customerId, getCustomer }: SelectedCustomerPr
         <p className="m">…</p>
       )}
     </section>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z" />
-    </svg>
   );
 }

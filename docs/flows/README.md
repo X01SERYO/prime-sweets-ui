@@ -2,7 +2,7 @@
 
 **Sources:** `src/main.tsx`, `src/app/App.tsx`, `src/app/composition.ts`, `src/modules/sales/adapters/ui/views/WeekHome.tsx`, `DaySalesList.tsx`.
 
-Pedidos is not a flow in the client yet. The target screens are [SPEC-006](../specs/SPEC-006.md).
+Pedidos is §3. The screen contract is [SPEC-006](../specs/SPEC-006.md).
 
 ## 1. Open the application
 
@@ -44,6 +44,16 @@ Screen: `/?deliveryDate=`.
 3. On a wide screen, Entregas shows **Seleccionar todas**, **Imprimir selección**, and **Imprimir confirmadas** above the list. On a phone those controls and the checkboxes are hidden.
 4. Cargue calls `GET /load-sheets?deliveryDate=` and does not print.
 5. Preview calls `GET /invoices/:saleId`. The label is **Fecha de entrega**. A voided document shows **ANULADA** on a diagonal and has no print action. Confirmed documents print at 70 mm with a page break between them.
+
+## 3. Pedidos
+
+Module `purchasing`. Navigation label **Pedidos**.
+
+1. `/purchasing` lists each supplier on one row: the name, **Editar proveedor** (the name becomes a field on that same row), **Editar último pedido** (disabled when `latestOrderId` is null), and **Crear nuevo pedido**. The name is not a link.
+2. `/purchasing/:supplierId` is a new order. The reference column is the latest order's date and `lastQuantity`. The entry column is empty and dated today. Guardar calls `POST /purchase-orders`.
+3. `/purchasing/:supplierId?order=:id` edits that latest order. The reference column is the previous order's date and `previousQuantity`. The entry column is dated with the latest order and starts at `lastQuantity`. Guardar calls `PATCH /purchase-orders/:id`.
+4. Totals use only the typed quantities. The client does not send `unitCost`. A saved extra name is sent again as `itemName` so a flavor is not wiped. The table does not edit that name.
+5. Product search links a catalog product. **Quitar** unlinks it.
 
 ## Still outside this UI
 

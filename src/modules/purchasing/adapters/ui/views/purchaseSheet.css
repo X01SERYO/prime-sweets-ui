@@ -1,0 +1,100 @@
+.supplier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.supplier-row {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) max-content;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.supplier-row-actions .btn {
+  padding: 0.45rem 0.8rem;
+  white-space: nowrap;
+}
+
+.supplier-row-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--deep);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.supplier-row-input {
+  width: 100%;
+  min-width: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.supplier-row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.qty-caption,
+.qty-date {
+  display: block;
+}
+
+.qty-caption {
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.qty-date {
+  font-weight: 500;
+}
+
+.purchase-sheet .qty-reference {
+  color: #5f6b73;
+  background: #f3f6f7;
+}
+
+.purchase-sheet .qty-entry input {
+  width: 6rem;
+  border: 2px solid var(--deep);
+  background: #fff;
+}
+
+.purchase-total {
+  font-size: 1.15rem;
+}
+
+.purchase-sheet {
+  overflow-x: auto;
+}
+
+.purchase-sheet table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.purchase-sheet th,
+.purchase-sheet td {
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.purchase-sheet input {
+  width: 10rem;
+}

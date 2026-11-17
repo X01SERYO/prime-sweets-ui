@@ -95,7 +95,7 @@
 }
 
 .day-sale-summary.open svg {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 .day-sale-detail {

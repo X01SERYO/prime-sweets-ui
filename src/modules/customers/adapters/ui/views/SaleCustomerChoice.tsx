@@ -1,3 +1,4 @@
+import { Search, X } from 'lucide-react';
 import { useEffect, useRef, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useCustomerSearch } from '@/modules/customers/adapters/ui/hooks/useCustomerSearch';
@@ -43,7 +44,7 @@ export function SaleCustomerChoice({ searchCustomers, onSelect }: SaleCustomerCh
               aria-label={search.loading ? t('searching') : t('search')}
               disabled={!search.query.trim() || search.loading}
             >
-              <SearchIcon />
+              <Search aria-hidden="true" strokeWidth={1.8} />
             </button>
           </div>
       </form>
@@ -127,7 +128,7 @@ function CustomerResults({
       <div className="modal-toolbar">
         <h2>{title}</h2>
         <button className="modal-x" type="button" aria-label={closeLabel} onClick={onClose}>
-          <CloseIcon />
+          <X aria-hidden="true" strokeWidth={1.8} />
         </button>
       </div>
       <div className="modal-scroll">{children}</div>
@@ -150,23 +151,6 @@ function highlightMatch(text: string, query: string): ReactNode {
       <mark>{text.slice(index, index + needle.length)}</mark>
       {text.slice(index + needle.length)}
     </>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M18.3 5.71 12 12.01l6.3 6.3-1.42 1.41L10.59 13.4l-6.3 6.3-1.41-1.42 6.3-6.29-6.3-6.3 1.42-1.41 6.29 6.29 6.3-6.3z" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M15.2 15.2 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
   );
 }
 

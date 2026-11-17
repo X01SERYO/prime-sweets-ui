@@ -25,6 +25,11 @@
   font-weight: 650;
 }
 
+.product-hits mark {
+  padding: 0 0.1rem;
+  background: #ffe08a;
+}
+
 .product-hit-code {
   color: var(--muted);
   font-size: 0.82rem;

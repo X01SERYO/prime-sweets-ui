@@ -5,6 +5,7 @@ import { listMessages } from '@/shared/i18n/lists';
 import { salesMessages } from '@/shared/i18n/sales';
 import { salesDayMessages } from '@/shared/i18n/salesDay';
 import { retailMessages } from '@/shared/i18n/retail';
+import { purchasingMessages } from '@/shared/i18n/purchasing';
 import { shellMessages } from '@/shared/i18n/shell';
 
 export type Locale = 'es' | 'en';
@@ -18,7 +19,8 @@ export const messages = {
     ...customerMessages.es,
     ...salesMessages.es,
     ...listMessages.es,
-    ...retailMessages.es
+    ...retailMessages.es,
+    ...purchasingMessages.es
   },
   en: {
     ...shellMessages.en,
@@ -28,7 +30,8 @@ export const messages = {
     ...customerMessages.en,
     ...salesMessages.en,
     ...listMessages.en,
-    ...retailMessages.en
+    ...retailMessages.en,
+    ...purchasingMessages.en
   }
 } as const;
 
