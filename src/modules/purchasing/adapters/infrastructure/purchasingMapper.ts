@@ -48,7 +48,14 @@ export function toSupplierSheet(value: unknown): SupplierSheet {
         unitCost: numberOrNull(product.unitCost),
         previousQuantity: numberOrNull(product.previousQuantity),
         lastQuantity: numberOrNull(product.lastQuantity),
-        lastItemName: product.lastItemName == null ? null : text(product.lastItemName)
+        lastItemName: product.lastItemName == null ? null : text(product.lastItemName),
+        items: Array.isArray(product.items)
+          ? product.items.flatMap(entry => {
+              const item = record(entry);
+              const itemName = text(item.itemName).trim();
+              return itemName ? [{ itemName, lastQuantity: numberOrNull(item.lastQuantity) }] : [];
+            })
+          : []
       };
     })
   };

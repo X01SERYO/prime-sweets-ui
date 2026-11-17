@@ -14,6 +14,7 @@ export interface SupplierProduct {
   previousQuantity: number | null;
   lastQuantity: number | null;
   lastItemName: string | null;
+  items: { itemName: string; lastQuantity: number | null }[];
 }
 
 export interface SupplierSheet {

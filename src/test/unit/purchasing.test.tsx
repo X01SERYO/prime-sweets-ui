@@ -43,7 +43,8 @@ const sheet = {
       unitCost: 1000,
       previousQuantity: 2,
       lastQuantity: 4,
-      lastItemName: 'CHOCO fresa'
+      lastItemName: 'CHOCO fresa',
+      items: []
     }
   ]
 };
@@ -124,8 +125,8 @@ test('the purchasing client maps every call and turns a failed response into a p
   await client.renameSupplier('sup-1', 'Andina');
   assert.equal((await client.getSupplier('sup-1')).name, 'Andina');
   assert.equal((await client.setSupplierProducts('sup-1', ['p1'])).products.length, 1);
-  assert.equal((await client.createPurchaseOrder('sup-1', [{ productId: 'p1', quantity: 1 }])).id, 'ord-1');
-  assert.equal((await client.updatePurchaseOrder('ord-1', [{ productId: 'p1', quantity: 2 }])).id, 'ord-1');
+  assert.equal((await client.createPurchaseOrder('sup-1', [{ productId: 'p1', quantity: 1 }], [])).id, 'ord-1');
+  assert.equal((await client.updatePurchaseOrder('ord-1', [{ productId: 'p1', quantity: 2 }], [])).id, 'ord-1');
   assert.equal((await client.listPurchaseOrders('sup-1', 1, 2)).items.length, 0);
   assert.equal((await client.getPurchaseOrder('ord-1')).lineCount, 1);
   assert.ok(calls.includes('/suppliers'));
@@ -225,7 +226,8 @@ test('a new order and the last order save the typed quantity', async () => {
                   unitCost: null,
                   previousQuantity: null,
                   lastQuantity: null,
-                  lastItemName: null
+                  lastItemName: null,
+                  items: []
                 }
           )
         })

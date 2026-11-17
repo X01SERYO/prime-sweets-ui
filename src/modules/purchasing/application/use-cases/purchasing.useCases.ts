@@ -47,9 +47,10 @@ export class CreatePurchaseOrderUseCase {
 
   execute(
     supplierId: string,
-    lines: { productId: string; quantity: number; itemName?: string }[]
+    lines: { productId: string; quantity: number; itemName?: string }[],
+    assortment: { productId: string; itemName: string }[] = []
   ): Promise<PurchaseOrder> {
-    return this.purchasing.createPurchaseOrder(supplierId, lines);
+    return this.purchasing.createPurchaseOrder(supplierId, lines, assortment);
   }
 }
 
@@ -58,9 +59,10 @@ export class UpdatePurchaseOrderUseCase {
 
   execute(
     orderId: string,
-    lines: { productId: string; quantity: number; itemName?: string }[]
+    lines: { productId: string; quantity: number; itemName?: string }[],
+    assortment: { productId: string; itemName: string }[] = []
   ): Promise<PurchaseOrder> {
-    return this.purchasing.updatePurchaseOrder(orderId, lines);
+    return this.purchasing.updatePurchaseOrder(orderId, lines, assortment);
   }
 }
 

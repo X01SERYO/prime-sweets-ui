@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, Navigate, Outlet, Route, Routes, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, Navigate, Outlet, Route, Routes, useBlocker, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { AppShellNav } from '@/app/AppShell';
 import { DeliveryDayCard } from '@/app/DeliveryDayCard';
 import { RetailSection } from '@/modules/retail-sales/adapters/ui/views/RetailSection';
@@ -389,13 +389,13 @@ export function App({ container }: AppProps) {
             path="/login"
             element={
               session ? (
-                <Navigate to="/" replace />
+                <NavigateAfterLogin />
               ) : (
                 <LoginView login={container.login} onLoggedIn={setSession} />
               )
             }
           />
-          <Route element={session ? <Outlet /> : <Navigate to="/login" replace />}>
+          <Route element={session ? <Outlet /> : <ReturnToLogin />}>
           <Route path="/" element={<WeekHome listSales={container.listDeliverySales} />} />
           <Route path="/sales-day" element={<Navigate to="/" replace />} />
           <Route
@@ -469,6 +469,25 @@ export function App({ container }: AppProps) {
     </div>
     </NavigationHistory>
   );
+}
+
+function ReturnToLogin() {
+  const location = useLocation();
+  const next = `${location.pathname}${location.search}`;
+  const target = next === '/' ? '/login' : `/login?next=${encodeURIComponent(next)}`;
+  return <Navigate to={target} replace />;
+}
+
+function NavigateAfterLogin() {
+  const [params] = useSearchParams();
+  return <Navigate to={returnPath(params.get('next'))} replace />;
+}
+
+function returnPath(next: string | null): string {
+  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/login')) {
+    return '/';
+  }
+  return next;
 }
 
 function shortDate(value: string): string {

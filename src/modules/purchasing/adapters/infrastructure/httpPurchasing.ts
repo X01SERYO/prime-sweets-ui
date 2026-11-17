@@ -42,16 +42,18 @@ export class HttpPurchasing implements PurchasingPort {
 
   createPurchaseOrder(
     supplierId: string,
-    lines: { productId: string; quantity: number; itemName?: string }[]
+    lines: { productId: string; quantity: number; itemName?: string }[],
+    assortment: { productId: string; itemName: string }[]
   ): Promise<PurchaseOrder> {
-    return this.readPost('/purchase-orders', { supplierId, lines }, toPurchaseOrder);
+    return this.readPost('/purchase-orders', { supplierId, lines, assortment }, toPurchaseOrder);
   }
 
   updatePurchaseOrder(
     orderId: string,
-    lines: { productId: string; quantity: number; itemName?: string }[]
+    lines: { productId: string; quantity: number; itemName?: string }[],
+    assortment: { productId: string; itemName: string }[]
   ): Promise<PurchaseOrder> {
-    return this.readPatch(`/purchase-orders/${encodeURIComponent(orderId)}`, { lines }, toPurchaseOrder);
+    return this.readPatch(`/purchase-orders/${encodeURIComponent(orderId)}`, { lines, assortment }, toPurchaseOrder);
   }
 
   listPurchaseOrders(supplierId: string, page: number, pageSize: number): Promise<PurchaseOrderPage> {

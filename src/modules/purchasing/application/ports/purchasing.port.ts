@@ -9,11 +9,13 @@ export interface PurchasingPort {
   setSupplierProducts(id: string, productIds: string[]): Promise<SupplierSheet>;
   createPurchaseOrder(
     supplierId: string,
-    lines: { productId: string; quantity: number; itemName?: string }[]
+    lines: { productId: string; quantity: number; itemName?: string }[],
+    assortment: { productId: string; itemName: string }[]
   ): Promise<PurchaseOrder>;
   updatePurchaseOrder(
     orderId: string,
-    lines: { productId: string; quantity: number; itemName?: string }[]
+    lines: { productId: string; quantity: number; itemName?: string }[],
+    assortment: { productId: string; itemName: string }[]
   ): Promise<PurchaseOrder>;
   listPurchaseOrders(supplierId: string, page: number, pageSize: number): Promise<PurchaseOrderPage>;
   getPurchaseOrder(id: string): Promise<PurchaseOrder>;
