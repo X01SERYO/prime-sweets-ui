@@ -207,12 +207,14 @@ function SaleRow({ sale, deliveryDate }: { sale: DaySaleModel; deliveryDate: str
         </div>
       </div>
       <div className="wholesale-amount">{formatCurrency(sale.total)}</div>
-      <Link
-        className={sale.status === 'DRAFT' ? 'wholesale-row-btn is-main' : 'wholesale-row-btn'}
-        to={`/sales?deliveryDate=${encodeURIComponent(deliveryDate)}&saleId=${encodeURIComponent(sale.id)}`}
-      >
-        {sale.status === 'DRAFT' ? t('continueSale') : t('viewSale')}
-      </Link>
+      {sale.status === 'DRAFT' ? (
+        <Link
+          className="wholesale-row-btn is-main"
+          to={`/sales?deliveryDate=${encodeURIComponent(deliveryDate)}&saleId=${encodeURIComponent(sale.id)}`}
+        >
+          {t('continueSale')}
+        </Link>
+      ) : null}
     </li>
   );
 }

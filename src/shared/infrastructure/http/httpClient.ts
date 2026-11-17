@@ -44,6 +44,7 @@ export function createHttpClient(
     try {
       const response = await fetch(`${baseUrl}${path}`, {
         ...init,
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {})

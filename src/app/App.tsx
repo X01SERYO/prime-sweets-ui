@@ -245,7 +245,7 @@ function SaleSearch({ container }: { container: AppContainer }) {
           }
           void confirmation.confirm(current).then(saved => {
             if (saved) {
-              navigate('/');
+              navigate(saved.deliveryDate ? `/?deliveryDate=${encodeURIComponent(saved.deliveryDate)}` : '/');
             }
           });
         }}
