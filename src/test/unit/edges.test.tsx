@@ -247,5 +247,5 @@ test('search, login, and the back link cover their failure branches', () => {
   fireEvent.click(screen.getByRole('button', { name: 'empty-login' }));
   fireEvent.click(screen.getByRole('button', { name: 'Disminuir cantidad' }));
   fireEvent.click(screen.getByRole('button', { name: 'Aumentar cantidad' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Volver' }));
+  screen.getByRole('heading', { name: 'Productos' });
 });

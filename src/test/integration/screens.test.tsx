@@ -246,7 +246,6 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   fireEvent.change(screen.getByLabelText(/buscar producto/i), { target: { value: 'SOD' } });
   fireEvent.click(screen.getByRole('button', { name: /^buscar$/i }));
   fireEvent.change(screen.getByLabelText(/tamaño|page size|por página/i), { target: { value: '20' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Volver' }));
   cleanup();
 
   open('/products/new');
@@ -281,6 +280,8 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   cleanup();
 
   open('/load-sheets?deliveryDate=2026-11-14');
+  await waitFor(() => screen.getByRole('button', { name: /ACME/ }));
+  fireEvent.click(screen.getByRole('button', { name: /ACME/ }));
   await waitFor(() => screen.getByText('SODA'));
   cleanup();
 

@@ -2447,6 +2447,10 @@ code {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+.app-nav-sub {
+  display: none;
+}
+
 .app-nav a,
 .app-nav-disabled {
   display: flex;
@@ -2574,6 +2578,16 @@ code {
     padding: 0.8rem 1rem;
     font-size: 0.95rem;
     text-align: start;
+  }
+
+  .app-nav-sub {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-nav-sub a {
+    padding: 0.55rem 1rem 0.55rem 1.7rem;
+    font-size: 0.9rem;
   }
 
   .app-nav a[aria-current='page'] {
