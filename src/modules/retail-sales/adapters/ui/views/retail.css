@@ -267,7 +267,7 @@
   position: fixed;
   z-index: 5;
   right: 0;
-  bottom: 4.75rem;
+  bottom: calc(3.34rem + env(safe-area-inset-bottom, 0px));
   left: 0;
   display: flex;
   align-items: center;
@@ -647,7 +647,7 @@
   position: fixed;
   z-index: 5;
   right: 0;
-  bottom: 4.75rem;
+  bottom: calc(3.34rem + env(safe-area-inset-bottom, 0px));
   left: 0;
   display: flex;
   justify-content: flex-end;
