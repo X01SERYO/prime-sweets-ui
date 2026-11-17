@@ -12,10 +12,11 @@ interface SelectedCustomerProps {
   customerId: string | null;
   getCustomer: GetCustomerUseCase;
   updateCustomer: UpdateCustomerUseCase;
-  onChange: () => void;
+  onChange?: () => void;
+  canEdit?: boolean;
 }
 
-export function SelectedCustomer({ customerId, getCustomer, updateCustomer, onChange }: SelectedCustomerProps) {
+export function SelectedCustomer({ customerId, getCustomer, updateCustomer, onChange, canEdit = true }: SelectedCustomerProps) {
   const { t } = useLocale();
   const { customer, error, replace } = useSaleCustomer(customerId, getCustomer);
   const [editing, setEditing] = useState(false);
@@ -68,11 +69,17 @@ export function SelectedCustomer({ customerId, getCustomer, updateCustomer, onCh
               </dl>
             ) : null}
           </div>
-          <div className="customer-actions">
-            <button className="btn btn-secondary" type="button" onClick={() => setEditing(true)}>{t('customerEdit')}</button>
-            <button className="btn btn-secondary" type="button" onClick={onChange}>{t('customerChange')}</button>
-          </div>
-          {editing ? (
+          {canEdit || onChange ? (
+            <div className="customer-actions">
+              {canEdit ? (
+                <button className="btn btn-secondary" type="button" onClick={() => setEditing(true)}>{t('customerEdit')}</button>
+              ) : null}
+              {onChange ? (
+                <button className="btn btn-secondary" type="button" onClick={onChange}>{t('customerChange')}</button>
+              ) : null}
+            </div>
+          ) : null}
+          {canEdit && editing ? (
             <CustomerFormDialog
               customer={customer}
               updateCustomer={updateCustomer}

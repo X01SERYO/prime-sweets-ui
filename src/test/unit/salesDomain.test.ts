@@ -10,7 +10,7 @@ import {
 } from '../../modules/sales/domain/deliveryDays.ts';
 import { isSellableQuantity } from '../../modules/sales/domain/quantity.ts';
 import { addedSaleLineName, previewLineTotal } from '../../modules/sales/domain/saleLineName.ts';
-import { canConfirmSale, canEditSaleLines, canRenameSaleLine, canVoidSale } from '../../modules/sales/domain/saleStatus.ts';
+import { canConfirmSale, canEditSaleLines, canRenameSaleLine, canReopenSale, canVoidSale } from '../../modules/sales/domain/saleStatus.ts';
 
 test('business dates stay inside the current week and reject a bad day', () => {
   assert.match(businessToday(new Date('2026-11-14T15:00:00Z')), /^\d{4}-\d{2}-\d{2}$/);
@@ -31,7 +31,10 @@ test('a sale line keeps a suffix and a quantity of up to 3 decimals', () => {
   assert.equal(previewLineTotal(1000, 1.5), 1500);
   assert.equal(isSellableQuantity(1.25), true);
   assert.equal(isSellableQuantity(0), false);
-  assert.equal(canEditSaleLines('CONFIRMED'), true);
+  assert.equal(canEditSaleLines('CONFIRMED'), false);
+  assert.equal(canEditSaleLines('DRAFT'), true);
+  assert.equal(canReopenSale('CONFIRMED'), true);
+  assert.equal(canReopenSale('DRAFT'), false);
   assert.equal(canRenameSaleLine('CONFIRMED'), false);
   assert.equal(canConfirmSale('DRAFT'), true);
   assert.equal(canVoidSale('DRAFT'), false);

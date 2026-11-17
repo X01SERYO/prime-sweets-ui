@@ -40,4 +40,13 @@ export class ListSalesByDeliveryDateUseCase {
     }
     return rows;
   }
+
+  async countActive(deliveryDate: string): Promise<number> {
+    const date = deliveryDate.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      throw new SaleInvalidError();
+    }
+    const sales = await this.sales.listByDeliveryDate(date);
+    return sales.filter(sale => sale.status !== 'VOIDED').length;
+  }
 }

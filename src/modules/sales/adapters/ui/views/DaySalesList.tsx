@@ -1,4 +1,4 @@
-import { Ban, ChevronRight, Eye, Pencil } from 'lucide-react';
+import { Ban, ChevronRight, Eye, Receipt } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
@@ -7,7 +7,7 @@ import { useDeliverySales } from '@/modules/sales/adapters/ui/hooks/useDeliveryS
 import { useVoidListedSale } from '@/modules/sales/adapters/ui/hooks/useVoidListedSale';
 import type { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application/use-cases/listSalesByDeliveryDate.useCase';
 import type { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
-import { canEditSaleLines, canPreviewInvoice, canVoidSale } from '@/modules/sales/domain/saleStatus';
+import { canPreviewInvoice, canVoidSale } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
@@ -208,14 +208,14 @@ function SaleAction({
 }) {
   const { t } = useLocale();
   const preview =
-    canPreviewInvoice(sale.status) || (sale.status === 'VOIDED' && sale.invoiceNumber) ? (
+    canPreviewInvoice(sale.status) || sale.status === 'VOIDED' ? (
       <Link className="btn icon-btn icon-preview" to={`/invoices/${sale.id}`} aria-label={t('invoicePreview')}>
-        <Eye aria-hidden="true" strokeWidth={1.8} />
+        <Receipt aria-hidden="true" strokeWidth={1.8} />
       </Link>
     ) : null;
-  const edit = canEditSaleLines(sale.status) ? (
-    <Link className="btn icon-btn icon-edit" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('editSale')}>
-      <Pencil aria-hidden="true" strokeWidth={1.8} />
+  const view = sale.status === 'CONFIRMED' ? (
+    <Link className="btn icon-btn icon-view" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('viewSale')}>
+      <Eye aria-hidden="true" strokeWidth={1.8} />
     </Link>
   ) : null;
   const voidAction = canVoidSale(sale.status) ? (
@@ -234,7 +234,7 @@ function SaleAction({
     return (
       <>
         <td className="day-sales-action">{preview}</td>
-        <td className="day-sales-action">{edit}</td>
+        <td className="day-sales-action">{view}</td>
         <td className="day-sales-action">{voidAction}</td>
       </>
     );
@@ -243,7 +243,7 @@ function SaleAction({
   return (
     <>
       <span className="day-sale-action">{preview}</span>
-      <span className="day-sale-action">{edit}</span>
+      <span className="day-sale-action">{view}</span>
       <span className="day-sale-action">{voidAction}</span>
     </>
   );

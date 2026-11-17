@@ -55,8 +55,8 @@ export function useWeekSaleCounts(dates: string[], listSales: ListSalesByDeliver
     let cancelled = false;
     Promise.all(
       dates.map(async date => {
-        const rows = await listSales.execute(date);
-        return [date, rows.filter(sale => sale.status !== 'VOIDED').length] as const;
+        const count = await listSales.countActive(date);
+        return [date, count] as const;
       })
     )
       .then(rows => {

@@ -21,6 +21,7 @@ import type { SessionStorePort } from '@/modules/identity/application/ports/sess
 import { HttpSale } from '@/modules/sales/adapters/infrastructure/httpSale';
 import { AddSaleItemUseCase } from '@/modules/sales/application/use-cases/addSaleItem.useCase';
 import { ConfirmSaleUseCase } from '@/modules/sales/application/use-cases/confirmSale.useCase';
+import { ReopenSaleUseCase } from '@/modules/sales/application/use-cases/reopenSale.useCase';
 import { CreateDraftSaleUseCase } from '@/modules/sales/application/use-cases/createDraftSale.useCase';
 import { SetSaleDeliveryDateUseCase } from '@/modules/sales/application/use-cases/setSaleDeliveryDate.useCase';
 import { AssignSaleCustomerUseCase } from '@/modules/sales/application/use-cases/assignSaleCustomer.useCase';
@@ -89,6 +90,7 @@ export interface AppContainer {
   updateSaleItemName: UpdateSaleItemNameUseCase;
   removeSaleItem: RemoveSaleItemUseCase;
   confirmSale: ConfirmSaleUseCase;
+  reopenSale: ReopenSaleUseCase;
   voidSale: VoidSaleUseCase;
   listLoadSheet: ListLoadSheetUseCase;
   listInvoices: ListInvoicesUseCase;
@@ -148,6 +150,7 @@ export function createAppContainer(): AppContainer {
     updateSaleItemName: new UpdateSaleItemNameUseCase(new HttpSale(http)),
     removeSaleItem: new RemoveSaleItemUseCase(new HttpSale(http)),
     confirmSale: new ConfirmSaleUseCase(new HttpSale(http)),
+    reopenSale: new ReopenSaleUseCase(new HttpSale(http)),
     voidSale: new VoidSaleUseCase(new HttpSale(http)),
     listLoadSheet: new ListLoadSheetUseCase(new HttpLoadSheetQuery(http)),
     listInvoices: new ListInvoicesUseCase(new HttpInvoiceQuery(http)),

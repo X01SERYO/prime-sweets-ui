@@ -1,7 +1,11 @@
 import type { SaleStatus } from '@/modules/sales/domain/models/sale';
 
 export function canEditSaleLines(status: SaleStatus): boolean {
-  return status === 'DRAFT' || status === 'CONFIRMED';
+  return status === 'DRAFT';
+}
+
+export function canReopenSale(status: SaleStatus): boolean {
+  return status === 'CONFIRMED';
 }
 
 export function canRenameSaleLine(status: SaleStatus): boolean {

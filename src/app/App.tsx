@@ -30,6 +30,7 @@ import type { Session } from '@/modules/identity/domain/models/session';
 import { useLocale } from '@/shared/i18n/useLocale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { NavigationHistory, ScreenTitle } from '@/shared/ui/BackButton';
+import { ScreenErrorBoundary, ScreenMonitor } from '@/shared/ui/Monitor';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { StatusMessage } from '@/shared/ui/StatusMessage';
 
@@ -110,7 +111,8 @@ function SaleSearch({ container }: { container: AppContainer }) {
     container.getSale
   );
   const shownCustomerId = draft.sale?.customerId ?? customerId;
-  const canEditLines = !draft.sale || draft.sale.status === 'DRAFT' || draft.sale.status === 'CONFIRMED';
+  const customerLocked = Boolean(saleId || draft.sale);
+  const canEditLines = !draft.sale || draft.sale.status === 'DRAFT';
   const confirmation = useConfirmSale(container.confirmSale, draft.setSale);
   useEffect(() => {
     if (!editingLine) {
@@ -157,38 +159,17 @@ function SaleSearch({ container }: { container: AppContainer }) {
   return (
     <div className="sale-screen">
       <ScreenTitle>{t('sale')}</ScreenTitle>
-      {(!shownCustomerId || changingCustomer) && !draft.loading ? (
+      {(!shownCustomerId || changingCustomer) && !draft.loading && !customerLocked ? (
         <SaleCustomerChoice
           searchCustomers={container.searchCustomers}
           createCustomer={container.createCustomer}
           changing={changingCustomer}
           onCancelChange={() => setChangingCustomer(false)}
           onSelect={id => {
-            const current = draft.sale;
-            if (!current) {
-              setCustomerError(null);
-              setChangingCustomer(false);
-              setDeliveryDate(null);
-              setParams({ customerId: id });
-              return;
-            }
-            if (current.customerId === id) {
-              setCustomerError(null);
-              setChangingCustomer(false);
-              setParams({ saleId: current.id, customerId: id });
-              return;
-            }
-            void container.assignSaleCustomer
-              .execute(current.id, id)
-              .then(saved => {
-                setCustomerError(null);
-                setChangingCustomer(false);
-                draft.setSale(saved);
-                setParams({ saleId: saved.id, customerId: saved.customerId });
-              })
-              .catch((caught: unknown) => {
-                setCustomerError(saleErrorKey(caught, 'saleCustomerFailed'));
-              });
+            setCustomerError(null);
+            setChangingCustomer(false);
+            setDeliveryDate(null);
+            setParams({ customerId: id });
           }}
         />
       ) : (
@@ -196,10 +177,15 @@ function SaleSearch({ container }: { container: AppContainer }) {
           customerId={shownCustomerId}
           getCustomer={container.getCustomer}
           updateCustomer={container.updateCustomer}
-          onChange={() => {
-            setCustomerError(null);
-            setChangingCustomer(true);
-          }}
+          canEdit={!customerLocked}
+          onChange={
+            customerLocked
+              ? undefined
+              : () => {
+                  setCustomerError(null);
+                  setChangingCustomer(true);
+                }
+          }
         />
       )}
       {customerError ? <StatusMessage tone="error">{t(customerError)}</StatusMessage> : null}
@@ -216,11 +202,7 @@ function SaleSearch({ container }: { container: AppContainer }) {
             if (date === current.deliveryDate || !canEditLines) {
               return;
             }
-            if (current.status === 'CONFIRMED') {
-              setPendingMove(date);
-              return;
-            }
-            moveDelivery(date);
+            setPendingMove(date);
           }}
         />
       ) : null}
@@ -228,8 +210,7 @@ function SaleSearch({ container }: { container: AppContainer }) {
       {pendingMove && draft.sale ? (
         <ConfirmDialog
           title={t('changeDeliveryDay')}
-          message={t('confirmMoveInvoice')
-            .replace('{number}', draft.sale.invoiceNumber ?? '')
+          message={(draft.sale.invoiceNumber ? t('confirmMoveInvoice').replace('{number}', draft.sale.invoiceNumber) : t('confirmMoveSale'))
             .replace('{from}', shortDate(draft.sale.deliveryDate))
             .replace('{to}', shortDate(pendingMove))}
           confirmLabel={t('confirmAction')}
@@ -264,6 +245,20 @@ function SaleSearch({ container }: { container: AppContainer }) {
         busy={lines.busy || confirmation.confirming}
         confirming={confirmation.confirming}
         confirmError={confirmation.error}
+        onReopen={() => {
+          const current = draft.sale;
+          if (!current) {
+            return;
+          }
+          void container.reopenSale
+            .execute(current.id)
+            .then(saved => {
+              draft.setSale(saved);
+            })
+            .catch((caught: unknown) => {
+              setDeliveryError(saleErrorKey(caught, 'saleLineFailed'));
+            });
+        }}
         onConfirm={updated => {
           const current = updated ?? draft.sale;
           if (current?.status === 'CONFIRMED') {
@@ -363,6 +358,7 @@ export function App({ container }: AppProps) {
 
   return (
     <NavigationHistory>
+    <ScreenMonitor />
     <div className="shell" ref={shellRef}>
       <div className="shell-head">
       <header className="topbar">
@@ -384,6 +380,7 @@ export function App({ container }: AppProps) {
       <div className={session ? 'app-frame' : undefined}>
       {session ? <AppShellNav /> : null}
       <main>
+        <ScreenErrorBoundary>
         <Routes>
           <Route
             path="/login"
@@ -464,6 +461,7 @@ export function App({ container }: AppProps) {
           <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
+        </ScreenErrorBoundary>
       </main>
       </div>
     </div>

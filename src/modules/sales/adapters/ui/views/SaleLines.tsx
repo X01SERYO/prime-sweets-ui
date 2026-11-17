@@ -2,7 +2,7 @@ import { Check, ChevronRight, Pencil, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
 import type { SaleItemModel, SaleModel } from '@/modules/sales/domain/models/sale';
 import { addedSaleLineName, composeSaleLineName, groupSaleItems, previewLineTotal } from '@/modules/sales/domain/saleLineName';
-import { canConfirmSale, canEditSaleLines, canRenameSaleLine } from '@/modules/sales/domain/saleStatus';
+import { canConfirmSale, canEditSaleLines, canRenameSaleLine, canReopenSale } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
@@ -26,6 +26,7 @@ interface SaleLinesProps {
   confirming: boolean;
   confirmError: MessageKey | null;
   onConfirm: (sale?: SaleModel) => void;
+  onReopen?: () => void;
   pending: PendingLine | null;
   onAcceptPending: (name: string, quantity: number) => Promise<SaleModel | null>;
   onCancelPending: () => void;
@@ -47,6 +48,7 @@ export function SaleLines({
   confirming,
   confirmError,
   onConfirm,
+  onReopen,
   pending,
   onAcceptPending,
   onCancelPending,
@@ -225,7 +227,12 @@ export function SaleLines({
                   .replace('{units}', String(sale.items.reduce((sum, item) => sum + item.quantity, 0)))}
               </p>
             </div>
-            {canEditSaleLines(sale.status) ? (
+            {canReopenSale(sale.status) && onReopen ? (
+              <button className="btn btn-secondary" type="button" disabled={busy} onClick={onReopen}>
+                {t('editSale')}
+              </button>
+            ) : null}
+            {canConfirmSale(sale.status) ? (
               <button
                 className="btn"
                 type="button"
