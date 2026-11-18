@@ -6,6 +6,7 @@ import type { ListBrandsUseCase } from '@/modules/catalog/application/use-cases/
 import type { Brand } from '@/modules/catalog/domain/models/brand';
 import { realMarginPercent, suggestedSalePrice } from '@/modules/catalog/domain/productPricing';
 import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
+import { alegraSyncText } from '@/modules/catalog/adapters/ui/alegraSyncText';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
@@ -105,7 +106,7 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
       navigate('/products', { state: { createdName: saved.name ?? saved.code } });
     } catch (caught) {
       if (caught instanceof HttpRequestError && caught.code === 'ALEGRA_SYNC_FAILED') {
-        setError(`${t('alegraSyncFailed')} ${caught.message}`);
+        setError(alegraSyncText(caught.message, t));
       } else if (caught instanceof HttpRequestError && caught.code === 'PRODUCT_ALREADY_EXISTS') {
         setError(t('productExists'));
       } else {

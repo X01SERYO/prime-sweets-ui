@@ -46,7 +46,8 @@ export const catalogMessages = catalog(
     toastOk: 'Listo',
     productInvalid: 'El valor no es válido. Use cero o más, sin dejar el campo vacío.',
     productUpdateFailed: 'No se pudo guardar el producto.',
-    alegraSyncFailed: 'No se pudo actualizar en Alegra. No se guardó ningún cambio.',
+    alegraSyncFailed: 'Alegra no confirmó el cambio. No se guardó ningún cambio.',
+    alegraSyncFailedItem: 'Alegra no confirmó la actualización del producto {item}. No se guardó ningún cambio.',
     previousPage: 'Anterior',
     nextPage: 'Siguiente',
     pageSize: 'Por página'
@@ -96,7 +97,8 @@ export const catalogMessages = catalog(
     toastOk: 'Done',
     productInvalid: 'The value is not valid. Use zero or more, and do not leave the field empty.',
     productUpdateFailed: 'The product could not be saved.',
-    alegraSyncFailed: 'Alegra could not be updated. Nothing was saved.',
+    alegraSyncFailed: 'Alegra did not confirm the change. Nothing was saved.',
+    alegraSyncFailedItem: 'Alegra did not confirm the update for product {item}. Nothing was saved.',
     previousPage: 'Previous',
     nextPage: 'Next',
     pageSize: 'Per page'

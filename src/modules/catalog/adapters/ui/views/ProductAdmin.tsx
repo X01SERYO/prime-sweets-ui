@@ -7,6 +7,7 @@ import type { CatalogProduct, CatalogProductPatch } from '@/modules/catalog/doma
 import { realMarginPercent, suggestedSalePrice } from '@/modules/catalog/domain/productPricing';
 import { isProductSearchTerm } from '@/modules/catalog/domain/productSearchTerm';
 import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
+import { alegraSyncText } from '@/modules/catalog/adapters/ui/alegraSyncText';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
@@ -136,6 +137,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
   const navigate = useNavigate();
   const createdName = (location.state as { createdName?: string } | null)?.createdName ?? '';
   const [query, setQuery] = useState('');
+  const [appliedQuery, setAppliedQuery] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(20);
@@ -214,7 +216,7 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
       setNotice(t('productSaved').replace('{name}', saved.name ?? saved.code));
     } catch (caught) {
       if (caught instanceof HttpRequestError && caught.code === 'ALEGRA_SYNC_FAILED') {
-        setError(`${t('alegraSyncFailed')} ${caught.message}`);
+        setError(alegraSyncText(caught.message, t));
       } else {
         setError(caught instanceof CatalogInvalidError || caught instanceof HttpRequestError ? t('productInvalid') : t('productUpdateFailed'));
       }
@@ -234,7 +236,9 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
       <form
         onSubmit={event => {
           event.preventDefault();
-          void load(1, query);
+          const term = query.trim();
+          setAppliedQuery(term);
+          void load(1, term);
         }}
       >
         <label htmlFor="product-admin-query">{t('searchProduct')}</label>
@@ -312,10 +316,10 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
         page={page}
         pageSize={pageSize}
         total={total}
-        onPage={next => void load(next, query)}
+        onPage={next => void load(next, appliedQuery)}
         onPageSize={size => {
           setPageSize(size);
-          void load(1, query, size);
+          void load(1, appliedQuery, size);
         }}
       />
       {!editing && (error || notice) ? <Toast error={error} notice={notice} onDone={dismissToast} /> : null}

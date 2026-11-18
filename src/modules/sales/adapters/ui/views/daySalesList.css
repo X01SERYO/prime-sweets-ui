@@ -1,139 +1,455 @@
-.day-sales-table {
-  width: 100%;
-  border-collapse: collapse;
-  white-space: nowrap;
+.deliveries {
+  padding-bottom: 7.5rem;
 }
 
-.day-sales-table th,
-.day-sales-table td {
-  padding: 0.55rem 1.15rem;
-  border-bottom: 1px solid var(--line);
-  vertical-align: middle;
-  text-align: left;
-  font-size: 1rem;
-}
-
-.day-sales-table th {
-  font-size: 0.95rem;
-  font-weight: 700;
-}
-
-.day-sales-table th:first-child,
-.day-sales-table td:first-child {
-  padding-left: 0;
-}
-
-.day-sales-pick {
-  width: 1.5rem;
-}
-
-.day-sales-check {
-  display: inline-flex;
+.dl-dnav {
+  display: flex;
   align-items: center;
-  margin: 0;
-}
-
-.day-sales-check input {
-  width: 1rem;
-  height: 1rem;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  border-radius: 3px;
-}
-
-.day-sales-total {
-  text-align: right;
-}
-
-.day-sales-cards {
-  display: none;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.day-sale-card {
   gap: 0.35rem;
-  padding: 0.5rem 0.65rem;
+  margin-bottom: 1rem;
 }
 
-.day-sale-summary {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
-  align-items: center;
-  gap: 0.4rem;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
+.dl-dnav-title {
+  min-width: 0;
+}
+
+.dl-dnav-title b {
+  display: block;
+  color: var(--deep);
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.dl-dnav-title small {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.dl-ib,
+.dl-out,
+.dl-main,
+.dl-link,
+.dl-chip {
   font: inherit;
-  text-align: left;
   cursor: pointer;
 }
 
-.day-sale-name {
-  overflow: hidden;
+.dl-ib {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  border: 1.5px solid #cfe0e3;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--deep);
+}
+
+.dl-ib svg,
+.dl-out svg,
+.dl-main svg,
+.dl-search svg,
+.dl-ab svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+.dl-link {
+  border: 0;
+  background: none;
   color: var(--deep);
   font-weight: 700;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-decoration: underline;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.6rem;
 }
 
-.day-sale-summary .day-sale-total {
+.dl-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.dl-out,
+.dl-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.85rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 999px;
   font-weight: 700;
-  white-space: nowrap;
 }
 
-.day-sale-summary svg {
+.dl-out {
+  border: 1.5px solid var(--deep);
+  background: #fff;
+  color: var(--deep);
+}
+
+.dl-main {
+  border: 0;
+  background: var(--orange, #ff5a00);
+  color: #fff;
+}
+
+.dl-out:disabled,
+.dl-main:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.dl-hint {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.dl-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0.85rem 0;
+}
+
+.dl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dl-chip {
+  min-height: 2.6rem;
+  padding: 0.4rem 0.9rem;
+  border: 1.5px solid #cfe0e3;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.dl-chip b {
+  margin-left: 0.25rem;
+  color: var(--ink, inherit);
+}
+
+.dl-chip[aria-pressed='true'] {
+  border-color: var(--deep);
+  background: #e6f1f2;
+  color: var(--deep);
+  font-weight: 700;
+}
+
+.dl-search {
+  position: relative;
+  display: block;
+  flex: 1 1 15rem;
+  min-width: 0;
+  max-width: 24rem;
+  margin: 0 0 0 auto;
+}
+
+.dl-search svg {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  color: var(--muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.dl-search input {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0 0.9rem 0 2.6rem;
+  border: 1.5px solid #cfe0e3;
+  border-radius: 14px;
+  background: #fff;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.dl-selbar {
+  display: none;
+}
+
+.dl-panel {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.dl-row {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) 8.2rem 8.2rem 7.5rem 8.75rem;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.dl-row:last-child {
+  border-bottom: 0;
+}
+
+.dl-head {
+  background: #fbfdfd;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dl-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dl-chk {
   width: 1.35rem;
   height: 1.35rem;
-  color: var(--deep);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  accent-color: var(--deep);
+  cursor: pointer;
 }
 
-.day-sale-summary.open svg {
-  transform: rotate(90deg);
+.dl-chk:focus,
+.dl-chk:focus-visible {
+  outline: none;
 }
 
-.day-sale-detail {
+.dl-chk:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.dl-name b {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.dl-name small {
+  display: none;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.dl-void .dl-name b,
+.dl-void .dl-tot {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.dl-act {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-top: 0.35rem;
-  border-top: 1px solid var(--line);
+  gap: 0.35rem;
+  justify-content: flex-end;
 }
 
-.day-sale-actions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 0.15rem;
-}
-
-.day-sale-action {
+.dl-ab {
   display: inline-flex;
-  width: 2.75rem;
+  align-items: center;
   justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1.5px solid;
+  border-radius: 12px;
+  background: #fff;
+  font-weight: 700;
 }
 
-@media (max-width: 40rem) {
-  .row.day-sales-print,
-  .day-sales-table {
+.dl-lb {
+  display: none;
+}
+
+.dl-pv {
+  color: #0b7f8c;
+  background: #e8f7f8;
+  border-color: #7cc9d2;
+}
+
+.dl-vw {
+  color: #2a4fd0;
+  background: #eef2ff;
+  border-color: #9db4f5;
+}
+
+.dl-cn {
+  color: #c94400;
+  background: #fff1e8;
+  border-color: #f0b49a;
+}
+
+.dl-ab:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dl-empty {
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+}
+
+.dl-empty h3 {
+  margin: 0;
+  color: var(--deep);
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.35rem;
+}
+
+.dl-empty p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.dl-bar {
+  display: none;
+}
+
+@media (max-width: 64rem) {
+  .dl-row {
+    grid-template-columns: 2.75rem minmax(0, 1fr) 7.6rem 6.8rem 8.75rem;
+  }
+
+  .dl-inv {
     display: none;
   }
 
-  .day-sales-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
+  .dl-name small {
+    display: block;
   }
 }
 
-.day-sales-table td.day-sales-action {
-  width: 2.15rem;
-  padding: 0.35rem 0.05rem;
-  text-align: center;
+@media (max-width: 45rem) {
+  .dl-tools > * {
+    flex: 1 1 100%;
+  }
+
+  .dl-filters {
+    gap: 0.5rem;
+  }
+
+  .dl-chips {
+    flex-wrap: nowrap;
+    width: calc(100% + 1.75rem);
+    margin: 0 -0.875rem;
+    padding: 0 0.875rem 0.15rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .dl-chip {
+    white-space: nowrap;
+  }
+
+  .dl-search {
+    flex: 1 1 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .dl-selbar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+  }
+
+  .dl-head {
+    display: none;
+  }
+
+  .dl-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    overflow: visible;
+    background: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .dl-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'chk name st'
+      'chk tot tot'
+      'act act act';
+    gap: 0.25rem 0.75rem;
+    padding: 0.75rem 0.9rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  .dl-row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dl-chk-cell {
+    grid-area: chk;
+    align-self: start;
+    padding-top: 0.15rem;
+  }
+
+  .dl-name {
+    grid-area: name;
+  }
+
+  .dl-st {
+    grid-area: st;
+  }
+
+  .dl-tot {
+    grid-area: tot;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .dl-act {
+    grid-area: act;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+  }
+
+  .dl-ab {
+    width: 2.85rem;
+    min-height: 2.85rem;
+  }
+
+  .dl-bar.on {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 25;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.9rem calc(0.65rem + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -6px 20px rgba(11, 79, 92, 0.08);
+  }
+
+  .dl-bar b {
+    margin-right: auto;
+  }
 }

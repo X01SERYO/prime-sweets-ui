@@ -315,7 +315,20 @@ function SaleLineGroupRows({
 
   return (
     <>
-      <tr className="line-group">
+      <tr
+        className="line-group"
+        tabIndex={0}
+        role="button"
+        aria-expanded={expanded}
+        aria-label={`${head.catalogName || head.itemName}, ${countLabel}. ${expanded ? t('hideVariants') : t('showVariants')}`}
+        onClick={() => setOpen(current => !current)}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setOpen(current => !current);
+          }
+        }}
+      >
         <td>{head.productCode}</td>
         <td className="product-cell">
           {head.catalogName || head.itemName}
@@ -325,15 +338,9 @@ function SaleLineGroupRows({
         <td className="num">{samePrice ? formatCurrency(head.wholesalePrice) : ''}</td>
         <td className="num">{formatCurrency(total)}</td>
         <td className="line-col">
-          <button
-            className="btn icon-btn line-fold"
-            type="button"
-            aria-expanded={expanded}
-            aria-label={expanded ? t('hideVariants') : t('showVariants')}
-            onClick={() => setOpen(current => !current)}
-          >
-            <ChevronRight aria-hidden="true" strokeWidth={1.8} />
-          </button>
+          <span className={expanded ? 'customer-fold open' : 'customer-fold'} aria-hidden="true">
+            <ChevronRight strokeWidth={1.8} />
+          </span>
         </td>
       </tr>
       {expanded ? group.map(item => (
@@ -602,7 +609,9 @@ function SaleLineCardGroup({
         </span>
         <span className="line-summary-qty">{quantity}</span>
         <span className="line-summary-total">{formatCurrency(total)}</span>
-        <ChevronRight aria-hidden="true" strokeWidth={1.8} />
+        <span className={expanded ? 'customer-fold open' : 'customer-fold'} aria-hidden="true">
+          <ChevronRight strokeWidth={1.8} />
+        </span>
       </button>
       {expanded ? (
         <ul className="line-variant-list">

@@ -285,7 +285,9 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   await waitFor(() => screen.getByText('SODA'));
   cleanup();
 
-  open('/invoices/s1');
+  open('/delivery-sales?deliveryDate=2026-11-14');
+  await waitFor(() => screen.getAllByRole('button', { name: 'Vista previa' })[0]);
+  fireEvent.click(screen.getAllByRole('button', { name: 'Vista previa' })[0]);
   await waitFor(() => screen.getByText(/Dulceria|factura|invoice/i));
   cleanup();
 

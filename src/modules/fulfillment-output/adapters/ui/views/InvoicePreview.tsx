@@ -1,11 +1,11 @@
-import { useParams } from 'react-router';
+import { X } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useInvoiceDocument } from '@/modules/fulfillment-output/adapters/ui/hooks/useInvoiceDocument';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
 import type { GenerateInvoiceUseCase } from '@/modules/fulfillment-output/application/use-cases/generateInvoice.useCase';
 import type { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
 import { formatCurrency } from '@/shared/domain/money';
 import { useLocale } from '@/shared/i18n/useLocale';
-import { ScreenTitle } from '@/shared/ui/BackButton';
 import { StatusMessage } from '@/shared/ui/StatusMessage';
 
 function businessDay(value: string): string {
@@ -30,34 +30,70 @@ function saleDay(value: string): string {
 }
 
 interface InvoicePreviewProps {
+  saleId: string;
   generateInvoice: GenerateInvoiceUseCase;
   printInvoices: PrintInvoicesUseCase;
+  onClose: () => void;
 }
 
-export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePreviewProps) {
+export function InvoicePreview({ saleId, generateInvoice, printInvoices, onClose }: InvoicePreviewProps) {
   const { t } = useLocale();
-  const { saleId } = useParams();
   const loaded = useInvoiceDocument(saleId, generateInvoice);
   const printing = usePrintInvoices(printInvoices);
   const document = loaded.document;
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || dialog.open) {
+      return;
+    }
+    dialog.showModal();
+    return () => {
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
+  }, []);
 
   return (
-    <section className="stack">
-      <ScreenTitle>{t('invoicePreview')}</ScreenTitle>
-      {loaded.loading ? <StatusMessage tone="info">{t('invoiceLoadLoading')}</StatusMessage> : null}
-      {loaded.error ? (
-        <StatusMessage tone={loaded.errorKind === 'business' ? 'warning' : 'error'}>
-          <p>{t(loaded.error)}</p>
-          <div className="row">
-            <button className="btn" type="button" onClick={loaded.retry}>
-              {t('retryInvoice')}
-            </button>
-          </div>
-        </StatusMessage>
-      ) : null}
-      {printing.error ? <StatusMessage tone="error">{t(printing.error)}</StatusMessage> : null}
-      {document ? (
-        <>
+    <dialog
+      ref={dialogRef}
+      className="modal invoice-preview-modal"
+      aria-labelledby="invoice-preview-title"
+      onCancel={event => {
+        event.preventDefault();
+        if (!printing.printing) {
+          onClose();
+        }
+      }}
+      onClick={event => {
+        if (event.target === event.currentTarget && !printing.printing) {
+          onClose();
+        }
+      }}
+    >
+      <div className="modal-toolbar">
+        <h2 id="invoice-preview-title">{t('invoicePreview')}</h2>
+        <button className="modal-x" type="button" aria-label={t('close')} disabled={printing.printing} onClick={onClose}>
+          <X aria-hidden="true" strokeWidth={2.2} />
+        </button>
+      </div>
+      <p className="invoice-preview-note">{document?.voided ? t('invoicePreviewVoidNote') : t('invoicePreviewNote')}</p>
+      <div className="modal-scroll">
+        {loaded.loading ? <StatusMessage tone="info">{t('invoiceLoadLoading')}</StatusMessage> : null}
+        {loaded.error ? (
+          <StatusMessage tone={loaded.errorKind === 'business' ? 'warning' : 'error'}>
+            <p>{t(loaded.error)}</p>
+            <div className="row">
+              <button className="btn" type="button" onClick={loaded.retry}>
+                {t('retryInvoice')}
+              </button>
+            </div>
+          </StatusMessage>
+        ) : null}
+        {printing.error ? <StatusMessage tone="error">{t(printing.error)}</StatusMessage> : null}
+        {document ? (
           <article className="invoice-sheet">
             {document.voided ? <p className="invoice-void-mark">ANULADA</p> : null}
             {document.logo ? <img className="invoice-logo" alt="" src={document.logo} /> : null}
@@ -125,13 +161,21 @@ export function InvoicePreview({ generateInvoice, printInvoices }: InvoicePrevie
               <span>{formatCurrency(document.total)}</span>
             </p>
           </article>
-          {document.voided ? null : (
-            <button className="btn" type="button" disabled={printing.printing} onClick={() => void printing.print([saleId ?? ''])}>
-              {printing.printing ? t('invoicePrinting') : t('reprint')}
-            </button>
-          )}
-        </>
-      ) : null}
-    </section>
+        ) : null}
+      </div>
+      <div className="modal-actions modal-actions-end">
+        <button className="btn btn-secondary" type="button" disabled={printing.printing} onClick={onClose}>
+          {t('close')}
+        </button>
+        <button
+          className="btn"
+          type="button"
+          disabled={printing.printing || !document || document.voided}
+          onClick={() => void printing.print([saleId])}
+        >
+          {printing.printing ? t('invoicePrinting') : t('reprint')}
+        </button>
+      </div>
+    </dialog>
   );
 }

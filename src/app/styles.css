@@ -1171,12 +1171,14 @@ button.btn.search-submit {
   padding-left: 1.25rem;
 }
 
-.line-fold svg {
-  transform: rotate(-90deg);
+.line-summary .customer-fold,
+.line-group .customer-fold {
+  justify-self: end;
 }
 
-.line-fold[aria-expanded='true'] svg {
-  transform: rotate(0deg);
+.line-summary .customer-fold svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .line-edit-actions {
@@ -1799,7 +1801,7 @@ dialog.pending-modal {
   right: 1rem;
   bottom: 5.25rem;
   z-index: 30;
-  max-width: min(22rem, calc(100vw - 2rem));
+  max-width: min(32rem, calc(100vw - 2rem));
   box-shadow: 0 16px 40px rgb(10 79 90 / 16%);
   animation: app-toast-in 0.28s ease;
 }
@@ -2609,17 +2611,57 @@ code {
   }
 }
 
+dialog.invoice-preview-modal {
+  width: min(34rem, calc(100vw - 2rem));
+  padding: 1.1rem 1.25rem 1rem;
+  overflow: hidden;
+}
+
+.invoice-preview-modal .modal-toolbar h2 {
+  margin: 0;
+  font-family: Fraunces, Georgia, serif;
+  color: var(--deep);
+}
+
+.invoice-preview-note {
+  margin: 0.35rem 0 0.75rem;
+  color: var(--muted);
+}
+
+.invoice-preview-modal .modal-scroll {
+  padding: 0.15rem;
+  background: #e9efef;
+  border-radius: 14px;
+}
+
+.invoice-preview-modal .modal-actions {
+  margin-top: 0.9rem;
+}
+
+@media (max-width: 45rem) {
+  dialog.invoice-preview-modal {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 94dvh;
+    border-radius: 20px 20px 0 0;
+    transform: none;
+  }
+}
+
 .invoice-sheet {
   position: relative;
   box-sizing: border-box;
-  width: min(100%, 36rem);
+  width: min(100%, 28rem);
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 0.9rem;
   overflow: hidden;
   color: #000;
   background: #fff;
   border: 1px solid #000;
-  font: 17px "Courier New", Courier, monospace;
+  font: 15px "Courier New", Courier, monospace;
   text-align: center;
 }
 
@@ -2645,19 +2687,19 @@ code {
 
 .invoice-logo {
   display: block;
-  width: min(100%, 22rem);
+  width: min(100%, 16rem);
   height: auto;
-  margin: 0 auto 1.25rem;
+  margin: 0 auto 0.85rem;
 }
 
 .invoice-name {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .invoice-sheet .small {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .invoice-sheet .b,
@@ -2673,7 +2715,7 @@ code {
 
 .invoice-sheet table {
   width: 100%;
-  margin-top: 1.75rem;
+  margin-top: 1.15rem;
   border-collapse: collapse;
   table-layout: fixed;
   text-align: left;
@@ -2681,9 +2723,9 @@ code {
 
 .invoice-sheet th,
 .invoice-sheet td {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 0.35rem 0.25rem;
+  padding: 0.25rem 0.2rem;
   vertical-align: top;
   overflow-wrap: anywhere;
 }
@@ -2694,7 +2736,7 @@ code {
 }
 
 .invoice-sheet th {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
@@ -2708,7 +2750,7 @@ code {
 }
 
 .invoice-sheet .num {
-  font-size: 14px;
+  font-size: 13px;
   text-align: right;
   white-space: nowrap;
 }
@@ -2741,7 +2783,7 @@ code {
 }
 
 .invoice-sheet hr.invoice-before-total {
-  margin: 3.5rem 0 2rem;
+  margin: 2.25rem 0 1.25rem;
 }
 
 .invoice-total,

@@ -9,7 +9,6 @@ import { SelectedCustomer } from '@/app/SelectedCustomer';
 import type { AppContainer } from '@/app/composition';
 import { CustomerList } from '@/modules/customers/adapters/ui/views/CustomerList';
 import { SaleCustomerChoice } from '@/modules/customers/adapters/ui/views/SaleCustomerChoice';
-import { InvoicePreview } from '@/modules/fulfillment-output/adapters/ui/views/InvoicePreview';
 import { LoadSheetList } from '@/modules/fulfillment-output/adapters/ui/views/LoadSheetList';
 import { useConfirmSale } from '@/modules/sales/adapters/ui/hooks/useConfirmSale';
 import { saleErrorKey } from '@/modules/sales/adapters/ui/hooks/saleErrorKey';
@@ -80,6 +79,7 @@ function DeliverySalesPage({ container }: { container: AppContainer }) {
       listDeliverySales={container.listDeliverySales}
       voidSale={container.voidSale}
       printInvoices={container.printInvoices}
+      generateInvoice={container.generateInvoice}
     />
   );
 }
@@ -453,10 +453,6 @@ export function App({ container }: AppProps) {
                 />
               </RetailSection>
             }
-          />
-          <Route
-            path="/invoices/:saleId"
-            element={<InvoicePreview generateInvoice={container.generateInvoice} printInvoices={container.printInvoices} />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

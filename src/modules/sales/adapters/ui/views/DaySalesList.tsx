@@ -1,14 +1,19 @@
-import { Ban, ChevronRight, Eye, Receipt } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { Ban, ChevronLeft, ChevronRight, Eye, Printer, Receipt, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 import { usePrintInvoices } from '@/modules/fulfillment-output/adapters/ui/hooks/usePrintInvoices';
+import { InvoicePreview } from '@/modules/fulfillment-output/adapters/ui/views/InvoicePreview';
+import type { GenerateInvoiceUseCase } from '@/modules/fulfillment-output/application/use-cases/generateInvoice.useCase';
 import type { PrintInvoicesUseCase } from '@/modules/fulfillment-output/application/use-cases/printInvoices.useCase';
 import { useDeliverySales } from '@/modules/sales/adapters/ui/hooks/useDeliverySales';
 import { useVoidListedSale } from '@/modules/sales/adapters/ui/hooks/useVoidListedSale';
 import type { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application/use-cases/listSalesByDeliveryDate.useCase';
 import type { VoidSaleUseCase } from '@/modules/sales/application/use-cases/voidSale.useCase';
+import { addBusinessDays, businessToday } from '@/modules/sales/domain/deliveryDays';
+import type { DaySaleModel, DaySaleStatus } from '@/modules/sales/domain/models/daySale';
 import { canPreviewInvoice, canVoidSale } from '@/modules/sales/domain/saleStatus';
 import { formatCurrency } from '@/shared/domain/money';
+import type { MessageKey } from '@/shared/i18n/messages';
 import { useLocale } from '@/shared/i18n/useLocale';
 import { ScreenTitle } from '@/shared/ui/BackButton';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
@@ -31,149 +36,275 @@ function formatDeliveryHeading(value: string, locale: string): string {
   return cleaned.charAt(0).toLocaleUpperCase(language) + cleaned.slice(1);
 }
 
+function countLabel(count: number, one: MessageKey, many: MessageKey, t: (key: MessageKey) => string): string {
+  return count === 1 ? t(one) : t(many).replace('{count}', String(count));
+}
+
+function invoiceLabel(sale: DaySaleModel, t: (key: MessageKey) => string): string {
+  return sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : t('noInvoice');
+}
+
 const statusKey = {
   DRAFT: 'statusDraft',
   CONFIRMED: 'statusConfirmed',
   VOIDED: 'statusVoided'
 } as const;
 
+type StatusFilter = 'all' | DaySaleStatus;
+
 interface DaySalesListProps {
   deliveryDate?: string;
   listDeliverySales: ListSalesByDeliveryDateUseCase;
   voidSale: VoidSaleUseCase;
   printInvoices: PrintInvoicesUseCase;
+  generateInvoice: GenerateInvoiceUseCase;
 }
 
-export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printInvoices }: DaySalesListProps) {
+export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printInvoices, generateInvoice }: DaySalesListProps) {
   const { t, locale } = useLocale();
+  const [, setParams] = useSearchParams();
+  const today = businessToday();
   const listed = useDeliverySales(deliveryDate, listDeliverySales);
   const voiding = useVoidListedSale(voidSale, listed.reload);
   const printing = usePrintInvoices(printInvoices);
   const [pendingVoidId, setPendingVoidId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<StatusFilter>('all');
+  const [query, setQuery] = useState('');
+  const [previewId, setPreviewId] = useState<string | null>(null);
+
   const printable = listed.sales.filter(sale => canPreviewInvoice(sale.status));
+  const visible = useMemo(() => {
+    const terms = query
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    return listed.sales.filter(sale => {
+      if (filter !== 'all' && sale.status !== filter) {
+        return false;
+      }
+      const haystack = `${sale.customerName} ${invoiceLabel(sale, t)}`
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+      return terms.every(term => haystack.includes(term));
+    });
+  }, [listed.sales, filter, query, t]);
+  const visiblePrintable = visible.filter(sale => canPreviewInvoice(sale.status));
+  const selectedVisible = visiblePrintable.filter(sale => selected.includes(sale.id));
+  const allChecked = visiblePrintable.length > 0 && selectedVisible.length === visiblePrintable.length;
+
+  function selectDate(date: string) {
+    setQuery('');
+    setSelected([]);
+    setParams({ deliveryDate: date });
+  }
+
+  function shift(days: number) {
+    if (!deliveryDate) {
+      return;
+    }
+    const next = addBusinessDays(deliveryDate, days);
+    if (next) {
+      selectDate(next);
+    }
+  }
 
   function toggle(saleId: string) {
     setSelected(current => (current.includes(saleId) ? current.filter(id => id !== saleId) : [...current, saleId]));
   }
 
+  function selectAll(on: boolean) {
+    const ids = visiblePrintable.map(sale => sale.id);
+    setSelected(current => (on ? [...new Set([...current, ...ids])] : current.filter(id => !ids.includes(id))));
+  }
+
+  const counts = {
+    all: listed.sales.length,
+    CONFIRMED: listed.sales.filter(sale => sale.status === 'CONFIRMED').length,
+    DRAFT: listed.sales.filter(sale => sale.status === 'DRAFT').length,
+    VOIDED: listed.sales.filter(sale => sale.status === 'VOIDED').length
+  };
+  const confirmedTotal = printable.reduce((sum, sale) => sum + sale.total, 0);
+
   return (
-    <section className="stack">
-      <div>
-        <ScreenTitle>{t('deliverySales')}</ScreenTitle>
-        {deliveryDate ? <p className="load-sheet-date">{formatDeliveryHeading(deliveryDate, locale)}</p> : null}
+    <section className="stack deliveries">
+      <ScreenTitle>{t('deliverySales')}</ScreenTitle>
+      {deliveryDate ? (
+        <div className="dl-dnav">
+          <button className="dl-ib" type="button" aria-label={t('previousDay')} onClick={() => shift(-1)}>
+            <ChevronLeft aria-hidden="true" strokeWidth={2.4} />
+          </button>
+          <div className="dl-dnav-title">
+            <b>{formatDeliveryHeading(deliveryDate, locale)}</b>
+            <small>
+              {listed.loading
+                ? t('daySalesLoading')
+                : listed.sales.length
+                  ? `${countLabel(listed.sales.length, 'saleCountOne', 'saleCount', t)} · ${countLabel(printable.length, 'confirmedCountOne', 'confirmedCount', t)} · ${formatCurrency(confirmedTotal)}`
+                  : t('noConfirmedSales')}
+            </small>
+          </div>
+          <button className="dl-ib" type="button" aria-label={t('nextDay')} onClick={() => shift(1)}>
+            <ChevronRight aria-hidden="true" strokeWidth={2.4} />
+          </button>
+          <button className="dl-link" type="button" onClick={() => selectDate(today)}>
+            {t('today')}
+          </button>
+        </div>
+      ) : null}
+
+      <div className="dl-tools">
+        <button className="dl-out" type="button" disabled={printing.printing || selectedVisible.length === 0} onClick={() => void printing.print(selectedVisible.map(sale => sale.id))}>
+          <Printer aria-hidden="true" strokeWidth={1.8} />
+          {printing.printing
+            ? t('invoicePrinting')
+            : selectedVisible.length
+              ? `${t('printSelected')} (${selectedVisible.length})`
+              : t('printSelected')}
+        </button>
+        <button className="dl-main" type="button" disabled={printing.printing || printable.length === 0} onClick={() => void printing.print(printable.map(sale => sale.id))}>
+          <Printer aria-hidden="true" strokeWidth={1.8} />
+          {t('printAll')} ({printable.length})
+        </button>
       </div>
+      <p className="dl-hint">{t('deliverySalesHint')}</p>
+
       {listed.loading ? <StatusMessage tone="info">{t('daySalesLoading')}</StatusMessage> : null}
       {listed.error ? <StatusMessage tone="error">{t(listed.error)}</StatusMessage> : null}
       {voiding.error && !pendingVoidId ? <StatusMessage tone="error">{t(voiding.error)}</StatusMessage> : null}
       {printing.error ? <StatusMessage tone="error">{t(printing.error)}</StatusMessage> : null}
-      {!listed.loading && !listed.error && listed.sales.length === 0 ? (
-        <StatusMessage tone="info">{t('deliverySalesEmpty')}</StatusMessage>
-      ) : null}
-      {printable.length > 0 ? (
-        <div className="row day-sales-print">
-          <button className="btn btn-secondary" type="button" disabled={printing.printing || selected.length === 0} onClick={() => void printing.print(selected)}>
-            {printing.printing ? t('invoicePrinting') : t('printSelected')}
-          </button>
-          <button
-            className="btn btn-secondary"
-            type="button"
-            disabled={printing.printing || printable.length === 0}
-            onClick={() => void printing.print(printable.map(sale => sale.id))}
-          >
-            {t('printAll')}
-          </button>
+
+      <div className="dl-filters">
+        <div className="dl-chips" role="group" aria-label={t('filterByStatus')}>
+          {(
+            [
+              ['all', t('filterAll'), counts.all],
+              ['CONFIRMED', t('statusConfirmed'), counts.CONFIRMED],
+              ['DRAFT', t('statusDraft'), counts.DRAFT],
+              ['VOIDED', t('statusVoided'), counts.VOIDED]
+            ] as const
+          ).map(([key, label, count]) => (
+            <button key={key} className="dl-chip" type="button" aria-pressed={filter === key} onClick={() => setFilter(key)}>
+              {label}
+              <b>{count}</b>
+            </button>
+          ))}
+        </div>
+        <label className="dl-search">
+          <Search aria-hidden="true" strokeWidth={2.2} />
+          <input
+            type="search"
+            value={query}
+            placeholder={t('searchDeliveries')}
+            aria-label={t('searchDeliveries')}
+            autoComplete="off"
+            onChange={event => setQuery(event.target.value)}
+          />
+        </label>
+      </div>
+
+      <label className="dl-selbar">
+        <input
+          className="dl-chk"
+          type="checkbox"
+          checked={allChecked}
+          disabled={visiblePrintable.length === 0 || printing.printing}
+          onChange={event => selectAll(event.target.checked)}
+        />
+        {t('selectConfirmed')}
+      </label>
+
+      {!listed.loading && !listed.error && visible.length === 0 ? (
+        <div className="dl-empty">
+          <h3>{listed.sales.length ? t('deliveriesNoMatch') : t('deliveriesEmptyTitle')}</h3>
+          <p>{listed.sales.length ? t('deliveriesNoMatchHint') : t('deliveriesEmptyHint')}</p>
         </div>
       ) : null}
-      <ul className="day-sales-cards">
-        {listed.sales.map(sale => {
-          const open = openId === sale.id;
-          return (
-            <li key={sale.id} className="card day-sale-card">
-              <button
-                className={open ? 'day-sale-summary open' : 'day-sale-summary'}
-                type="button"
-                aria-expanded={open}
-                aria-label={`${sale.customerName}, ${t(statusKey[sale.status])}, ${formatCurrency(sale.total)}. ${open ? t('hideSaleDetail') : t('showSaleDetail')}`}
-                onClick={() => setOpenId(open ? null : sale.id)}
-              >
-                <span className="day-sale-name">{sale.customerName}</span>
-                <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
-                <span className="day-sale-total">{formatCurrency(sale.total)}</span>
-                <ChevronRight aria-hidden="true" strokeWidth={1.8} />
-              </button>
-              {open ? (
-                <div className="day-sale-detail">
-                  <span>{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</span>
-                  <span className="day-sale-actions">
-                    <SaleAction
-                      sale={sale}
-                      voidingId={voiding.voidingId}
-                      pendingVoidId={pendingVoidId}
-                      onVoid={setPendingVoidId}
-                    />
-                  </span>
-                </div>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-      <table className="day-sales-table">
-        <thead>
-          <tr>
-            <th className="day-sales-pick" />
-            <th>{t('customerName')}</th>
-            <th>{t('status')}</th>
-            <th>{t('invoice')}</th>
-            <th className="day-sales-total">{t('saleTotal')}</th>
-            <th className="day-sales-action" />
-            <th className="day-sales-action" />
-            <th className="day-sales-action" />
-          </tr>
-        </thead>
-        <tbody>
-          {listed.sales.map(sale => (
-            <tr key={sale.id}>
-              {canPreviewInvoice(sale.status) ? (
-                <td className="day-sales-pick">
-                  <label className="day-sales-check">
-                    <input
-                      type="checkbox"
-                      aria-label={sale.invoiceNumber ?? sale.customerName}
-                      checked={selected.includes(sale.id)}
-                      disabled={printing.printing}
-                      onChange={() => toggle(sale.id)}
-                    />
-                  </label>
-                </td>
-              ) : (
-                <td className="day-sales-pick" />
-              )}
-              <td>
-                <b>{sale.customerName}</b>
-              </td>
-              <td>
-                <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
-              </td>
-              <td className="m">{sale.invoiceNumber ? `${t('invoice')} ${sale.invoiceNumber}` : ''}</td>
-              <td className="m day-sales-total">{formatCurrency(sale.total)}</td>
-              <SaleAction
-                sale={sale}
-                voidingId={voiding.voidingId}
-                pendingVoidId={pendingVoidId}
-                onVoid={setPendingVoidId}
-                asCells
+
+      {visible.length > 0 ? (
+        <section className="dl-panel" aria-label={t('deliverySales')}>
+          <div className="dl-row dl-head">
+            <span>
+              <input
+                className="dl-chk"
+                type="checkbox"
+                aria-label={t('selectConfirmed')}
+                checked={allChecked}
+                disabled={visiblePrintable.length === 0 || printing.printing}
+                onChange={event => selectAll(event.target.checked)}
               />
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            </span>
+            <span>{t('lineName')}</span>
+            <span>{t('status')}</span>
+            <span className="dl-inv">{t('invoice')}</span>
+            <span className="dl-num">{t('saleTotalShort')}</span>
+            <span className="dl-num">{t('actions')}</span>
+          </div>
+          {visible.map(sale => {
+            const printableSale = canPreviewInvoice(sale.status);
+            return (
+              <div key={sale.id} className={sale.status === 'VOIDED' ? 'dl-row dl-void' : 'dl-row'}>
+                <span className="dl-chk-cell">
+                  <input
+                    className="dl-chk"
+                    type="checkbox"
+                    aria-label={sale.invoiceNumber ?? sale.customerName}
+                    checked={printableSale && selected.includes(sale.id)}
+                    disabled={!printableSale || printing.printing}
+                    title={printableSale ? undefined : t('invoiceNotPrintable')}
+                    onChange={() => toggle(sale.id)}
+                  />
+                </span>
+                <span className="dl-name">
+                  <b>{sale.customerName}</b>
+                  <small>
+                    {invoiceLabel(sale, t)}
+                    {printableSale ? '' : ` · ${t('cannotPrint')}`}
+                  </small>
+                </span>
+                <span className="dl-st">
+                  <span className={`tag tag-${sale.status.toLowerCase()}`}>{t(statusKey[sale.status])}</span>
+                </span>
+                <span className="dl-inv">{invoiceLabel(sale, t)}</span>
+                <span className="dl-tot dl-num">{formatCurrency(sale.total)}</span>
+                <span className="dl-act">
+                  <SaleAction
+                  sale={sale}
+                  voidingId={voiding.voidingId}
+                  pendingVoidId={pendingVoidId}
+                  onVoid={setPendingVoidId}
+                  onPreview={setPreviewId}
+                />
+                </span>
+              </div>
+            );
+          })}
+        </section>
+      ) : null}
+
+      <div className={selectedVisible.length > 0 ? 'dl-bar on' : 'dl-bar'}>
+        <b>{countLabel(selectedVisible.length, 'selectedCountOne', 'selectedCount', t)}</b>
+        <button className="dl-main" type="button" disabled={printing.printing} onClick={() => void printing.print(selectedVisible.map(sale => sale.id))}>
+          <Printer aria-hidden="true" strokeWidth={1.8} />
+          {t('printSelected')}
+        </button>
+      </div>
+
+      {previewId ? (
+        <InvoicePreview
+          saleId={previewId}
+          generateInvoice={generateInvoice}
+          printInvoices={printInvoices}
+          onClose={() => setPreviewId(null)}
+        />
+      ) : null}
       {pendingVoidId ? (
         <ConfirmDialog
-          title={t('voidSale')}
-          message={t('confirmVoid')}
+          title={t('confirmVoid')}
           confirmLabel={voiding.voidingId === pendingVoidId ? t('voidingSale') : t('confirmAction')}
           cancelLabel={t('cancelAction')}
           busy={voiding.voidingId === pendingVoidId}
@@ -198,53 +329,52 @@ function SaleAction({
   voidingId,
   pendingVoidId,
   onVoid,
-  asCells = false
+  onPreview
 }: {
-  sale: { id: string; status: 'DRAFT' | 'CONFIRMED' | 'VOIDED'; invoiceNumber: string | null };
+  sale: DaySaleModel;
   voidingId: string | null;
   pendingVoidId: string | null;
   onVoid: (saleId: string) => void;
-  asCells?: boolean;
+  onPreview: (saleId: string) => void;
 }) {
   const { t } = useLocale();
   const preview =
     canPreviewInvoice(sale.status) || sale.status === 'VOIDED' ? (
-      <Link className="btn icon-btn icon-preview" to={`/invoices/${sale.id}`} aria-label={t('invoicePreview')}>
+      <button className="dl-ab dl-pv" type="button" aria-label={t('invoicePreview')} onClick={() => onPreview(sale.id)}>
         <Receipt aria-hidden="true" strokeWidth={1.8} />
+      </button>
+    ) : (
+      <span />
+    );
+  const view =
+    sale.status === 'CONFIRMED' ? (
+      <Link className="dl-ab dl-vw" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('viewSale')}>
+        <Eye aria-hidden="true" strokeWidth={1.8} />
+        <span className="dl-lb">{t('viewSale')}</span>
       </Link>
-    ) : null;
-  const view = sale.status === 'CONFIRMED' ? (
-    <Link className="btn icon-btn icon-view" to={`/sales?saleId=${encodeURIComponent(sale.id)}`} aria-label={t('viewSale')}>
-      <Eye aria-hidden="true" strokeWidth={1.8} />
-    </Link>
-  ) : null;
+    ) : (
+      <span />
+    );
   const voidAction = canVoidSale(sale.status) ? (
     <button
-      className="btn icon-btn icon-void"
+      className="dl-ab dl-cn"
       type="button"
       aria-label={t('voidSale')}
       disabled={voidingId !== null || pendingVoidId === sale.id}
       onClick={() => onVoid(sale.id)}
     >
       <Ban aria-hidden="true" strokeWidth={1.8} />
+      <span className="dl-lb">{t('voidSale')}</span>
     </button>
-  ) : null;
-
-  if (asCells) {
-    return (
-      <>
-        <td className="day-sales-action">{preview}</td>
-        <td className="day-sales-action">{view}</td>
-        <td className="day-sales-action">{voidAction}</td>
-      </>
-    );
-  }
+  ) : (
+    <span />
+  );
 
   return (
     <>
-      <span className="day-sale-action">{preview}</span>
-      <span className="day-sale-action">{view}</span>
-      <span className="day-sale-action">{voidAction}</span>
+      {preview}
+      {view}
+      {voidAction}
     </>
   );
 }
