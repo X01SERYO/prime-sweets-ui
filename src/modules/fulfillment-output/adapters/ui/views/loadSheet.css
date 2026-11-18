@@ -10,7 +10,14 @@
 }
 
 .ls-dnav-title {
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 22rem;
+  max-width: calc(100% - 8.5rem);
+  flex: none;
+  min-height: 3.4rem;
+  text-align: center;
 }
 
 .ls-dnav-title b {
