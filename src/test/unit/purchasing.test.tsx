@@ -173,7 +173,7 @@ test('the supplier list creates, renames, and reports a failed load', async () =
       createSupplier={{ execute: async (name: string) => ({ id: 'sup-3', name }) }}
       renameSupplier={{
         execute: async (_id: string, name: string) => {
-          if (name === 'Malo') throw new PurchaseInvalidError('SUPPLIER_NAME_TAKEN');
+          if (name.toLocaleUpperCase('es-CO') === 'MALO') throw new PurchaseInvalidError('SUPPLIER_NAME_TAKEN');
         }
       }}
     />
@@ -182,24 +182,26 @@ test('the supplier list creates, renames, and reports a failed load', async () =
   assert.ok(screen.getByRole('link', { name: 'Editar último pedido' }));
   assert.ok(screen.getByRole('button', { name: 'Editar último pedido' }).hasAttribute('disabled'));
 
-  fireEvent.click(screen.getAllByRole('button', { name: 'Editar proveedor' })[0]);
+  const rename = () => screen.getAllByRole('button', { name: /Editar proveedor|Guardar proveedor/ })[0];
+  fireEvent.click(rename());
   fireEvent.keyDown(screen.getByDisplayValue('Andina'), { key: 'Escape' });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Editar proveedor' })[0]);
+  fireEvent.click(rename());
   fireEvent.keyDown(screen.getByDisplayValue('Andina'), { key: 'Enter' });
 
-  fireEvent.click(screen.getAllByRole('button', { name: 'Editar proveedor' })[0]);
+  fireEvent.click(rename());
   fireEvent.change(screen.getByDisplayValue('Andina'), { target: { value: 'Andina Sur' } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Editar proveedor' })[0]);
-  await screen.findByText('Andina Sur');
+  fireEvent.click(rename());
+  await screen.findByText('ANDINA SUR');
 
-  fireEvent.click(screen.getAllByRole('button', { name: 'Editar proveedor' })[0]);
-  fireEvent.change(screen.getByDisplayValue('Andina Sur'), { target: { value: 'Malo' } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Editar proveedor' })[0]);
+  fireEvent.click(rename());
+  fireEvent.change(screen.getByDisplayValue('ANDINA SUR'), { target: { value: 'Malo' } });
+  fireEvent.click(rename());
   await screen.findByText('SUPPLIER_NAME_TAKEN');
 
+  fireEvent.click(screen.getByRole('button', { name: 'Nuevo proveedor' }));
   fireEvent.change(document.getElementById('supplier-name')!, { target: { value: 'Nuevo' } });
   fireEvent.click(screen.getByRole('button', { name: 'Crear proveedor' }));
-  await waitFor(() => assert.equal((document.getElementById('supplier-name') as HTMLInputElement).value, 'Nuevo'));
+  await waitFor(() => assert.equal((document.getElementById('supplier-name') as HTMLInputElement).value, 'NUEVO'));
 });
 
 test('a new order and the last order save the typed quantity', async () => {

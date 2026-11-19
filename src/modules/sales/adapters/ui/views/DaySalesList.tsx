@@ -144,7 +144,7 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
               {listed.loading
                 ? t('daySalesLoading')
                 : listed.sales.length
-                  ? `${countLabel(listed.sales.length, 'saleCountOne', 'saleCount', t)} · ${countLabel(printable.length, 'confirmedCountOne', 'confirmedCount', t)} · ${formatCurrency(confirmedTotal)}`
+                  ? `${countLabel(listed.sales.length, 'saleCountOne', 'saleCount', t)} · ${countLabel(printable.length, 'confirmedCountOne', 'confirmedInvoiceCount', t)} · ${formatCurrency(confirmedTotal)}`
                   : t('noConfirmedSales')}
             </small>
           </div>
