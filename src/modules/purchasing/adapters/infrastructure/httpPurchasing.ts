@@ -17,7 +17,11 @@ interface Envelope {
 }
 
 export class HttpPurchasing implements PurchasingPort {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http: HttpClient;
+
+  constructor(http: HttpClient) {
+    this.http = http;
+  }
 
   listSuppliers(): Promise<SupplierListItem[]> {
     return this.read('/suppliers', toSupplierList);

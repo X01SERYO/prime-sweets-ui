@@ -3,7 +3,11 @@ import type { PurchaseOrder, PurchaseOrderPage } from '@/modules/purchasing/doma
 import type { SupplierListItem, SupplierSheet } from '@/modules/purchasing/domain/models/supplier';
 
 export class ListSuppliersUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(): Promise<SupplierListItem[]> {
     return this.purchasing.listSuppliers();
@@ -11,7 +15,11 @@ export class ListSuppliersUseCase {
 }
 
 export class CreateSupplierUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(name: string): Promise<{ id: string; name: string }> {
     return this.purchasing.createSupplier(name);
@@ -19,7 +27,11 @@ export class CreateSupplierUseCase {
 }
 
 export class RenameSupplierUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(id: string, name: string): Promise<void> {
     return this.purchasing.renameSupplier(id, name);
@@ -27,7 +39,11 @@ export class RenameSupplierUseCase {
 }
 
 export class GetSupplierUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(id: string): Promise<SupplierSheet> {
     return this.purchasing.getSupplier(id);
@@ -35,7 +51,11 @@ export class GetSupplierUseCase {
 }
 
 export class SetSupplierProductsUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(id: string, productIds: string[]): Promise<SupplierSheet> {
     return this.purchasing.setSupplierProducts(id, productIds);
@@ -43,7 +63,11 @@ export class SetSupplierProductsUseCase {
 }
 
 export class CreatePurchaseOrderUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(
     supplierId: string,
@@ -55,7 +79,11 @@ export class CreatePurchaseOrderUseCase {
 }
 
 export class UpdatePurchaseOrderUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(
     orderId: string,
@@ -67,7 +95,11 @@ export class UpdatePurchaseOrderUseCase {
 }
 
 export class ListPurchaseOrdersUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(supplierId: string, page: number, pageSize: number): Promise<PurchaseOrderPage> {
     return this.purchasing.listPurchaseOrders(supplierId, page, pageSize);
@@ -75,7 +107,11 @@ export class ListPurchaseOrdersUseCase {
 }
 
 export class GetPurchaseOrderUseCase {
-  constructor(private readonly purchasing: PurchasingPort) {}
+  private readonly purchasing: PurchasingPort;
+
+  constructor(purchasing: PurchasingPort) {
+    this.purchasing = purchasing;
+  }
 
   execute(id: string): Promise<PurchaseOrder> {
     return this.purchasing.getPurchaseOrder(id);

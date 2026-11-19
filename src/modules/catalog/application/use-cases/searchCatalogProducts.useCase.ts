@@ -1,7 +1,11 @@
 import type { CatalogProductPage, CatalogProductPort } from '@/modules/catalog/application/ports/catalogProduct.port';
 
 export class SearchCatalogProductsUseCase {
-  constructor(private readonly catalog: CatalogProductPort) {}
+  private readonly catalog: CatalogProductPort;
+
+  constructor(catalog: CatalogProductPort) {
+    this.catalog = catalog;
+  }
 
   async execute(page: number, pageSize: number, query?: string, brands?: string[]): Promise<CatalogProductPage> {
     const term = query?.trim() ?? '';

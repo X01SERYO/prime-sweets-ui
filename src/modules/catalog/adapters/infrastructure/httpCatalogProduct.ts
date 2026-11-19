@@ -10,7 +10,11 @@ interface Envelope {
 }
 
 export class HttpCatalogProduct implements CatalogProductPort {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http: HttpClient;
+
+  constructor(http: HttpClient) {
+    this.http = http;
+  }
 
   async list(page: number, pageSize: number, query?: string, brands?: string[]): Promise<CatalogProductPage> {
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });

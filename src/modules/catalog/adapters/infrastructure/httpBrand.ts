@@ -20,7 +20,11 @@ function toBrand(value: unknown): Brand {
 }
 
 export class HttpBrand implements BrandPort {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http: HttpClient;
+
+  constructor(http: HttpClient) {
+    this.http = http;
+  }
 
   async list(): Promise<Brand[]> {
     const body = await this.http.get<Envelope>('/brands');

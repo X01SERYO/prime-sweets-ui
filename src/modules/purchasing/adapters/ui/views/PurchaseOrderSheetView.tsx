@@ -64,7 +64,7 @@ export function PurchaseOrderSheetView({ supplierId, getSupplier, createPurchase
   function update(productId: string, patch: Partial<DraftRow>) {
     setDrafts(current => ({
       ...current,
-      [productId]: { quantity: '', itemName: '', ...current[productId], ...patch }
+      [productId]: { ...(current[productId] ?? { quantity: '', itemName: '' }), ...patch }
     }));
   }
 

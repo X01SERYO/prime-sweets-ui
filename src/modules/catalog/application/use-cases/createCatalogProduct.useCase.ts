@@ -2,7 +2,11 @@ import type { CatalogProductPort } from '@/modules/catalog/application/ports/cat
 import type { CatalogProduct, CatalogProductCreate } from '@/modules/catalog/domain/models/catalogProduct';
 
 export class CreateCatalogProductUseCase {
-  constructor(private readonly catalog: CatalogProductPort) {}
+  private readonly catalog: CatalogProductPort;
+
+  constructor(catalog: CatalogProductPort) {
+    this.catalog = catalog;
+  }
 
   async execute(input: CatalogProductCreate): Promise<CatalogProduct> {
     return this.catalog.create(input);
