@@ -8,7 +8,7 @@ export interface CatalogProductPage {
 }
 
 export interface CatalogProductPort {
-  list(page: number, pageSize: number, query?: string): Promise<CatalogProductPage>;
+  list(page: number, pageSize: number, query?: string, brands?: string[]): Promise<CatalogProductPage>;
   update(id: string, patch: CatalogProductPatch): Promise<CatalogProduct>;
   create(input: CatalogProductCreate): Promise<CatalogProduct>;
 }

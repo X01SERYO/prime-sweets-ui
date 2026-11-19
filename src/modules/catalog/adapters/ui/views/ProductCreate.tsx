@@ -18,9 +18,11 @@ interface ProductCreateProps {
   createCatalogProduct: CreateCatalogProductUseCase;
   listBrands: ListBrandsUseCase;
   createBrand: CreateBrandUseCase;
+  onCreated?: (name: string) => void;
+  onCancel?: () => void;
 }
 
-export function ProductCreate({ createCatalogProduct, listBrands, createBrand }: ProductCreateProps) {
+export function ProductCreate({ createCatalogProduct, listBrands, createBrand, onCreated, onCancel }: ProductCreateProps) {
   const { t } = useLocale();
   const navigate = useNavigate();
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -103,7 +105,12 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
         units: unitCount,
         pack: packCount
       });
-      navigate('/products', { state: { createdName: saved.name ?? saved.code } });
+      const createdName = saved.name ?? saved.code;
+      if (onCreated) {
+        onCreated(createdName);
+      } else {
+        navigate('/products', { state: { createdName } });
+      }
     } catch (caught) {
       if (caught instanceof HttpRequestError && caught.code === 'ALEGRA_SYNC_FAILED') {
         setError(alegraSyncText(caught.message, t));
@@ -118,7 +125,7 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
 
   return (
     <section className="stack product-editor">
-      <ScreenTitle>{t('createProduct')}</ScreenTitle>
+      {onCancel ? <h2>{t('createProduct')}</h2> : <ScreenTitle>{t('createProduct')}</ScreenTitle>}
       {error ? <StatusMessage tone="error">{error}</StatusMessage> : null}
       <div className="product-editor-grid">
         <Field label={t('brand')} wide>
@@ -127,7 +134,14 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
               <input
                 value={brandQuery}
                 autoComplete="off"
-                onFocus={() => setBrandListOpen(true)}
+                onFocus={event => {
+                  const input = event.currentTarget;
+                  window.requestAnimationFrame(() => {
+                    if (document.activeElement === input) {
+                      setBrandListOpen(true);
+                    }
+                  });
+                }}
                 onBlur={() => window.setTimeout(() => setBrandListOpen(false), 120)}
                 onChange={event => {
                   const next = event.target.value.toLocaleUpperCase('es-CO');
@@ -220,7 +234,7 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand }:
         </Field>
       </div>
       <div className="product-editor-actions">
-        <button className="btn btn-secondary" type="button" onClick={() => navigate('/products')}>
+        <button className="btn btn-secondary" type="button" onClick={() => (onCancel ? onCancel() : navigate('/products'))}>
           {t('cancelAction')}
         </button>
         <button className="btn" type="button" disabled={!canSave} onClick={() => void save()}>

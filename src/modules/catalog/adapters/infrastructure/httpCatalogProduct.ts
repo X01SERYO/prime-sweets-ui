@@ -12,10 +12,13 @@ interface Envelope {
 export class HttpCatalogProduct implements CatalogProductPort {
   constructor(private readonly http: HttpClient) {}
 
-  async list(page: number, pageSize: number, query?: string): Promise<CatalogProductPage> {
+  async list(page: number, pageSize: number, query?: string, brands?: string[]): Promise<CatalogProductPage> {
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
     if (query) {
       params.set('q', query);
+    }
+    for (const brand of brands ?? []) {
+      params.append('brands', brand);
     }
     const body = await this.http.get<Envelope>(`/products?${params.toString()}`);
     const data = body?.success === true ? body.data : null;

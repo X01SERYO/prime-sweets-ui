@@ -240,11 +240,10 @@ test('the signed-in screens render a sale, the catalog, the load sheet, and an i
   fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: 'SODA EXTRA' } });
   fireEvent.change(screen.getByLabelText('% de ganancia'), { target: { value: '20' } });
   fireEvent.change(screen.getByLabelText('Unidades'), { target: { value: '2' } });
-  fireEvent.change(screen.getByLabelText('Caja'), { target: { value: '4' } });
+  fireEvent.change(screen.getByLabelText('Cajas'), { target: { value: '4' } });
   fireEvent.change(screen.getByLabelText('Venta por mayor'), { target: { value: '1500' } });
   fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
   fireEvent.change(screen.getByLabelText(/buscar producto/i), { target: { value: 'SOD' } });
-  fireEvent.click(screen.getByRole('button', { name: /^buscar$/i }));
   fireEvent.change(screen.getByLabelText(/tamaño|page size|por página/i), { target: { value: '20' } });
   cleanup();
 

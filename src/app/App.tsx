@@ -21,7 +21,6 @@ import { PurchaseOrderView } from '@/modules/purchasing/adapters/ui/views/Purcha
 import { SupplierDetailView } from '@/modules/purchasing/adapters/ui/views/SupplierDetailView';
 import { SupplierListView } from '@/modules/purchasing/adapters/ui/views/SupplierListView';
 import { ProductAdmin } from '@/modules/catalog/adapters/ui/views/ProductAdmin';
-import { ProductCreate } from '@/modules/catalog/adapters/ui/views/ProductCreate';
 import { ProductSearchView } from '@/modules/catalog/adapters/ui/views/ProductSearchView';
 import { LoginView } from '@/modules/identity/adapters/ui/views/LoginView';
 import { WeekHome } from '@/modules/sales/adapters/ui/views/WeekHome';
@@ -395,22 +394,16 @@ export function App({ container }: AppProps) {
           <Route element={session ? <Outlet /> : <ReturnToLogin />}>
           <Route path="/" element={<WeekHome listSales={container.listDeliverySales} />} />
           <Route path="/sales-day" element={<Navigate to="/" replace />} />
-          <Route
-            path="/products/new"
-            element={
-              <ProductCreate
-                createCatalogProduct={container.createCatalogProduct}
-                listBrands={container.listBrands}
-                createBrand={container.createBrand}
-              />
-            }
-          />
+          <Route path="/products/new" element={<Navigate to="/products" replace />} />
           <Route
             path="/products"
             element={
               <ProductAdmin
                 searchCatalogProducts={container.searchCatalogProducts}
                 updateCatalogProduct={container.updateCatalogProduct}
+                createCatalogProduct={container.createCatalogProduct}
+                listBrands={container.listBrands}
+                createBrand={container.createBrand}
               />
             }
           />

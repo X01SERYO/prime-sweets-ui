@@ -1,11 +1,14 @@
-import { Pencil, Search } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Pencil, Plus, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import type { CreateBrandUseCase } from '@/modules/catalog/application/use-cases/createBrand.useCase';
+import type { CreateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/createCatalogProduct.useCase';
+import type { ListBrandsUseCase } from '@/modules/catalog/application/use-cases/listBrands.useCase';
 import type { SearchCatalogProductsUseCase } from '@/modules/catalog/application/use-cases/searchCatalogProducts.useCase';
 import type { UpdateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/updateCatalogProduct.useCase';
+import type { Brand } from '@/modules/catalog/domain/models/brand';
 import type { CatalogProduct, CatalogProductPatch } from '@/modules/catalog/domain/models/catalogProduct';
 import { realMarginPercent, suggestedSalePrice } from '@/modules/catalog/domain/productPricing';
-import { isProductSearchTerm } from '@/modules/catalog/domain/productSearchTerm';
 import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
 import { alegraSyncText } from '@/modules/catalog/adapters/ui/alegraSyncText';
 import { formatCurrency } from '@/shared/domain/money';
@@ -14,12 +17,18 @@ import { ScreenTitle } from '@/shared/ui/BackButton';
 import { AppToast } from '@/shared/ui/AppToast';
 import { Pager } from '@/shared/ui/Pager';
 import { HttpRequestError } from '@/shared/infrastructure/http/httpClient';
+import { ProductCreate } from '@/modules/catalog/adapters/ui/views/ProductCreate';
 import './productAdmin.css';
 
 interface ProductAdminProps {
   searchCatalogProducts: SearchCatalogProductsUseCase;
   updateCatalogProduct: UpdateCatalogProductUseCase;
+  createCatalogProduct: CreateCatalogProductUseCase;
+  listBrands: ListBrandsUseCase;
+  createBrand: CreateBrandUseCase;
 }
+
+type SortKey = 'name' | 'code' | 'brand' | 'price' | 'margin';
 
 type Draft = {
   name: string;
@@ -131,7 +140,13 @@ function patchFor(product: CatalogProduct, draft: Draft): CatalogProductPatch | 
   return Object.keys(patch).length === 0 ? null : patch;
 }
 
-export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: ProductAdminProps) {
+export function ProductAdmin({
+  searchCatalogProducts,
+  updateCatalogProduct,
+  createCatalogProduct,
+  listBrands,
+  createBrand
+}: ProductAdminProps) {
   const { t } = useLocale();
   const location = useLocation();
   const navigate = useNavigate();
@@ -147,30 +162,50 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandQuery, setBrandQuery] = useState('');
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>('code');
+  const selectedBrandsRef = useRef<string[]>([]);
+  selectedBrandsRef.current = selectedBrands;
+  const firstQuery = useRef(true);
+  const skipBrands = useRef(true);
+  const requestId = useRef(0);
   const dismissToast = useCallback(() => {
     setError(null);
     setNotice(null);
   }, []);
 
-  async function load(nextPage: number, term: string, size = pageSize) {
+  async function load(nextPage: number, term: string, size = pageSize, brandNames = selectedBrandsRef.current) {
     const trimmed = term.trim();
-    if (trimmed && !isProductSearchTerm(trimmed)) {
-      setError(t('searchRequired'));
-      return;
-    }
+    const id = ++requestId.current;
     setError(null);
-    setNotice(null);
     try {
-      const found = await searchCatalogProducts.execute(nextPage, size, trimmed || undefined);
+      const found = await searchCatalogProducts.execute(nextPage, size, trimmed || undefined, brandNames);
+      if (id !== requestId.current) {
+        return;
+      }
       setPage(found.page);
       setTotal(found.total);
       setPageSize(found.pageSize);
       setProducts(found.items);
+      setAppliedQuery(trimmed);
     } catch {
+      if (id !== requestId.current) {
+        return;
+      }
       setProducts([]);
       setError(t('catalogFailed'));
     }
   }
+
+  useEffect(() => {
+    void listBrands.execute().then(setBrands).catch(() => undefined);
+  }, [listBrands]);
+
+  const visible = useMemo(() => [...products].sort((left, right) => compareProducts(left, right, sortKey)), [products, sortKey]);
 
   useEffect(() => {
     void load(1, '').then(() => {
@@ -183,6 +218,29 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
     // The first page loads once when the screen opens.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (firstQuery.current) {
+      firstQuery.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void load(1, query);
+    }, 250);
+    return () => window.clearTimeout(timer);
+    // Search runs as the text changes. load closes over the latest page size.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  useEffect(() => {
+    if (skipBrands.current) {
+      skipBrands.current = false;
+      return;
+    }
+    void load(1, query, pageSize, selectedBrands);
+    // Brand selection reloads the first page with the current search.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBrands]);
 
   function openEditor(product: CatalogProduct) {
     setEditing(product);
@@ -229,74 +287,119 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
     <section className="stack">
       <div className="product-admin-heading">
         <ScreenTitle>{t('products')}</ScreenTitle>
-        <Link className="btn" to="/products/new">
+        <button className="btn product-admin-create" type="button" onClick={() => setCreating(true)}>
+          <Plus aria-hidden="true" strokeWidth={2.4} />
           {t('createProduct')}
-        </Link>
+        </button>
       </div>
-      <form
-        onSubmit={event => {
-          event.preventDefault();
-          const term = query.trim();
-          setAppliedQuery(term);
-          void load(1, term);
-        }}
-      >
-        <label htmlFor="product-admin-query">{t('searchProduct')}</label>
-        <div className="search-row">
-          <input
-            className="search-field"
-            id="product-admin-query"
-            value={query}
-            placeholder={t('productSearchPlaceholder')}
-            autoComplete="off"
-            onChange={event => setQuery(event.target.value)}
-          />
-          <button
-            className="btn search-submit"
-            type="submit"
-            aria-label={t('search')}
-            disabled={query.trim().length > 0 && !isProductSearchTerm(query)}
-          >
+      <div className="product-admin-filters">
+        <label className="product-admin-search">
+          {t('searchProduct')}
+          <span>
             <Search aria-hidden="true" strokeWidth={1.8} />
-          </button>
+            <input
+              type="search"
+              value={query}
+              placeholder={t('productSearchPlaceholder')}
+              autoComplete="off"
+              onChange={event => setQuery(event.target.value)}
+            />
+          </span>
+        </label>
+        <BrandFilter
+          brands={brands}
+          query={brandQuery}
+          selected={selectedBrands}
+          open={brandOpen}
+          allLabel={t('allBrands')}
+          label={t('brand')}
+          onQuery={value => {
+            setBrandQuery(value);
+            setBrandOpen(true);
+          }}
+          onOpen={setBrandOpen}
+          onToggle={name => {
+            setSelectedBrands(current => (current.includes(name) ? current.filter(item => item !== name) : [...current, name]));
+          }}
+          onClear={() => setSelectedBrands([])}
+        />
+        <label className="product-admin-sort">
+          {t('sortBy')}
+          <select aria-label={t('sortBy')} value={sortKey} onChange={event => setSortKey(event.target.value as SortKey)}>
+            <option value="name">{t('sortName')}</option>
+            <option value="code">{t('sortCode')}</option>
+            <option value="brand">{t('sortBrand')}</option>
+            <option value="price">{t('sortPrice')}</option>
+            <option value="margin">{t('sortMargin')}</option>
+          </select>
+        </label>
+      </div>
+      <div className="product-list" role="table" aria-label={t('products')}>
+        <div className="pr thd" role="row">
+          <span className="p-code">{t('code')}</span>
+          <span className="p-name">{t('productName')}</span>
+          <span className="p-brand">{t('brand')}</span>
+          <span className="g-may">
+            <span className="hf num">{t('productWholesaleCost')}</span>
+            <span className="hf num">{t('wholesaleSale')}</span>
+            <span className="hc num">{t('channelWholesale')}</span>
+          </span>
+          <span className="g-men">
+            <span className="hf num">{t('retailCost')}</span>
+            <span className="hf num">{t('retailSale')}</span>
+            <span className="hc num">{t('channelRetail')}</span>
+          </span>
+          <span className="g-inv">
+            <span className="hf num">{t('productUnits')}</span>
+            <span className="hf num">{t('productPack')}</span>
+            <span className="hc num">{t('packaging')}</span>
+          </span>
+          <span />
         </div>
-      </form>
-      <table className="product-admin-table">
-        <thead>
-          <tr>
-            <th>{t('code')}</th>
-            <th>{t('productName')}</th>
-            <th className="product-admin-wide">{t('productWholesaleCost')}</th>
-            <th className="product-admin-wide">{t('wholesaleSale')}</th>
-            <th className="product-admin-wide">{t('retailCost')}</th>
-            <th className="product-admin-wide">{t('retailSale')}</th>
-            <th className="product-admin-wide">{t('productUnits')}</th>
-            <th className="product-admin-wide">{t('productPack')}</th>
-            <th className="product-admin-wide">{t('brand')}</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {products.map(product => (
-            <tr key={product.id}>
-              <td>{product.code}</td>
-              <td>{product.name ?? t('noName')}</td>
-              <td className="product-admin-wide">{money(product.wholesaleCost, t('notAvailable'))}</td>
-              <td className="product-admin-wide">{money(product.wholesalePrice, t('notAvailable'))}</td>
-              <td className="product-admin-wide">{money(product.retailCost, t('notAvailable'))}</td>
-              <td className="product-admin-wide">{money(product.retailPrice, t('notAvailable'))}</td>
-              <td className="product-admin-wide">{product.units}</td>
-              <td className="product-admin-wide">{product.pack}</td>
-              <td className="product-admin-wide">{product.brandName ?? '—'}</td>
-              <td>
+        {visible.map(product => {
+          const wholesaleMargin = realMarginPercent(product.wholesalePrice, product.wholesaleCost);
+          const retailMargin = realMarginPercent(product.retailPrice, product.retailCost);
+          return (
+            <div className="pr" role="row" key={product.id}>
+              <span className="p-code">{highlightMatch(product.code, appliedQuery)}</span>
+              <span className="p-name">
+                <b>{product.name ? highlightMatch(product.name, appliedQuery) : t('noName')}</b>
+                <small className="p-sub">
+                  {highlightMatch(product.code, appliedQuery)}
+                  {product.brandName ? ' · ' : ''}
+                  {product.brandName ? highlightMatch(product.brandName, appliedQuery) : ''}
+                </small>
+              </span>
+              <span className="p-brand">{product.brandName ? highlightMatch(product.brandName, appliedQuery) : '—'}</span>
+              <span className="g-may">
+                <b className="gh">{t('channelWholesale')}</b>
+                <PriceLine label={t('costLabel')} value={money(product.wholesaleCost, t('notAvailable'))} />
+                <PriceLine label={t('saleLabel')} value={money(product.wholesalePrice, t('notAvailable'))} margin={wholesaleMargin} />
+              </span>
+              <span className="g-men">
+                <b className="gh">{t('channelRetail')}</b>
+                <PriceLine label={t('costLabel')} value={money(product.retailCost, t('notAvailable'))} />
+                <PriceLine label={t('saleLabel')} value={money(product.retailPrice, t('notAvailable'))} margin={retailMargin} />
+              </span>
+              <span className="g-inv">
+                <span className="num p-un">
+                  <i className="lb">{t('productUnits')}</i>
+                  {product.units}
+                </span>
+                <span className="num p-ca">
+                  <i className="lb">{t('productPack')}</i>
+                  {product.pack || '—'}
+                </span>
+              </span>
+              <span className="p-act">
                 <button className="btn icon-btn icon-edit" type="button" aria-label={t('editProduct')} onClick={() => openEditor(product)}>
                   <Pencil aria-hidden="true" strokeWidth={1.8} />
                 </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </span>
+            </div>
+          );
+        })}
+      </div>
       {editing && draft ? (
         <ProductEditor
           product={editing}
@@ -312,6 +415,19 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
           onSave={() => void save(editing)}
         />
       ) : null}
+      {creating ? (
+        <CreateDialog
+          onClose={() => setCreating(false)}
+          onCreated={name => {
+            setCreating(false);
+            setNotice(t('productCreated').replace('{name}', name));
+            void load(1, appliedQuery);
+          }}
+          createCatalogProduct={createCatalogProduct}
+          listBrands={listBrands}
+          createBrand={createBrand}
+        />
+      ) : null}
       <Pager
         page={page}
         pageSize={pageSize}
@@ -324,6 +440,153 @@ export function ProductAdmin({ searchCatalogProducts, updateCatalogProduct }: Pr
       />
       {!editing && (error || notice) ? <Toast error={error} notice={notice} onDone={dismissToast} /> : null}
     </section>
+  );
+}
+
+function compareProducts(left: CatalogProduct, right: CatalogProduct, sortKey: SortKey): number {
+  if (sortKey === 'code') {
+    return left.code.localeCompare(right.code, 'es');
+  }
+  if (sortKey === 'brand') {
+    return (left.brandName ?? '').localeCompare(right.brandName ?? '', 'es') || (left.name ?? '').localeCompare(right.name ?? '', 'es');
+  }
+  if (sortKey === 'price') {
+    return (right.wholesalePrice ?? 0) - (left.wholesalePrice ?? 0);
+  }
+  if (sortKey === 'margin') {
+    return (realMarginPercent(left.wholesalePrice, left.wholesaleCost) ?? 1e9) - (realMarginPercent(right.wholesalePrice, right.wholesaleCost) ?? 1e9);
+  }
+  return (left.name ?? '').localeCompare(right.name ?? '', 'es');
+}
+
+function PriceLine({ label, value, margin }: { label: string; value: string; margin?: number | null }) {
+  return (
+    <span className="price-line">
+      <span className="price-pct">{margin === undefined ? null : <Margin value={margin} />}</span>
+      <span className="price-lb">{label}</span>
+      <span className="price-val">{value}</span>
+    </span>
+  );
+}
+
+function Margin({ value }: { value: number | null }) {
+  if (value === null) {
+    return null;
+  }
+  const tone = value < 0 ? 'neg' : value < 10 ? 'low' : '';
+  return <em className={`product-admin-margin ${tone}`}>{`${value >= 0 ? '+' : ''}${value.toFixed(2)} %`}</em>;
+}
+
+function BrandFilter({
+  brands,
+  query,
+  selected,
+  open,
+  label,
+  allLabel,
+  onQuery,
+  onOpen,
+  onToggle,
+  onClear
+}: {
+  brands: Brand[];
+  query: string;
+  selected: string[];
+  open: boolean;
+  label: string;
+  allLabel: string;
+  onQuery: (value: string) => void;
+  onOpen: (open: boolean) => void;
+  onToggle: (name: string) => void;
+  onClear: () => void;
+}) {
+  const needle = query.trim().toLocaleUpperCase('es-CO');
+  const options = brands.filter(brand => brand.name.toLocaleUpperCase('es-CO').includes(needle));
+  return (
+    <label className="product-brand-combo product-admin-brand">
+      {label}
+      <input
+        value={query}
+        placeholder={selected.length > 0 ? selected.join(', ') : allLabel}
+        autoComplete="off"
+        aria-label={label}
+        onFocus={() => onOpen(true)}
+        onBlur={() => window.setTimeout(() => onOpen(false), 150)}
+        onChange={event => onQuery(event.target.value.toLocaleUpperCase('es-CO'))}
+      />
+      {open ? (
+        <ul className="product-brand-options">
+          <li>
+            <button type="button" onMouseDown={event => event.preventDefault()} onClick={onClear}>
+              {allLabel}
+            </button>
+          </li>
+          {options.map(brand => (
+            <li key={brand.id}>
+              <button type="button" aria-pressed={selected.includes(brand.name)} onMouseDown={event => event.preventDefault()} onClick={() => onToggle(brand.name)}>
+                {selected.includes(brand.name) ? '✓ ' : ''}
+                {brand.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </label>
+  );
+}
+
+function CreateDialog({
+  onClose,
+  onCreated,
+  createCatalogProduct,
+  listBrands,
+  createBrand
+}: {
+  onClose: () => void;
+  onCreated: (name: string) => void;
+  createCatalogProduct: CreateCatalogProductUseCase;
+  listBrands: ListBrandsUseCase;
+  createBrand: CreateBrandUseCase;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || dialog.open) {
+      return;
+    }
+    dialog.showModal();
+    anchorRef.current?.focus({ preventScroll: true });
+  }, []);
+  return (
+    <dialog ref={dialogRef} className="product-editor" onCancel={onClose}>
+      <span ref={anchorRef} className="product-dialog-anchor" tabIndex={-1} />
+      <ProductCreate
+        createCatalogProduct={createCatalogProduct}
+        listBrands={listBrands}
+        createBrand={createBrand}
+        onCancel={onClose}
+        onCreated={onCreated}
+      />
+    </dialog>
+  );
+}
+
+function highlightMatch(text: string, query: string): ReactNode {
+  const needle = query.trim();
+  if (!needle) {
+    return text;
+  }
+  const index = text.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
+  if (index < 0) {
+    return text;
+  }
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + needle.length)}</mark>
+      {text.slice(index + needle.length)}
+    </>
   );
 }
 
