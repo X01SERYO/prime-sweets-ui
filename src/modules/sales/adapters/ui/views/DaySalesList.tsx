@@ -238,7 +238,7 @@ export function DaySalesList({ deliveryDate, listDeliverySales, voidSale, printI
                 onChange={event => selectAll(event.target.checked)}
               />
             </span>
-            <span>{t('lineName')}</span>
+            <span>{t('deliveryCustomer')}</span>
             <span>{t('status')}</span>
             <span className="dl-inv">{t('invoice')}</span>
             <span className="dl-num">{t('saleTotalShort')}</span>

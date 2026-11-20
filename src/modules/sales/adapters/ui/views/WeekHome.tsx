@@ -6,6 +6,7 @@ import type { ListSalesByDeliveryDateUseCase } from '@/modules/sales/application
 import { businessToday, nextWeek, previousWeek, weekDeliveryDays } from '@/modules/sales/domain/deliveryDays';
 import type { DaySaleModel, DaySaleStatus } from '@/modules/sales/domain/models/daySale';
 import { formatCurrency } from '@/shared/domain/money';
+import { formatQuantity } from '@/shared/domain/quantity';
 import { useLocale } from '@/shared/i18n/useLocale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { StatusMessage } from '@/shared/ui/StatusMessage';
@@ -172,7 +173,7 @@ export function WeekHome({ listSales }: WeekHomeProps) {
               <ClipboardList aria-hidden="true" strokeWidth={2} />
               <span>
                 {t('loadSheet')}
-                <small>{confirmedUnits ? t('unitsToLoad').replace('{count}', String(confirmedUnits)) : t('nothingToLoad')}</small>
+                <small>{confirmedUnits ? t('unitsToLoad').replace('{count}', formatQuantity(confirmedUnits, 1)) : t('nothingToLoad')}</small>
               </span>
             </Link>
           </div>

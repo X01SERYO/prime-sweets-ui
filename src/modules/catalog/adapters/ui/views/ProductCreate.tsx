@@ -4,6 +4,7 @@ import type { CreateBrandUseCase } from '@/modules/catalog/application/use-cases
 import type { CreateCatalogProductUseCase } from '@/modules/catalog/application/use-cases/createCatalogProduct.useCase';
 import type { ListBrandsUseCase } from '@/modules/catalog/application/use-cases/listBrands.useCase';
 import type { Brand } from '@/modules/catalog/domain/models/brand';
+import type { CatalogProduct } from '@/modules/catalog/domain/models/catalogProduct';
 import { realMarginPercent, suggestedSalePrice } from '@/modules/catalog/domain/productPricing';
 import { CatalogInvalidError } from '@/modules/catalog/domain/errors/catalogInvalid.error';
 import { alegraSyncText } from '@/modules/catalog/adapters/ui/alegraSyncText';
@@ -18,7 +19,7 @@ interface ProductCreateProps {
   createCatalogProduct: CreateCatalogProductUseCase;
   listBrands: ListBrandsUseCase;
   createBrand: CreateBrandUseCase;
-  onCreated?: (name: string) => void;
+  onCreated?: (product: CatalogProduct) => void;
   onCancel?: () => void;
 }
 
@@ -105,11 +106,10 @@ export function ProductCreate({ createCatalogProduct, listBrands, createBrand, o
         units: unitCount,
         pack: packCount
       });
-      const createdName = saved.name ?? saved.code;
       if (onCreated) {
-        onCreated(createdName);
+        onCreated(saved);
       } else {
-        navigate('/products', { state: { createdName } });
+        navigate('/products', { state: { createdName: saved.name ?? saved.code } });
       }
     } catch (caught) {
       if (caught instanceof HttpRequestError && caught.code === 'ALEGRA_SYNC_FAILED') {

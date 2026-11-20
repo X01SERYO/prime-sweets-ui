@@ -17,6 +17,7 @@ import {
 } from '@/modules/fulfillment-output/domain/loadSheetPresentation';
 import { addBusinessDays, businessToday } from '@/modules/sales/domain/deliveryDays';
 import { formatCurrency } from '@/shared/domain/money';
+import { formatQuantity } from '@/shared/domain/quantity';
 import { useLocale } from '@/shared/i18n/useLocale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import { ScreenTitle } from '@/shared/ui/BackButton';
@@ -25,6 +26,14 @@ import '@/modules/fulfillment-output/adapters/ui/views/loadSheet.css';
 
 interface LoadSheetListProps {
   listLoadSheet: ListLoadSheetUseCase;
+}
+
+function unitLabel(quantity: number, t: (key: MessageKey) => string): string {
+  const rounded = Math.round(quantity * 10) / 10;
+  if (rounded === 1) {
+    return t('unitCountOne');
+  }
+  return t('unitCount').replace('{count}', formatQuantity(quantity, 1));
 }
 
 function formatMargin(gain: number, sold: number, locale: string): string {
@@ -56,11 +65,11 @@ function countLabel(count: number, one: MessageKey, many: MessageKey, t: (key: M
   return count === 1 ? t(one) : t(many).replace('{count}', String(count));
 }
 
-function Numbers({ totals, locale }: { totals: LoadSheetTotals; locale: string }) {
+function Numbers({ totals, locale, quantityDecimals = 3 }: { totals: LoadSheetTotals; locale: string; quantityDecimals?: number }) {
   const { t } = useLocale();
   return (
     <>
-      <span className="ls-qty ls-num" data-l={t('quantity')}>{totals.quantity}</span>
+      <span className="ls-qty ls-num" data-l={t('quantity')}>{formatQuantity(totals.quantity, quantityDecimals)}</span>
       <span className="ls-cost ls-num" data-l={t('lineCost')}>{formatCurrency(totals.cost)}</span>
       <span className="ls-sold ls-num" data-l={t('sold')}>{formatCurrency(totals.sold)}</span>
       <span className="ls-gain ls-num" data-l={t('profit')}>
@@ -209,7 +218,7 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
             {sheet.loading
               ? t('loadSheetLoading')
               : rows.length
-                ? `${countLabel(rows.length, 'productCountOne', 'productCount', t)} · ${countLabel(dayTotals.quantity, 'unitCountOne', 'unitCount', t)} · ${countLabel(brandCount, 'brandCountOne', 'brandCount', t)}`
+                ? `${countLabel(rows.length, 'productCountOne', 'productCount', t)} · ${unitLabel(dayTotals.quantity, t)} · ${countLabel(brandCount, 'brandCountOne', 'brandCount', t)}`
                 : t('noConfirmedSales')}
           </small>
         </div>
@@ -298,7 +307,7 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
             <span className="ls-name">
               <b>{searching ? t('filteredTotal') : t('sheetTotal')}</b>
             </span>
-            <Numbers totals={filteredTotals} locale={locale} />
+            <Numbers totals={filteredTotals} locale={locale} quantityDecimals={1} />
             <span />
           </div>
         </section>
@@ -319,7 +328,7 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
             <div className="ls-detail" key={product.productId}>
               <span className="ls-dbrand">{product.brand || t('noBrand')}</span>
               <span className="ls-dprod">{product.name}</span>
-              <span className="ls-dqty ls-num" data-l={t('quantity')}>{product.quantity}</span>
+              <span className="ls-dqty ls-num" data-l={t('quantity')}>{formatQuantity(product.quantity, 3)}</span>
               <span className="ls-dcost ls-num" data-l={t('wholesaleCost')}>{product.unitCost === null ? '—' : formatCurrency(product.unitCost)}</span>
               <span className="ls-dprice ls-num" data-l={t('wholesalePrice')}>{product.unitPrice === null ? '—' : formatCurrency(product.unitPrice)}</span>
               <span className="ls-dtot ls-num" data-l={t('saleTotalShort')}>{formatCurrency(product.sold)}</span>
@@ -331,7 +340,7 @@ export function LoadSheetList({ listLoadSheet }: LoadSheetListProps) {
             <span className="ls-dprod">
               <b>{searching ? t('filteredTotal') : t('sheetTotal')}</b>
             </span>
-            <span className="ls-dqty ls-num" data-l={t('quantity')}>{filteredTotals.quantity}</span>
+            <span className="ls-dqty ls-num" data-l={t('quantity')}>{formatQuantity(filteredTotals.quantity, 1)}</span>
             <span className="ls-dcost" />
             <span className="ls-dprice" />
             <span className="ls-dtot ls-num" data-l={t('saleTotalShort')}>{formatCurrency(filteredTotals.sold)}</span>

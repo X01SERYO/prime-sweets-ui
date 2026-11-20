@@ -418,10 +418,15 @@ export function ProductAdmin({
       {creating ? (
         <CreateDialog
           onClose={() => setCreating(false)}
-          onCreated={name => {
+          onCreated={created => {
             setCreating(false);
-            setNotice(t('productCreated').replace('{name}', name));
-            void load(1, appliedQuery);
+            setNotice(t('productCreated').replace('{name}', created.name ?? created.code));
+            void load(1, appliedQuery).then(() => {
+              if (!matchesList(created, appliedQuery, selectedBrandsRef.current)) {
+                return;
+              }
+              setProducts(current => (current.some(item => item.id === created.id) ? current : [created, ...current]));
+            });
           }}
           createCatalogProduct={createCatalogProduct}
           listBrands={listBrands}
@@ -441,6 +446,17 @@ export function ProductAdmin({
       {!editing && (error || notice) ? <Toast error={error} notice={notice} onDone={dismissToast} /> : null}
     </section>
   );
+}
+
+function matchesList(product: CatalogProduct, query: string, brands: string[]): boolean {
+  if (brands.length > 0 && !brands.includes(product.brandName ?? '')) {
+    return false;
+  }
+  const needle = query.trim().toLocaleLowerCase('es');
+  if (!needle) {
+    return true;
+  }
+  return [product.name, product.code, product.brandName].some(value => (value ?? '').toLocaleLowerCase('es').includes(needle));
 }
 
 function compareProducts(left: CatalogProduct, right: CatalogProduct, sortKey: SortKey): number {
@@ -543,7 +559,7 @@ function CreateDialog({
   createBrand
 }: {
   onClose: () => void;
-  onCreated: (name: string) => void;
+  onCreated: (product: CatalogProduct) => void;
   createCatalogProduct: CreateCatalogProductUseCase;
   listBrands: ListBrandsUseCase;
   createBrand: CreateBrandUseCase;
