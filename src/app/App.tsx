@@ -362,7 +362,7 @@ export function App({ container }: AppProps) {
       <div className="shell-head">
       <header className="topbar">
         <Link to={session ? '/' : '/login'} aria-label={t('home')}>
-          <img className="shell-logo" src="/logo.webp" alt="Dulcería La Principal" />
+          <img className="shell-logo" src="/logo.svg" alt="Dulcería La Principal" />
         </Link>
         {session ? (
           <button type="button" className="lang" onClick={() => void signOut()}>
